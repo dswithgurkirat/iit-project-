@@ -815,27 +815,188 @@ html.dark .topbar { background: var(--navy); }
 .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
 
 /* ── Graph Block ── */
-.graph-block { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%); border-radius: var(--r-xl); overflow: hidden; margin-bottom: 16px; }
-.graph-block-hd { padding: 20px 24px; border-bottom: 1px solid rgba(255,255,255,.08); display: flex; align-items: center; justify-content: space-between; }
-.graph-block-bd { padding: 20px 24px; }
+.graph-block {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-xl);
+  overflow: hidden;
+  margin-bottom: 16px;
+  box-shadow: var(--sh-sm);
+}
+.graph-block-hd {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.graph-block-bd {
+  padding: 20px 24px;
+}
 
 /* ── KPI Grid ── */
 .kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
-.kpi-item { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.1); border-radius: var(--r-md); padding: 14px 16px; }
-.kpi-lbl  { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.5); margin-bottom: 4px; }
-.kpi-val  { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 22px; font-weight: 700; color: #fff; }
-.kpi-unit { font-size: 12px; font-weight: 400; opacity: .6; }
+.kpi-item {
+  background: var(--off);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+}
+.kpi-lbl {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--text-soft);
+  margin-bottom: 4px;
+}
+.kpi-val {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+}
+.kpi-unit {
+  font-size: 12px;
+  font-weight: 400;
+  opacity: .6;
+}
 
-.result-bar { background: rgba(13,148,136,.2); border: 1px solid rgba(20,184,166,.3); border-radius: var(--r-md); padding: 14px 16px; }
-.result-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.5); margin-bottom: 4px; }
-.result-val { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 24px; font-weight: 700; color: #fff; }
+.result-bar {
+  background: rgba(13, 148, 136, 0.12);
+  border: 1px solid rgba(20, 184, 166, 0.2);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+}
+.result-lbl {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--teal);
+  margin-bottom: 4px;
+}
+.result-val {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--teal);
+}
+.result-formula {
+  font-size: 10px;
+  color: var(--teal-2);
+  margin-top: 2px;
+}
 
 .graph-canvas-wrap { background: var(--card); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 16px; position: relative; }
-.graph-canvas-label {
-  position: absolute; top: 4px; left: 8px;
-  font-size: 10px; font-weight: 700;
+
+/* --- Graph Canvas Containers & Headers --- */
+.graph-canvas-container {
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  overflow: hidden;
+  padding: 16px;
+  background: var(--card);
+  margin-bottom: 16px;
+}
+.graph-canvas-container:last-child {
+  margin-bottom: 0;
+}
+.graph-canvas-header {
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.graph-canvas-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
   color: var(--text);
-  z-index: 10;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.graph-canvas-badge {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-soft);
+  background: var(--bg);
+  padding: 2px 8px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+/* Custom styled inputs inside graph blocks */
+.graph-block-title {
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  font-size: 12px;
+}
+.graph-name-input {
+  background: var(--bg);
+  border: 1px solid var(--border-2);
+  color: var(--text);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  width: 150px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.graph-name-input:focus {
+  border-color: var(--primary);
+}
+.graph-field-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-mid);
+  letter-spacing: .01em;
+}
+.graph-field-input {
+  background: var(--bg);
+  border: 1px solid var(--border-2);
+  color: var(--text);
+  padding: 10px 14px;
+  border-radius: var(--r-md);
+  font-size: 13px;
+  width: 100%;
+  transition: border-color .2s, box-shadow .2s;
+}
+.graph-field-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px var(--primary-lt);
+  background: var(--card);
+}
+.graph-field-label-override {
+  font-size: 12px;
+  font-weight: 600;
+  color: #d97706;
+  letter-spacing: .01em;
+}
+.graph-field-input-override {
+  background: rgba(217, 119, 6, 0.08);
+  border: 1px solid rgba(217, 119, 6, 0.3);
+  color: #d97706;
+  padding: 10px 14px;
+  border-radius: var(--r-md);
+  font-size: 13px;
+  width: 100%;
+  transition: border-color .2s, box-shadow .2s;
+}
+.graph-field-input-override:focus {
+  border-color: #d97706;
+  box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.2);
+}
+.graph-sub-section {
+  background: rgba(217, 119, 6, 0.04);
+  border: 1px dashed rgba(217, 119, 6, 0.3);
+  padding: 12px;
+  margin-bottom: 16px;
+  border-radius: 6px;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1338,31 +1499,94 @@ html.dark .feature-tab.active {
   color: var(--primary);
 }
 
-/* Graph UI */
+/* Graph UI Dark Mode overrides */
+html.dark .graph-block {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+html.dark .graph-block-hd {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+html.dark .graph-block-title {
+  color: #4fd1c5;
+}
+html.dark .graph-name-input {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #ffffff;
+}
+html.dark .graph-field-label {
+  color: rgba(255, 255, 255, 0.6);
+}
+html.dark .graph-field-input {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+html.dark .graph-field-input:focus {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+html.dark .graph-field-label-override {
+  color: #facc15;
+}
+html.dark .graph-field-input-override {
+  background: rgba(250, 204, 21, 0.1);
+  border-color: rgba(250, 204, 21, 0.3);
+  color: #facc15;
+}
+html.dark .graph-field-input-override:focus {
+  border-color: #facc15;
+  box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.2);
+}
+html.dark .graph-sub-section {
+  background: rgba(238, 195, 74, 0.05);
+  border-color: rgba(238, 195, 74, 0.3);
+}
+
 html.dark .graph-canvas-wrap {
   background: var(--off) !important;
   border-color: var(--border-2) !important;
 }
+html.dark .graph-canvas-container {
+  background: var(--off) !important;
+  border-color: var(--border-2) !important;
+}
+html.dark .graph-canvas-header {
+  border-bottom-color: var(--border-2) !important;
+}
+html.dark .graph-canvas-title {
+  color: #ffffff;
+}
+html.dark .graph-canvas-badge {
+  color: var(--text-soft);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--border-2);
+}
 
-html.dark .graph-canvas-label {
+html.dark .kpi-item {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+html.dark .kpi-lbl {
+  color: rgba(255, 255, 255, 0.55);
+}
+html.dark .kpi-val {
   color: #ffffff;
 }
 
-html.dark .graph-block .field label {
-  color: #e2e8f0;
+html.dark .result-bar {
+  background: rgba(13, 148, 136, 0.2);
+  border-color: rgba(20, 184, 166, 0.3);
 }
-
-html.dark .kpi-lbl,
 html.dark .result-lbl {
-  color: rgba(255, 255, 255, 0.75);
+  color: rgba(255, 255, 255, 0.55);
 }
-
-html.dark .kpi-val,
-html.dark .result-val,
-html.dark .hero-title,
-html.dark .hero-sub,
-html.dark .hero-eyebrow {
-  color: #ffffff;
+html.dark .result-val {
+  color: #34d399;
+}
+html.dark .result-formula {
+  color: #a7f3d0;
 }
 
 html.dark .graph-block .tbl th,

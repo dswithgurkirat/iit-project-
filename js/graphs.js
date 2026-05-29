@@ -112,18 +112,36 @@ function buildGraphHTML(g) {
   
   // Layout logic for single vs comparison graphs
   const canvasHTML = g.hasSubGraph 
-    ? `<div style="display:flex; flex-direction:column; gap:10px;">
-         <div style="position:relative"><span class="graph-canvas-label">${g.name || 'Post Monsoon'}</span><canvas id="canvas-${g.id}-post" height="120"></canvas></div>
-         <div style="position:relative"><span class="graph-canvas-label">${g.subName || 'Pre Monsoon'}</span><canvas id="canvas-${g.id}-pre" height="120"></canvas></div>
+    ? `<div style="display:flex; flex-direction:column; gap:16px;">
+         <div class="graph-canvas-container">
+           <div class="graph-canvas-header">
+             <span class="graph-canvas-title">${g.name || 'Post Monsoon'}</span>
+             <span class="graph-canvas-badge">POST-MONSOON</span>
+           </div>
+           <div class="canvas-holder"><canvas id="canvas-${g.id}-post" height="120"></canvas></div>
+         </div>
+         <div class="graph-canvas-container">
+           <div class="graph-canvas-header">
+             <span class="graph-canvas-title">${g.subName || 'Pre Monsoon'}</span>
+             <span class="graph-canvas-badge">PRE-MONSOON</span>
+           </div>
+           <div class="canvas-holder"><canvas id="canvas-${g.id}-pre" height="120"></canvas></div>
+         </div>
        </div>`
-    : `<canvas id="canvas-${g.id}-post" height="200"></canvas>`;
+    : `<div class="graph-canvas-container">
+         <div class="graph-canvas-header">
+           <span class="graph-canvas-title">${g.name || 'Post Monsoon'}</span>
+           <span class="graph-canvas-badge">SINGLE GRAPH</span>
+         </div>
+         <div class="canvas-holder"><canvas id="canvas-${g.id}-post" height="200"></canvas></div>
+       </div>`;
 
   return `
   <div class="graph-block" id="gs-${g.id}">
     <div class="graph-block-hd">
       <div style="flex:1; display:flex; gap:15px; align-items:center;">
-        <span style="font-weight:700; color:#4fd1c5; text-transform:uppercase; font-size:12px;">Main Graph (Post-Monsoon)</span>
-        <input value="${g.name}" placeholder="Main Graph Name" oninput="updateG('${g.id}','name',this.value)" style="background:rgba(255,255,255,0.1);border:none;color:#fff;padding:4px 8px;border-radius:4px;font-size:13px;width:150px;font-family:inherit;outline:none;">
+        <span class="graph-block-title">Main Graph (Post-Monsoon)</span>
+        <input value="${g.name}" placeholder="Main Graph Name" oninput="updateG('${g.id}','name',this.value)" class="graph-name-input">
       </div>
       <button class="btn btn-xs btn-danger" style="margin-right: 8px;" onclick="generatePDF('${g.id}')">Download PDF Report</button>
       <button class="btn btn-xs btn-danger" onclick="deleteGraph('${g.id}')">Delete Section</button>
@@ -131,34 +149,34 @@ function buildGraphHTML(g) {
     <div class="graph-block-bd">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
         <div class="field-group">
-          <div class="field"><label style="color:rgba(255,255,255,.6)">Distance Array (m)</label><input value="${g.dist}" oninput="updateG('${g.id}','dist',this.value)" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:#fff"></div>
-          <div class="field"><label style="color:rgba(255,255,255,.6)">Elevation Array (m)</label><input value="${g.post}" oninput="updateG('${g.id}','post',this.value)" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:#fff"></div>
+          <div class="field"><label class="graph-field-label">Distance Array (m)</label><input value="${g.dist}" oninput="updateG('${g.id}','dist',this.value)" class="graph-field-input"></div>
+          <div class="field"><label class="graph-field-label">Elevation Array (m)</label><input value="${g.post}" oninput="updateG('${g.id}','post',this.value)" class="graph-field-input"></div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;align-content:start">
-          <div class="field"><label style="color:rgba(255,255,255,.6)">Red Line (m)</label><input type="number" step="0.01" value="${g.red}" oninput="updateG('${g.id}','red',this.value)" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:#fff"></div>
-          <div class="field"><label style="color:rgba(255,255,255,.6)">Thalweg (m)</label><input type="number" step="0.01" value="${g.thal}" oninput="updateG('${g.id}','thal',this.value)" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:#fff"></div>
-          <div class="field"><label style="color:rgba(255,255,255,.6)">Total Area (Ha)</label><input type="number" step="0.01" value="${g.area}" oninput="updateG('${g.id}','area',this.value)" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:#fff"></div>
-          <div class="field"><label style="color:rgba(255,255,255,.6)">No-Mine (Ha)</label><input type="number" step="0.01" value="${g.noMine}" oninput="updateG('${g.id}','noMine',this.value)" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:#fff"></div>
-          <div class="field"><label style="color:rgba(255,255,255,.6)">Density (g/cc)</label><input type="number" step="0.01" value="${g.bulk}" oninput="updateG('${g.id}','bulk',this.value)" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:#fff"></div>
-          <div class="field"><label style="color:rgba(255,255,255,.6)">Mining %</label><input type="number" value="${g.pct}" oninput="updateG('${g.id}','pct',this.value)" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:#fff"></div>
-          <div class="field" style="grid-column: span 3;"><label style="color:#facc15">Calculation Thickness Override (m)</label><input type="number" step="0.01" value="${g.calcThick || ''}" placeholder="Defaults to Post Avg if empty" oninput="updateG('${g.id}','calcThick',this.value)" style="background:rgba(250,204,21,.1);border-color:rgba(250,204,21,.3);color:#facc15"></div>
+          <div class="field"><label class="graph-field-label">Red Line (m)</label><input type="number" step="0.01" value="${g.red}" oninput="updateG('${g.id}','red',this.value)" class="graph-field-input"></div>
+          <div class="field"><label class="graph-field-label">Thalweg (m)</label><input type="number" step="0.01" value="${g.thal}" oninput="updateG('${g.id}','thal',this.value)" class="graph-field-input"></div>
+          <div class="field"><label class="graph-field-label">Total Area (Ha)</label><input type="number" step="0.01" value="${g.area}" oninput="updateG('${g.id}','area',this.value)" class="graph-field-input"></div>
+          <div class="field"><label class="graph-field-label">No-Mine (Ha)</label><input type="number" step="0.01" value="${g.noMine}" oninput="updateG('${g.id}','noMine',this.value)" class="graph-field-input"></div>
+          <div class="field"><label class="graph-field-label">Density (g/cc)</label><input type="number" step="0.01" value="${g.bulk}" oninput="updateG('${g.id}','bulk',this.value)" class="graph-field-input"></div>
+          <div class="field"><label class="graph-field-label">Mining %</label><input type="number" value="${g.pct}" oninput="updateG('${g.id}','pct',this.value)" class="graph-field-input"></div>
+          <div class="field" style="grid-column: span 3;"><label class="graph-field-label-override">Calculation Thickness Override (m)</label><input type="number" step="0.01" value="${g.calcThick || ''}" placeholder="Defaults to Post Avg if empty" oninput="updateG('${g.id}','calcThick',this.value)" class="graph-field-input-override"></div>
         </div>
       </div>
       
       ${g.hasSubGraph ? `
-        <div style="background: rgba(238, 195, 74, 0.05); border: 1px dashed rgba(238, 195, 74, 0.3); padding: 12px; margin-bottom: 16px; border-radius: 6px;">
+        <div class="graph-sub-section">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
             <strong style="color:#eec34a; font-size:13px;">Sub-Graph for Comparison (Pre-Monsoon)</strong>
             <button class="btn btn-xs btn-danger" onclick="updateG('${g.id}', 'hasSubGraph', false)">Remove Comparison</button>
           </div>
           <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-bottom: 10px;">
-            <div class="field"><label>Pre Name</label><input value="${g.subName || ''}" oninput="updateG('${g.id}','subName',this.value)" style="background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.15);"></div>
-            <div class="field"><label>Pre Distance (m)</label><input value="${g.subDist || ''}" oninput="updateG('${g.id}','subDist',this.value)" style="background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.15);"></div>
-            <div class="field"><label>Pre Elevation (m)</label><input value="${g.subElev || ''}" oninput="updateG('${g.id}','subElev',this.value)" style="background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.15);"></div>
+            <div class="field"><label class="graph-field-label">Pre Name</label><input value="${g.subName || ''}" oninput="updateG('${g.id}','subName',this.value)" class="graph-field-input"></div>
+            <div class="field"><label class="graph-field-label">Pre Distance (m)</label><input value="${g.subDist || ''}" oninput="updateG('${g.id}','subDist',this.value)" class="graph-field-input"></div>
+            <div class="field"><label class="graph-field-label">Pre Elevation (m)</label><input value="${g.subElev || ''}" oninput="updateG('${g.id}','subElev',this.value)" class="graph-field-input"></div>
           </div>
           <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
-            <div class="field"><label>Pre Red Line (m)</label><input type="number" step="0.01" value="${g.subRed !== undefined ? g.subRed : g.red}" oninput="updateG('${g.id}','subRed',this.value)" style="background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.15);"></div>
-            <div class="field"><label>Pre Thalweg (m)</label><input type="number" step="0.01" value="${g.subThal !== undefined ? g.subThal : g.thal}" oninput="updateG('${g.id}','subThal',this.value)" style="background:rgba(255,255,255,.08);color:#fff;border-color:rgba(255,255,255,.15);"></div>
+            <div class="field"><label class="graph-field-label">Pre Red Line (m)</label><input type="number" step="0.01" value="${g.subRed !== undefined ? g.subRed : g.red}" oninput="updateG('${g.id}','subRed',this.value)" class="graph-field-input"></div>
+            <div class="field"><label class="graph-field-label">Pre Thalweg (m)</label><input type="number" step="0.01" value="${g.subThal !== undefined ? g.subThal : g.thal}" oninput="updateG('${g.id}','subThal',this.value)" class="graph-field-input"></div>
           </div>
         </div>
       ` : `
@@ -168,23 +186,23 @@ function buildGraphHTML(g) {
       `}
       
       <div style="display:grid;grid-template-columns:1.5fr 0.5fr;gap:16px">
-        <div class="graph-canvas-wrap" style="background:var(--card); border: 1px solid var(--border); border-radius:8px; padding:10px;">${canvasHTML}</div>
+        <div class="graph-canvas-wrap">${canvasHTML}</div>
         <div>
           <div class="kpi-grid">
-            <div class="kpi-item"><div class="kpi-lbl">Post Avg Thick</div><div class="kpi-val">${o.avgThickPost.toFixed(2)}<span class="kpi-unit"> m</span></div></div>
-            ${g.hasSubGraph ? `<div class="kpi-item"><div class="kpi-lbl">Pre Avg Thick</div><div class="kpi-val">${o.avgThickPre.toFixed(2)}<span class="kpi-unit"> m</span></div></div>` : ''}
-            <div class="kpi-item"><div class="kpi-lbl">Potential Area</div><div class="kpi-val">${o.pArea.toFixed(2)}<span class="kpi-unit"> Ha</span></div></div>
-            <div class="kpi-item"><div class="kpi-lbl">Total Excav.</div><div class="kpi-val">${fmtN(o.allowed,0)}<span class="kpi-unit"> MT</span></div></div>
+            <div class="kpi-item"><div class="kpi-lbl">Post Avg Thick</div><div class="kpi-val" id="kpi-val-avgThickPost-${g.id}">${o.avgThickPost.toFixed(2)}<span class="kpi-unit"> m</span></div></div>
+            ${g.hasSubGraph ? `<div class="kpi-item"><div class="kpi-lbl">Pre Avg Thick</div><div class="kpi-val" id="kpi-val-avgThickPre-${g.id}">${o.avgThickPre.toFixed(2)}<span class="kpi-unit"> m</span></div></div>` : ''}
+            <div class="kpi-item"><div class="kpi-lbl">Potential Area</div><div class="kpi-val" id="kpi-val-pArea-${g.id}">${o.pArea.toFixed(2)}<span class="kpi-unit"> Ha</span></div></div>
+            <div class="kpi-item"><div class="kpi-lbl">Total Excav.</div><div class="kpi-val" id="kpi-val-allowed-${g.id}">${fmtN(o.allowed,0)}<span class="kpi-unit"> MT</span></div></div>
           </div>
-          <div class="result-bar" style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 12px; border-radius: 8px;">
-            <div class="result-lbl" style="font-size: 11px; color: #10b981; font-weight: 600; text-transform: uppercase;">Allowed Excavation (${g.pct}%)</div>
-            <div class="result-val" style="font-size: 20px; font-weight: 700; color: #34d399;">${fmtN(o.allowed,2)} MT</div>
-            <div style="font-size:10px;color:var(--teal-2);margin-top:2px">= ${fmtN(o.pArea,2)} Ha × 10000 × ${o.activeCalcThick.toFixed(2)}m × ${g.bulk} × ${g.pct}%</div>
+          <div class="result-bar">
+            <div class="result-lbl" id="result-lbl-pct-${g.id}">Allowed Excavation (${g.pct}%)</div>
+            <div class="result-val" id="result-val-allowed-${g.id}">${fmtN(o.allowed,2)} MT</div>
+            <div class="result-formula" id="result-formula-${g.id}">= ${fmtN(o.pArea,2)} Ha × 10000 × ${o.activeCalcThick.toFixed(2)}m × ${g.bulk} × ${g.pct}%</div>
           </div>
           <div class="tbl-wrap" style="margin-top:10px;max-height:150px;overflow-y:auto">
             <table class="tbl" style="font-size:11px">
               <thead><tr><th>Dist</th><th>Post</th><th>Thick</th></tr></thead>
-              <tbody>${o.dist.map((d,i)=>`<tr><td>${d}</td><td>${o.post[i]??'—'}</td><td>${(o.thickPost[i]??0).toFixed(2)}</td></tr>`).join('')}</tbody>
+              <tbody id="tbl-tbody-${g.id}">${o.dist.map((d,i)=>`<tr><td>${d}</td><td>${o.post[i]??'—'}</td><td>${(o.thickPost[i]??0).toFixed(2)}</td></tr>`).join('')}</tbody>
             </table>
           </div>
         </div>
@@ -194,6 +212,12 @@ function buildGraphHTML(g) {
 }
 
 function drawGraph(g) {
+  // Destroy previous chart instances to avoid reuse errors on the existing canvas elements
+  try { S.graphCharts[g.id + '_pre']?.destroy(); } catch(e) {}
+  try { S.graphCharts[g.id + '_post']?.destroy(); } catch(e) {}
+  delete S.graphCharts[g.id + '_pre'];
+  delete S.graphCharts[g.id + '_post'];
+
   const o = calcGraph(g);
   
   // Calculate independent Y-axis bounds
@@ -241,6 +265,19 @@ function drawGraph(g) {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        layout: {
+          padding: isDarkMode() ? {
+            top: 15,
+            left: 5,
+            right: 5,
+            bottom: 5
+          } : {
+            top: 10,
+            left: 10,
+            right: 10,
+            bottom: 5
+          }
+        },
         plugins: {
           legend: {
             display: isDarkMode(),
@@ -304,8 +341,8 @@ function updateG(id, key, val) {
     if (g.subThal === undefined) g.subThal = g.thal;
   }
   
-  clearTimeout(g._t);
-  g._t = setTimeout(() => { 
+  if (key === 'hasSubGraph') {
+    // Layout change requires full block re-rendering (outerHTML replacement)
     try { S.graphCharts[id + '_pre']?.destroy(); } catch(e) {} 
     try { S.graphCharts[id + '_post']?.destroy(); } catch(e) {} 
     const block = document.getElementById('gs-'+id);
@@ -313,7 +350,45 @@ function updateG(id, key, val) {
       block.outerHTML = buildGraphHTML(g); 
       drawGraph(g); 
     }
-  }, 400);
+  } else {
+    // Normal keystroke inputs are updated in-place to preserve input focus & cursor placement
+    clearTimeout(g._t);
+    g._t = setTimeout(() => { 
+      const o = calcGraph(g);
+      
+      // Update KPIs
+      const elPostAvg = document.getElementById(`kpi-val-avgThickPost-${id}`);
+      if (elPostAvg) elPostAvg.innerHTML = `${o.avgThickPost.toFixed(2)}<span class="kpi-unit"> m</span>`;
+      
+      const elPreAvg = document.getElementById(`kpi-val-avgThickPre-${id}`);
+      if (elPreAvg) elPreAvg.innerHTML = `${o.avgThickPre.toFixed(2)}<span class="kpi-unit"> m</span>`;
+      
+      const elPArea = document.getElementById(`kpi-val-pArea-${id}`);
+      if (elPArea) elPArea.innerHTML = `${o.pArea.toFixed(2)}<span class="kpi-unit"> Ha</span>`;
+      
+      const elAllowed = document.getElementById(`kpi-val-allowed-${id}`);
+      if (elAllowed) elAllowed.innerHTML = `${fmtN(o.allowed,0)}<span class="kpi-unit"> MT</span>`;
+      
+      // Update result bar values and formulas
+      const elResultLbl = document.getElementById(`result-lbl-pct-${id}`);
+      if (elResultLbl) elResultLbl.textContent = `Allowed Excavation (${g.pct}%)`;
+      
+      const elResultVal = document.getElementById(`result-val-allowed-${id}`);
+      if (elResultVal) elResultVal.textContent = `${fmtN(o.allowed,2)} MT`;
+      
+      const elResultFormula = document.getElementById(`result-formula-${id}`);
+      if (elResultFormula) elResultFormula.innerHTML = `= ${fmtN(o.pArea,2)} Ha × 10000 × ${o.activeCalcThick.toFixed(2)}m × ${g.bulk} × ${g.pct}%`;
+      
+      // Update table body
+      const elTbody = document.getElementById(`tbl-tbody-${id}`);
+      if (elTbody) {
+        elTbody.innerHTML = o.dist.map((d,i)=>`<tr><td>${d}</td><td>${o.post[i]??'—'}</td><td>${(o.thickPost[i]??0).toFixed(2)}</td></tr>`).join('');
+      }
+      
+      // Redraw charts on the existing canvases
+      drawGraph(g); 
+    }, 400);
+  }
 }
 
 function deleteGraph(id) {
