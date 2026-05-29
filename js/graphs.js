@@ -1,9 +1,22 @@
-/* ══════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════
    GRAPHS — CROSS SECTION
-   ══════════════════════════════════════ */
+   ═══════════════════════════════════════════════════════════ */
 
 function isDarkMode() {
   return document.documentElement.classList.contains('dark');
+}
+
+function getYBounds(values) {
+  if (!values.length) return { min: 220, max: 230 };
+  const minVal = Math.min(...values);
+  const maxVal = Math.max(...values);
+  const diff = maxVal - minVal;
+  const pad = Math.max(diff * 0.1, 0.2); // Tighter padding (10% or minimum 0.2m)
+  
+  // Tighter boundaries round to 1 decimal place to capture small fluctuations
+  const min = Math.floor((minVal - pad) * 10) / 10;
+  const max = Math.ceil((maxVal + pad) * 10) / 10;
+  return { min, max };
 }
 
 function chartAxisColor() {
@@ -50,7 +63,8 @@ function addGraph() {
     subDist: '0,25,50',
     subElev: '227.59,227.39,227.26',
     subRed: '224.30',
-    subThal: '223.40'
+    subThal: '223.40',
+    pdfLayout: 1
   });
   renderGraphs();
   
@@ -104,11 +118,16 @@ function calcGraph(g) {
   const tonnes = volume * bulk;
   const allowed = tonnes * (pct / 100);
 
-  return { dist, post, subDist, subElev, thickPre, avgThickPre, thickPost, avgThickPost, activeCalcThick, pArea, volume, tonnes, allowed, red, thal, subRed, subThal };
+  return { 
+    dist, post, subDist, subElev, thickPre, avgThickPre, thickPost, avgThickPost, 
+    activeCalcThick, avgThick: activeCalcThick, pArea, volume, tonnes, allowed, 
+    red, thal, subRed, subThal, bulk, area, noMine, pct 
+  };
 }
 
 function buildGraphHTML(g) {
   const o = calcGraph(g);
+  const layout = g.pdfLayout || 1;
   
   // Layout logic for single vs comparison graphs
   const canvasHTML = g.hasSubGraph 
@@ -118,14 +137,14 @@ function buildGraphHTML(g) {
              <span class="graph-canvas-title">${g.name || 'Post Monsoon'}</span>
              <span class="graph-canvas-badge">POST-MONSOON</span>
            </div>
-           <div class="canvas-holder"><canvas id="canvas-${g.id}-post" height="120"></canvas></div>
+           <div class="canvas-holder"><canvas id="canvas-${g.id}-post" height="180"></canvas></div>
          </div>
          <div class="graph-canvas-container">
            <div class="graph-canvas-header">
              <span class="graph-canvas-title">${g.subName || 'Pre Monsoon'}</span>
              <span class="graph-canvas-badge">PRE-MONSOON</span>
            </div>
-           <div class="canvas-holder"><canvas id="canvas-${g.id}-pre" height="120"></canvas></div>
+           <div class="canvas-holder"><canvas id="canvas-${g.id}-pre" height="180"></canvas></div>
          </div>
        </div>`
     : `<div class="graph-canvas-container">
@@ -133,7 +152,7 @@ function buildGraphHTML(g) {
            <span class="graph-canvas-title">${g.name || 'Post Monsoon'}</span>
            <span class="graph-canvas-badge">SINGLE GRAPH</span>
          </div>
-         <div class="canvas-holder"><canvas id="canvas-${g.id}-post" height="200"></canvas></div>
+         <div class="canvas-holder"><canvas id="canvas-${g.id}-post" height="300"></canvas></div>
        </div>`;
 
   return `
@@ -142,6 +161,12 @@ function buildGraphHTML(g) {
       <div style="flex:1; display:flex; gap:15px; align-items:center;">
         <span class="graph-block-title">Main Graph (Post-Monsoon)</span>
         <input value="${g.name}" placeholder="Main Graph Name" oninput="updateG('${g.id}','name',this.value)" class="graph-name-input">
+      </div>
+      <!-- PDF Layout Toggle -->
+      <div class="layout-pill" style="margin-right: 8px;">
+        <span class="layout-pill-label">PDF</span>
+        <button class="layout-btn ${layout===1?'active':''}" onclick="updateG('${g.id}','pdfLayout',1)">L1</button>
+        <button class="layout-btn ${layout===2?'active':''}" onclick="updateG('${g.id}','pdfLayout',2)">L2</button>
       </div>
       <button class="btn btn-xs btn-danger" style="margin-right: 8px;" onclick="generatePDF('${g.id}')">Download PDF Report</button>
       <button class="btn btn-xs btn-danger" onclick="deleteGraph('${g.id}')">Delete Section</button>
@@ -222,18 +247,10 @@ function drawGraph(g) {
   
   // Calculate independent Y-axis bounds
   const postY = [...o.post, o.red, o.thal].filter(v => !isNaN(v));
-  const postMin = Math.min(...postY);
-  const postMax = Math.max(...postY);
-  const postPad = (postMax - postMin) * 0.2 || 1;
-  const postYMin = Math.floor(postMin - postPad);
-  const postYMax = Math.ceil(postMax + postPad);
+  const { min: postYMin, max: postYMax } = getYBounds(postY);
 
   const preY = [...(g.hasSubGraph ? o.subElev : []), o.subRed, o.subThal].filter(v => !isNaN(v));
-  const preMin = Math.min(...preY);
-  const preMax = Math.max(...preY);
-  const prePad = (preMax - preMin) * 0.2 || 1;
-  const preYMin = Math.floor(preMin - prePad);
-  const preYMax = Math.ceil(preMax + prePad);
+  const { min: preYMin, max: preYMax } = getYBounds(preY);
 
   const uiPointLabelsPlugin = {
     id: 'uiPointLabels',
@@ -268,14 +285,14 @@ function drawGraph(g) {
         layout: {
           padding: isDarkMode() ? {
             top: 15,
-            left: 5,
-            right: 5,
-            bottom: 5
-          } : {
-            top: 10,
             left: 10,
-            right: 10,
-            bottom: 5
+            right: 15,
+            bottom: 10
+          } : {
+            top: 15,
+            left: 15,
+            right: 15,
+            bottom: 10
           }
         },
         plugins: {
@@ -283,20 +300,31 @@ function drawGraph(g) {
             display: isDarkMode(),
             labels: {
               color: chartAxisColor(),
-              font: { family: 'Inter', size: 11 }
+              font: { family: 'Inter', size: 12, weight: 'bold' },
+              boxWidth: 12,
+              boxHeight: 12,
+              padding: 12
             }
           },
           tooltip: chartTooltipOptions()
         },
         scales: {
           x: {
-            ticks: { color: chartAxisColor(), font: { family: 'Times New Roman' } },
+            ticks: { 
+              color: chartAxisColor(), 
+              font: { family: 'Times New Roman', size: 12 },
+              padding: 8
+            },
             grid: { color: chartGridColor() }
           },
           y: {
             min: yMin,
             max: yMax,
-            ticks: { color: chartAxisColor(), font: { family: 'Times New Roman' } },
+            ticks: { 
+              color: chartAxisColor(), 
+              font: { family: 'Times New Roman', size: 12 },
+              padding: 10
+            },
             grid: { color: chartGridColor() }
           }
         }
@@ -334,11 +362,27 @@ function updateG(id, key, val) {
   if (key === 'hasSubGraph') {
     val = (val === 'true' || val === true);
   }
+  
+  if (key === 'pdfLayout') {
+    val = Number(val);
+    g[key] = val;
+    const block = document.getElementById('gs-'+id);
+    if (block) {
+      try { S.graphCharts[id + '_pre']?.destroy(); } catch(e) {} 
+      try { S.graphCharts[id + '_post']?.destroy(); } catch(e) {} 
+      block.outerHTML = buildGraphHTML(g); 
+      drawGraph(g); 
+    }
+    return;
+  }
+
   g[key] = val;
   
   if (key === 'hasSubGraph' && val === true) {
     if (g.subRed === undefined) g.subRed = g.red;
     if (g.subThal === undefined) g.subThal = g.thal;
+    if (!g.subDist) g.subDist = g.dist;
+    if (!g.subElev) g.subElev = g.post;
   }
   
   if (key === 'hasSubGraph') {
@@ -411,24 +455,18 @@ function buildPdfChartHelper(g, o, type, canvasEl) {
   const isPre = type === 'pre';
   const dists = isPre ? o.subDist : o.dist;
   const elevs = isPre ? o.subElev : o.post;
-  
+  const isLayout2 = (g.pdfLayout || 1) === 2;
+  const dpiScale = 3; // Render at 3x resolution for high sharpness
+
   // Calculate independent Y-axis bounds
   const postY = [...o.post, o.red, o.thal].filter(v => !isNaN(v));
-  const postMin = Math.min(...postY);
-  const postMax = Math.max(...postY);
-  const postPad = (postMax - postMin) * 0.2 || 1;
-  const postYMin = Math.floor(postMin - postPad);
-  const postYMax = Math.ceil(postMax + postPad);
+  const { min: postYMin, max: postYMax } = getYBounds(postY);
 
   const preY = [...(g.hasSubGraph ? o.subElev : []), o.subRed, o.subThal].filter(v => !isNaN(v));
-  const preMin = Math.min(...preY);
-  const preMax = Math.max(...preY);
-  const prePad = (preMax - preMin) * 0.2 || 1;
-  const preYMin = Math.floor(preMin - prePad);
-  const preYMax = Math.ceil(preMax + prePad);
+  const { min: preYMin, max: preYMax } = getYBounds(preY);
 
   const yMin = isPre ? preYMin : postYMin;
-  const yMax = isPre ? preYMax : postYMax;
+  const yMax = isPre ? postYMax : postYMax;
   
   const redArr = isPre ? dists.map(() => o.subRed) : dists.map(() => o.red);
   const thalArr = isPre ? dists.map(() => o.subThal) : dists.map(() => o.thal);
@@ -436,172 +474,302 @@ function buildPdfChartHelper(g, o, type, canvasEl) {
   const pdfPointLabelsPlugin = {
     id: 'pdfPointLabels',
     afterDatasetsDraw(chart) {
+      if (isLayout2) return; // Layout 2 keeps it clean
       const ctx = chart.ctx;
-      chart.data.datasets.forEach((dataset, i) => {
+      chart.data.datasets.forEach((dataset) => {
         if (dataset.label && dataset.label.includes('Elevation')) {
-          const meta = chart.getDatasetMeta(i);
+          const meta = chart.getDatasetMeta(chart.data.datasets.indexOf(dataset));
           meta.data.forEach((element, index) => {
             ctx.fillStyle = '#000';
-            ctx.font = '11px "Times New Roman"';
+            ctx.font = (10 * dpiScale) + 'px "Times New Roman"';
             ctx.textAlign = 'left';
             ctx.textBaseline = 'middle';
             const val = dataset.data[index];
-            if(val !== undefined) ctx.fillText(Number(val).toFixed(2), element.x + 8, element.y - 6);
+            if (val !== undefined) ctx.fillText(Number(val).toFixed(2), element.x + (6 * dpiScale), element.y - (7 * dpiScale));
           });
         }
       });
     }
   };
 
-  const chartDatasets = isPre 
-    ? [{ label: 'Pre monsoon Elevation', data: elevs, borderColor: '#eec34a', backgroundColor: '#eec34a', pointBackgroundColor: '#8ba3b5', tension: 0.1, pointRadius: 4, borderWidth: 1.5, fill: false }]
-    : [{ label: 'Post monsoon Elevation', data: elevs, borderColor: '#da8b4e', backgroundColor: '#da8b4e', pointBackgroundColor: '#8ba3b5', tension: 0.1, pointRadius: 4, borderWidth: 1.5, fill: false }];
-  
-  chartDatasets.push(
-    { label: 'Red Line', data: redArr, borderColor: '#de3b3b', backgroundColor: '#de3b3b', pointBackgroundColor: '#e37878', borderWidth: 1.5, pointRadius: 4, fill: false },
-    { label: 'Thalweg', data: thalArr, borderColor: '#3b8bba', backgroundColor: '#3b8bba', pointBackgroundColor: '#7db1e3', borderWidth: 1.5, pointRadius: 4, fill: false }
-  );
+  /* Layout 1 colour scheme (original technical style) */
+  const L1_elev_color  = isPre ? '#eec34a' : '#da8b4e';
+  const L1_red_color   = '#de3b3b';
+  const L1_thal_color  = '#3b8bba';
+
+  /* Layout 2 colour scheme (Excel / clean report style) */
+  const L2_elev_color  = '#1f77b4';    // blue — matches clean report scheme
+  const L2_red_color   = '#ff7f0e';    // orange
+  const L2_thal_color  = '#7f7f7f';    // grey
+
+  const elevColor  = isLayout2 ? L2_elev_color  : L1_elev_color;
+  const redColor   = isLayout2 ? L2_red_color   : L1_red_color;
+  const thalColor  = isLayout2 ? L2_thal_color  : L1_thal_color;
+
+  const elevLabel  = isPre ? (isLayout2 ? 'Pre Monsoon'  : 'Pre monsoon Elevation')  : (isLayout2 ? 'Post Monsoon' : 'Post monsoon Elevation');
+  const redLabel   = isPre ? (isLayout2 ? 'Red Line (Pre-monsoon)'  : 'Red Line')  : (isLayout2 ? 'Red Line (Post-monsoon)'  : 'Red Line');
+  const thalLabel  = isPre ? (isLayout2 ? 'Thalweg Line (Pre-monsoon)'  : 'Thalweg') : (isLayout2 ? 'Thalweg Line (Post-monsoon)' : 'Thalweg');
+
+  const datasets = [
+    { label: elevLabel, data: elevs, borderColor: elevColor, backgroundColor: elevColor, pointBackgroundColor: elevColor, tension: 0.1, pointRadius: isLayout2 ? 3 * dpiScale : 4 * dpiScale, borderWidth: 1.5 * dpiScale, fill: false },
+    { label: redLabel,  data: redArr,  borderColor: redColor,  backgroundColor: redColor,  pointBackgroundColor: redColor,  borderWidth: 1.5 * dpiScale, pointRadius: isLayout2 ? 2 * dpiScale : 4 * dpiScale, fill: false },
+    { label: thalLabel, data: thalArr, borderColor: thalColor, backgroundColor: thalColor, pointBackgroundColor: thalColor, borderWidth: 1.5 * dpiScale, pointRadius: isLayout2 ? 2 * dpiScale : 4 * dpiScale, fill: false }
+  ];
 
   return new Chart(canvasEl, {
     type: 'line',
-    data: { labels: dists, datasets: chartDatasets },
+    data: { labels: dists, datasets },
     plugins: [pdfPointLabelsPlugin],
     options: {
       animation: false,
       responsive: false,
-      plugins: { legend: { display: false } },
+      layout: { padding: { top: 15 * dpiScale, right: (isLayout2 ? 8 : 30) * dpiScale, bottom: 5 * dpiScale, left: 5 * dpiScale } },
+      plugins: {
+        legend: {
+          display: isLayout2,
+          position: 'right',
+          labels: { color: '#000', font: { family: 'Arial', size: 10 * dpiScale }, boxWidth: 24 * dpiScale, padding: 10 * dpiScale }
+        }
+      },
       scales: {
-        x: { ticks: { color: '#000', font: { family: 'Times New Roman', size: 10 } }, grid: { color: '#e5e5e5' } },
-        y: { min: yMin, max: yMax, ticks: { color: '#000', font: { family: 'Times New Roman', size: 10 } }, grid: { color: '#e5e5e5' } }
+        x: {
+          title: { display: isLayout2, text: 'Distance (m)', color: '#000', font: { family: 'Arial', size: 10 * dpiScale } },
+          ticks: { color: '#000', font: { family: isLayout2 ? 'Arial' : 'Times New Roman', size: 10 * dpiScale }, padding: 4 * dpiScale },
+          grid: { color: '#e5e5e5', lineWidth: 1 * dpiScale }
+        },
+        y: {
+          min: yMin, max: yMax,
+          title: { display: isLayout2, text: 'Elevation (m)', color: '#000', font: { family: 'Arial', size: 10 * dpiScale } },
+          ticks: { color: '#000', font: { family: isLayout2 ? 'Arial' : 'Times New Roman', size: 10 * dpiScale }, padding: 4 * dpiScale },
+          grid: { color: '#e5e5e5', lineWidth: 1 * dpiScale }
+        }
       }
     }
   });
 }
 
-function buildGraphPdfPageHTML(g, o, imgPost, imgPre, pageNum) {
-  const mathStr = `${o.pArea.toFixed(2)}*10000*${o.activeCalcThick.toFixed(1)}*${g.bulk}=${o.tonnes.toFixed(2)} Tonnes`;
-  const allowedStr = o.allowed.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 0});
+function buildPdfPage_L1(g, o, imgPost, imgPre, pageNum) {
+  const mathStr  = `${o.pArea.toFixed(2)}*10000*${o.activeCalcThick.toFixed(1)}*${g.bulk}=${o.tonnes.toFixed(2)} Tonnes`;
+  const allowedStr = o.allowed.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:0});
 
   if (g.hasSubGraph) {
     const maxLen = Math.max(o.dist.length, o.subDist.length);
     let dualTableRows = '';
     for (let i = 0; i < maxLen; i++) {
-      const preVal = o.thickPre[i] !== undefined ? o.thickPre[i].toFixed(2) : '-';
+      const preVal  = o.thickPre[i]  !== undefined ? o.thickPre[i].toFixed(2)  : '-';
       const postVal = o.thickPost[i] !== undefined ? o.thickPost[i].toFixed(2) : '-';
       dualTableRows += `<tr>
-        <td style="background: #f1f3fa; border: 1px solid #fff; padding: 4px;">${postVal}</td>
-        <td style="background: #f1f3fa; border: 1px solid #fff; padding: 4px;">${preVal}</td>
+        <td style="background:#f1f3fa;border:1px solid #fff;padding:4px;">${postVal}</td>
+        <td style="background:#f1f3fa;border:1px solid #fff;padding:4px;">${preVal}</td>
       </tr>`;
     }
 
     return `
-      <div class="pdf-page-container" id="pdf-container" style="width: 1040px; height: 710px; position: relative; background: #fff; color: #000; font-family: 'Times New Roman', serif; box-sizing: border-box; font-size: 15px; margin: 0; overflow: hidden;">
-        <div style="position: absolute; top: 50px; left: 20px; width: 330px; line-height: 1.3;">
-          <div><b>Source-</b> Primary Data generated<br>by DGPS<br>Hi- Target DGPS ( Model No.<br>V30plus)</div>
-          <div style="font-size: 18px; font-weight: bold; margin: 15px 0 10px 0;">Calculation</div>
-          <div style="padding-left: 18px; position: relative;"><span style="position:absolute;left:0;">➢</span><b>Total Area: ${g.area}Ha.(Source:Table no. 7.2)</b></div>
-          <div style="padding-left: 18px; position: relative; margin-bottom: 8px; margin-top: 8px;"><span style="position:absolute;left:0;">➢</span><b>No mining area: ${g.noMine} Ha.</b> &nbsp;&nbsp;&nbsp;&nbsp;(Source: Page No 84)</div>
-          <div style="padding-left: 18px; font-size: 14px;">Potential area(Ha.): Total area(Ha.)- No mining Area(Ha.)<br>
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${g.area}-${g.noMine}=${o.pArea.toFixed(2)} Ha.</div>
-          
-          <div style="padding-left: 18px; position: relative; margin-top: 15px;"><span style="position:absolute;left:0;">➢</span>Potential Area(Ha.):${o.pArea.toFixed(2)}</div>
-          <div style="padding-left: 18px; position: relative;"><span style="position:absolute;left:0;">➢</span>Average Thickness:${o.activeCalcThick.toFixed(1)}</div>
-          <div style="padding-left: 18px; position: relative;"><span style="position:absolute;left:0;">➢</span>Bulk Density:${g.bulk}</div>
-          
-          <div style="margin: 4px 0 4px 0; font-size: 15px; letter-spacing: -0.2px;">${mathStr}</div>
-          <div style="padding-left: 18px; position: relative;"><span style="position:absolute;left:0;">➢</span>Total excavation in Tonnes<br>&nbsp;&nbsp;&nbsp;(Considering ${g.pct}% as per EMGSM,<br>&nbsp;&nbsp;&nbsp;2020)=${allowedStr}</div>
+    <div id="pdf-container" style="width:1040px;height:710px;position:relative;background:#fff;color:#000;font-family:'Times New Roman',serif;box-sizing:border-box;font-size:15px;margin:0;overflow:hidden;">
+      <div style="position:absolute;top:50px;left:20px;width:330px;line-height:1.3;">
+        <div><b>Source-</b> Primary Data generated<br>by DGPS<br>Hi- Target DGPS ( Model No.<br>V30plus)</div>
+        <div style="font-size:18px;font-weight:bold;margin:15px 0 10px 0;">Calculation</div>
+        <div style="padding-left:18px;position:relative;"><span style="position:absolute;left:0;">➢</span><b>Total Area: ${g.area}Ha.(Source:Table no. 7.2)</b></div>
+        <div style="padding-left:18px;position:relative;margin:8px 0;"><span style="position:absolute;left:0;">➢</span><b>No mining area: ${g.noMine} Ha.</b> &nbsp;&nbsp;&nbsp;&nbsp;(Source: Page No 84)</div>
+        <div style="padding-left:18px;font-size:14px;">Potential area(Ha.): Total area(Ha.)- No mining Area(Ha.)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${g.area}-${g.noMine}=${o.pArea.toFixed(2)} Ha.</div>
+        
+        <div style="padding-left:18px;position:relative;margin-top:15px;"><span style="position:absolute;left:0;">➢</span>Potential Area(Ha.):${o.pArea.toFixed(2)}</div>
+        <div style="padding-left:18px;position:relative;"><span style="position:absolute;left:0;">➢</span>Average Thickness:${o.activeCalcThick.toFixed(1)}</div>
+        <div style="padding-left:18px;position:relative;"><span style="position:absolute;left:0;">➢</span>Bulk Density:${g.bulk}</div>
+        <div style="margin:4px 0;font-size:15px;">${mathStr}</div>
+        <div style="padding-left:18px;position:relative;"><span style="position:absolute;left:0;">➢</span>Total excavation in Tonnes<br>&nbsp;&nbsp;&nbsp;(Considering ${g.pct}% as per EMGSM,<br>&nbsp;&nbsp;&nbsp;2020)=${allowedStr}</div>
 
-          <div style="margin-top: 70px; margin-left: 20px;">
-            <div style="display:flex; align-items:center; margin-bottom:6px;"><span style="display:inline-block; width:35px; height:3px; background:#de3b3b; margin-right:8px;"></span> Red Line</div>
-            <div style="display:flex; align-items:center; margin-bottom:6px;"><span style="display:inline-block; width:35px; height:3px; background:#da8b4e; margin-right:8px;"></span> Post monsoon Elevation</div>
-            <div style="display:flex; align-items:center; margin-bottom:6px;"><span style="display:inline-block; width:35px; height:3px; background:#eec34a; margin-right:8px;"></span> Pre monsoon Elevation</div>
-            <div style="display:flex; align-items:center; margin-bottom:6px;"><span style="display:inline-block; width:35px; height:3px; background:#3b8bba; margin-right:8px;"></span> Thalweg line</div>
-          </div>
+        <div style="margin-top:70px;margin-left:20px;">
+          <div style="display:flex;align-items:center;margin-bottom:6px;"><span style="display:inline-block;width:35px;height:3px;background:#de3b3b;margin-right:8px;"></span> Red Line</div>
+          <div style="display:flex;align-items:center;margin-bottom:6px;"><span style="display:inline-block;width:35px;height:3px;background:#da8b4e;margin-right:8px;"></span> Post monsoon Elevation</div>
+          <div style="display:flex;align-items:center;margin-bottom:6px;"><span style="display:inline-block;width:35px;height:3px;background:#eec34a;margin-right:8px;"></span> Pre monsoon Elevation</div>
+          <div style="display:flex;align-items:center;margin-bottom:6px;"><span style="display:inline-block;width:35px;height:3px;background:#3b8bba;margin-right:8px;"></span> Thalweg line</div>
         </div>
-
-        <div style="position: absolute; top: 480px; left: 320px; font-size: 16px; transform: rotate(-90deg); transform-origin: left top;">Elevation (m)</div>
-
-        <div style="position: absolute; top: 35px; left: 360px; width: 480px; text-align: center;">
-          <div style="font-size: 18px;">Cross Section Sand Bar</div>
-          <div style="font-size: 16px; font-weight: bold; margin-bottom: 5px;">${g.name || 'Post Monsoon'}</div>
-          <img src="${imgPost}" style="width: 100%; margin-bottom: 20px;" />
-          
-          <div style="font-size: 16px; font-weight: bold; margin-bottom: 5px;">${g.subName || 'Pre Monsoon'}</div>
-          <img src="${imgPre}" style="width: 100%; margin-bottom: 5px;" />
-          <div style="font-size: 16px;">Distance of the sand bar from river bank towards river (m)</div>
-        </div>
-
-        <div style="position: absolute; top: 120px; right: 20px; width: 180px; text-align: center; font-size: 16px;">
-          <div style="text-align:left; margin-left:10px;">Post Monsoon<br>Average Thickness:${o.avgThickPost.toFixed(2)}</div>
-          
-          <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 12px; margin-top: 100px; margin-bottom: 100px;">
-            <tr>
-              <th style="background: #e4e7f2; border: 1px solid #fff; padding: 4px; font-weight: normal;">Post-<br>Thickness</th>
-              <th style="background: #e4e7f2; border: 1px solid #fff; padding: 4px; font-weight: normal;">Pre-<br>Thickness</th>
-            </tr>
-            ${dualTableRows}
-            <tr>
-              <td style="background: #e4e7f2; border: 1px solid #fff; padding: 4px; font-weight: bold;">${o.avgThickPost.toFixed(2)}</td>
-              <td style="background: #e4e7f2; border: 1px solid #fff; padding: 4px; font-weight: bold;">${o.avgThickPre.toFixed(2)}</td>
-            </tr>
-          </table>
-
-          <div style="text-align:left; margin-left:10px;">Pre Monsoon<br>Average Thickness:${o.avgThickPre.toFixed(2)}</div>
-        </div>
-
-        <div style="position: absolute; bottom: 30px; left: 330px; width: 650px; font-size: 13px; line-height: 1.3;">
-          Note: The levels given in the cross- section as observed in the field has been checked and found<br>nearly matching with the office record.
-        </div>
-        <div style="position: absolute; bottom: -5px; right: 0; font-size: 20px; font-weight: bold; padding: 5px; background: #fff;">${pageNum}</div>
-        <div style="position: absolute; top: 20px; left: 20px; width: 1000px; height: 670px; border: 1px solid #000; pointer-events: none;"></div>
       </div>
-    `;
+
+      <div style="position:absolute;top:480px;left:320px;font-size:16px;transform:rotate(-90deg);transform-origin:left top;">Elevation (m)</div>
+
+      <div style="position:absolute;top:35px;left:360px;width:480px;text-align:center;">
+        <div style="font-size:18px;">Cross Section Sand Bar</div>
+        <div style="font-size:16px;font-weight:bold;margin-bottom:5px;">${g.name||'Post Monsoon'}</div>
+        <img src="${imgPost}" style="width:100%;margin-bottom:20px;" />
+        
+        <div style="font-size:16px;font-weight:bold;margin-bottom:5px;">${g.subName||'Pre Monsoon'}</div>
+        <img src="${imgPre}" style="width:100%;margin-bottom:5px;" />
+        <div style="font-size:16px;">Distance of the sand bar from river bank towards river (m)</div>
+      </div>
+
+      <div style="position:absolute;top:120px;right:20px;width:180px;text-align:center;font-size:16px;">
+        <div style="text-align:left;margin-left:10px;">Post Monsoon<br>Average Thickness:${o.avgThickPost.toFixed(2)}</div>
+        
+        <table style="width:100%;border-collapse:collapse;text-align:center;font-size:12px;margin-top:100px;margin-bottom:100px;">
+          <tr>
+            <th style="background:#e4e7f2;border:1px solid #fff;padding:4px;font-weight:normal;">Post-<br>Thickness</th>
+            <th style="background:#e4e7f2;border:1px solid #fff;padding:4px;font-weight:normal;">Pre-<br>Thickness</th>
+          </tr>
+          ${dualTableRows}
+          <tr>
+            <td style="background:#e4e7f2;border:1px solid #fff;padding:4px;font-weight:bold;">${o.avgThickPost.toFixed(2)}</td>
+            <td style="background:#e4e7f2;border:1px solid #fff;padding:4px;font-weight:bold;">${o.avgThickPre.toFixed(2)}</td>
+          </tr>
+        </table>
+
+        <div style="text-align:left;margin-left:10px;">Pre Monsoon<br>Average Thickness:${o.avgThickPre.toFixed(2)}</div>
+      </div>
+
+      <div style="position:absolute;bottom:30px;left:330px;width:650px;font-size:13px;line-height:1.3;">
+        Note: The levels given in the cross- section as observed in the field has been checked and found<br>nearly matching with the office record.
+      </div>
+      <div style="position:absolute;bottom:-5px;right:0;font-size:20px;font-weight:bold;padding:5px;background:#fff;">${pageNum}</div>
+      <div style="position:absolute;top:20px;left:20px;width:1000px;height:670px;border:1px solid #000;pointer-events:none;"></div>
+    </div>`;
   } else {
-    const singleTableRows = o.dist.map((d, i) => `<tr><td style="background: #f1f3fa; border: 1px solid #fff; padding: 4px;">${o.thickPost[i] !== undefined ? o.thickPost[i].toFixed(2) : '-'}</td></tr>`).join('');
+    const singleTableRows = o.dist.map((_d,i)=>`<tr><td style="background:#f1f3fa;border:1px solid #fff;padding:4px;">${o.thickPost[i]!==undefined?o.thickPost[i].toFixed(2):'-'}</td></tr>`).join('');
 
     return `
-      <div class="pdf-page-container" id="pdf-container" style="width: 1040px; height: 710px; position: relative; background: #fff; color: #000; font-family: 'Times New Roman', serif; box-sizing: border-box; font-size: 15px; margin: 0; overflow: hidden;">
-        <div style="position: absolute; top: 10px; left: 0; width: 100%; text-align: center; font-size: 18px;">Cross Section Sand Bar</div>
-        <div style="position: absolute; top: 35px; left: 0; width: 100%; text-align: center; font-size: 17px; font-weight: bold;">${g.name}</div>
-        <div style="position: absolute; top: 70px; left: 20px; width: 330px; line-height: 1.3;">
-          <div><b>Source-</b> Primary Data generated<br>by DGPS<br>Hi- Target DGPS ( Model No.<br>V30plus)</div>
-          <div style="font-size: 18px; font-weight: bold; margin: 15px 0 10px 0;">Calculation</div>
-          <div style="padding-left: 18px; position: relative;"><span style="position:absolute;left:0;">➢</span><b>Total Area: ${g.area} Ha.</b>(Source: Table 7.2 )</div>
-          <div style="padding-left: 18px; position: relative; margin-bottom: 8px;"><span style="position:absolute;left:0;">➢</span><b>No mining area: ${g.noMine}Ha.</b> (Source: Page No 88)</div>
-          <div style="padding-left: 18px;">Potential area(Ha.): Total area(Ha.)- No mining Area(Ha.)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${g.area}-${g.noMine}=${o.pArea.toFixed(2)} Ha.</div>
-          <div style="padding-left: 18px; position: relative; margin-top: 8px;"><span style="position:absolute;left:0;">➢</span>Potential Area(Ha.):${o.pArea.toFixed(2)}</div>
-          <div style="padding-left: 18px; position: relative;"><span style="position:absolute;left:0;">➢</span>Average Thickness:${o.activeCalcThick.toFixed(2)}</div>
-          <div style="padding-left: 18px; position: relative;"><span style="position:absolute;left:0;">➢</span>Bulk Density:${g.bulk}</div>
-          <div style="margin: 4px 0 4px 0; font-size: 15px; letter-spacing: -0.2px;">${mathStr.replace('Tonnes', 'Ton<br>nes')}</div>
-          <div style="padding-left: 18px; position: relative;"><span style="position:absolute;left:0;">➢</span>Total excavation in Tonnes<br>(Considering ${g.pct}% as per EMGSM,<br>2020)=${allowedStr}</div>
-          <div style="margin-top: 40px;">
-            <div style="display:flex; align-items:center; margin-bottom:6px;"><span style="display:inline-block; width:35px; height:3px; background:#de3b3b; margin-right:8px;"></span> Red Line</div>
-            <div style="display:flex; align-items:center; margin-bottom:6px;"><span style="display:inline-block; width:35px; height:3px; background:#da8b4e; margin-right:8px;"></span> Post monsoon Elevation</div>
-            <div style="display:flex; align-items:center; margin-bottom:6px;"><span style="display:inline-block; width:35px; height:3px; background:#3b8bba; margin-right:8px;"></span> Thalweg line</div>
-          </div>
+    <div id="pdf-container" style="width:1040px;height:710px;position:relative;background:#fff;color:#000;font-family:'Times New Roman',serif;box-sizing:border-box;font-size:15px;margin:0;overflow:hidden;">
+      <div style="position:absolute;top:10px;left:0;width:100%;text-align:center;font-size:18px;">Cross Section Sand Bar</div>
+      <div style="position:absolute;top:35px;left:0;width:100%;text-align:center;font-size:17px;font-weight:bold;">${g.name}</div>
+      <div style="position:absolute;top:70px;left:20px;width:330px;line-height:1.3;">
+        <div><b>Source-</b> Primary Data generated<br>by DGPS<br>Hi- Target DGPS ( Model No.<br>V30plus)</div>
+        <div style="font-size:18px;font-weight:bold;margin:15px 0 10px 0;">Calculation</div>
+        <div style="padding-left:18px;position:relative;"><span style="position:absolute;left:0;">➢</span><b>Total Area: ${g.area} Ha.</b>(Source: Table 7.2 )</div>
+        <div style="padding-left:18px;position:relative;margin-bottom:8px;"><span style="position:absolute;left:0;">➢</span><b>No mining area: ${g.noMine}Ha.</b> (Source: Page No 88)</div>
+        <div style="padding-left:18px;">Potential area(Ha.): Total area(Ha.)- No mining Area(Ha.)<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${g.area}-${g.noMine}=${o.pArea.toFixed(2)} Ha.</div>
+        <div style="padding-left:18px;position:relative;margin-top:8px;"><span style="position:absolute;left:0;">➢</span>Potential Area(Ha.):${o.pArea.toFixed(2)}</div>
+        <div style="padding-left:18px;position:relative;"><span style="position:absolute;left:0;">➢</span>Average Thickness:${o.activeCalcThick.toFixed(2)}</div>
+        <div style="padding-left:18px;position:relative;"><span style="position:absolute;left:0;">➢</span>Bulk Density:${g.bulk}</div>
+        <div style="margin:4px 0;font-size:15px;">${mathStr.replace('Tonnes','Ton<br>nes')}</div>
+        <div style="padding-left:18px;position:relative;"><span style="position:absolute;left:0;">➢</span>Total excavation in Tonnes<br>(Considering ${g.pct}% as per EMGSM,<br>2020)=${allowedStr}</div>
+        <div style="margin-top:40px;">
+          <div style="display:flex;align-items:center;margin-bottom:6px;"><span style="display:inline-block;width:35px;height:3px;background:#de3b3b;margin-right:8px;"></span> Red Line</div>
+          <div style="display:flex;align-items:center;margin-bottom:6px;"><span style="display:inline-block;width:35px;height:3px;background:#3b82f6;margin-right:8px;"></span> Post monsoon Elevation</div>
+          <div style="display:flex;align-items:center;margin-bottom:6px;"><span style="display:inline-block;width:35px;height:3px;background:#8b5cf6;margin-right:8px;"></span> Thalweg line</div>
         </div>
-        <div style="position: absolute; top: 85px; left: 360px; width: 550px; text-align: center;">
-          <img src="${imgPost}" style="width: 100%; margin-bottom: 5px;" />
-          <div style="font-size: 16px;">Distance of the sand bar from river bank towards river (m)</div>
-        </div>
-        <div style="position: absolute; top: 180px; right: 20px; width: 110px;">
-          <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 13px;">
-            <tr><th style="background: #e4e7f2; border: 1px solid #fff; padding: 4px; font-weight: normal;">Post -Thickness</th></tr>
-            ${singleTableRows}
-            <tr><td style="background: #f1f3fa; border: 1px solid #fff; padding: 4px; font-weight: bold;">${o.avgThickPost.toFixed(2)}</td></tr>
-          </table>
-        </div>
-        <div style="position: absolute; top: 375px; right: -15px; width: 220px; text-align: center; font-size: 16px; line-height: 1.3;">
-          Post Monsoon<br>Average Thickness: ${o.avgThickPost.toFixed(2)}
-        </div>
-        <div style="position: absolute; bottom: 40px; left: 360px; width: 550px; font-size: 13px; line-height: 1.3;">
-          Note: The levels given in the cross- section as observed in the field has been checked and found<br>nearly matching with the office record.
-        </div>
-        <div style="position: absolute; bottom: -5px; right: 0; font-size: 20px; font-weight: bold; padding: 5px; background: #fff;">${pageNum}</div>
-        <div style="position: absolute; top: 5px; left: 5px; width: 1025px; height: 695px; border: 1px solid #000; pointer-events: none;"></div>
       </div>
-    `;
+      <div style="position:absolute;top:85px;left:360px;width:550px;text-align:center;">
+        <img src="${imgPost}" style="width:100%;margin-bottom:5px;" />
+        <div style="font-size:16px;">Distance of the sand bar from river bank towards river (m)</div>
+      </div>
+      <div style="position:absolute;top:180px;right:20px;width:110px;">
+        <table style="width:100%;border-collapse:collapse;text-align:center;font-size:13px;">
+          <tr><th style="background:#e4e7f2;border:1px solid #fff;padding:4px;font-weight:normal;">Post -Thickness</th></tr>
+          ${singleTableRows}
+          <tr><td style="background:#f1f3fa;border:1px solid #fff;padding:4px;font-weight:bold;">${o.avgThickPost.toFixed(2)}</td></tr>
+        </table>
+      </div>
+      <div style="position:absolute;top:375px;right:-15px;width:220px;text-align:center;font-size:16px;line-height:1.3;">
+        Post Monsoon<br>Average Thickness: ${o.avgThickPost.toFixed(2)}
+      </div>
+      <div style="position:absolute;bottom:40px;left:360px;width:550px;font-size:13px;line-height:1.3;">
+        Note: The levels given in the cross- section as observed in the field has been checked and found<br>nearly matching with the office record.
+      </div>
+      <div style="position:absolute;bottom:-5px;right:0;font-size:20px;font-weight:bold;padding:5px;background:#fff;">${pageNum}</div>
+      <div style="position:absolute;top:5px;left:5px;width:1025px;height:695px;border:1px solid #000;pointer-events:none;"></div>
+    </div>`;
   }
+}
+
+function buildPdfPage_L2(g, o, imgPost, imgPre, pageNum) {
+  const siteName = g.name || 'Site';
+
+  if (g.hasSubGraph) {
+    return `
+    <div id="pdf-container" style="width:1040px;height:710px;position:relative;background:#fff;color:#000;font-family:Arial,sans-serif;box-sizing:border-box;padding:16px 20px 10px 20px;overflow:hidden;">
+      <div style="text-align:center;font-size:12px;color:#555;margin-bottom:8px;letter-spacing:0.4px;">
+        Site: ${siteName}
+      </div>
+      <div style="border:1px solid #c0c0c0;border-radius:3px;padding:8px 12px 6px 12px;margin-bottom:9px;background:#fff;">
+        <div style="font-size:13px;font-weight:bold;text-align:center;margin-bottom:3px;">
+          Site: ${siteName} - Pre Monsoon
+        </div>
+        <img src="${imgPre}" style="width:100%;display:block;" />
+        <div style="text-align:center;font-size:10px;color:#444;margin-top:3px;font-weight:600;">Distance (m)</div>
+      </div>
+      <div style="border:1px solid #c0c0c0;border-radius:3px;padding:8px 12px 6px 12px;background:#fff;">
+        <div style="font-size:13px;font-weight:bold;text-align:center;margin-bottom:3px;">
+          Site: ${siteName} - Post Monsoon
+        </div>
+        <img src="${imgPost}" style="width:100%;display:block;" />
+        <div style="text-align:center;font-size:10px;color:#444;margin-top:3px;font-weight:600;">Distance (m)</div>
+      </div>
+      <div style="position:absolute;bottom:5px;right:12px;font-size:11px;color:#666;">${pageNum}</div>
+    </div>`;
+  } else {
+    return `
+    <div id="pdf-container" style="width:1040px;height:710px;position:relative;background:#fff;color:#000;font-family:Arial,sans-serif;box-sizing:border-box;padding:24px 30px 16px 30px;overflow:hidden;">
+      <div style="text-align:center;font-size:12px;color:#555;margin-bottom:12px;letter-spacing:0.4px;">
+        Site: ${siteName}
+      </div>
+      <div style="border:1px solid #c0c0c0;border-radius:3px;padding:14px 16px 10px 16px;background:#fff;">
+        <div style="font-size:15px;font-weight:bold;text-align:center;margin-bottom:8px;">
+          Site: ${siteName} - Post Monsoon
+        </div>
+        <img src="${imgPost}" style="width:100%;display:block;" />
+        <div style="text-align:center;font-size:11px;color:#444;margin-top:6px;font-weight:600;">Distance (m)</div>
+      </div>
+      <div style="position:absolute;bottom:7px;right:14px;font-size:11px;color:#666;">${pageNum}</div>
+    </div>`;
+  }
+}
+
+function buildGraphPdfPageHTML(g, o, imgPost, imgPre, pageNum) {
+  return (g.pdfLayout || 1) === 2
+    ? buildPdfPage_L2(g, o, imgPost, imgPre, pageNum)
+    : buildPdfPage_L1(g, o, imgPost, imgPre, pageNum);
+}
+
+function _buildChartImages(g, o) {
+  const isLayout2 = (g.pdfLayout || 1) === 2;
+  let imgPre = '', imgPost = '';
+  const dpiScale = 3; // Render at 3x resolution for high sharpness
+
+  if (g.hasSubGraph) {
+    const w = isLayout2 ? 760 : 460;
+    const h = isLayout2 ? 225 : 200;
+    const canPre  = document.createElement('canvas'); canPre.width  = w * dpiScale; canPre.height = h * dpiScale;
+    const canPost = document.createElement('canvas'); canPost.width = w * dpiScale; canPost.height = h * dpiScale;
+    
+    canPre.style.position = 'fixed';
+    canPre.style.left = '-9999px';
+    canPre.style.top = '0';
+    canPost.style.position = 'fixed';
+    canPost.style.left = '-9999px';
+    canPost.style.top = '0';
+    
+    document.body.appendChild(canPre);  
+    document.body.appendChild(canPost); 
+
+    const chartPre  = buildPdfChartHelper(g, o, 'pre',  canPre);
+    const chartPost = buildPdfChartHelper(g, o, 'post', canPost);
+    
+    chartPre.update();
+    chartPost.update();
+
+    imgPre  = canPre.toDataURL('image/png');
+    imgPost = canPost.toDataURL('image/png');
+    
+    chartPre.destroy(); chartPost.destroy();
+    canPre.remove(); canPost.remove();
+  } else {
+    const w = isLayout2 ? 810 : 600;
+    const h = isLayout2 ? 330 : 280;
+    const canPost = document.createElement('canvas'); canPost.width = w * dpiScale; canPost.height = h * dpiScale;
+    
+    canPost.style.position = 'fixed';
+    canPost.style.left = '-9999px';
+    canPost.style.top = '0';
+    
+    document.body.appendChild(canPost);
+
+    const chartPost = buildPdfChartHelper(g, o, 'post', canPost);
+    chartPost.update();
+
+    imgPost = canPost.toDataURL('image/png');
+    chartPost.destroy(); canPost.remove();
+  }
+
+  return { imgPost, imgPre };
 }
 
 function generatePDF(id) {
@@ -609,132 +777,82 @@ function generatePDF(id) {
   if (!g) return;
   const o = calcGraph(g);
   
-  toast('Generating PDF, please wait...', 'success');
+  toast('Assembling PDF, please wait…', 'success');
 
-  let imgPre = '';
-  let imgPost = '';
-  
-  if (g.hasSubGraph) {
-    const canPre = document.createElement('canvas'); canPre.width = 460; canPre.height = 200;
-    const canPost = document.createElement('canvas'); canPost.width = 460; canPost.height = 200;
-    document.body.appendChild(canPre); document.body.appendChild(canPost);
-    canPre.style.display = 'none'; canPost.style.display = 'none';
-
-    const chartPre = buildPdfChartHelper(g, o, 'pre', canPre);
-    const chartPost = buildPdfChartHelper(g, o, 'post', canPost);
-    imgPre = chartPre.toBase64Image();
-    imgPost = chartPost.toBase64Image();
-    chartPre.destroy(); chartPost.destroy();
-    canPre.remove(); canPost.remove();
-  } else {
-    const canPost = document.createElement('canvas'); canPost.width = 600; canPost.height = 280;
-    document.body.appendChild(canPost); canPost.style.display = 'none';
-    
-    const chartPost = buildPdfChartHelper(g, o, 'post', canPost);
-    imgPost = chartPost.toBase64Image();
-    chartPost.destroy(); canPost.remove();
-  }
-
+  const { imgPost, imgPre } = _buildChartImages(g, o);
   const pageNum = g.hasSubGraph ? 159 : 170;
   const templateHTML = buildGraphPdfPageHTML(g, o, imgPost, imgPre, pageNum);
 
-  const template = document.createElement('div');
-  const wrapper = document.createElement('div');
-  wrapper.style.position = 'fixed';
-  wrapper.style.top = '-9999px';
-  wrapper.appendChild(template);
-  template.innerHTML = templateHTML; 
-  document.body.appendChild(wrapper);
+  const container = document.createElement('div');
+  container.style.position = 'absolute';
+  container.style.left = '-9999px';
+  container.style.top = '0';
+  container.style.zIndex = '-100';
+  container.style.opacity = '1';
+  container.innerHTML = templateHTML; 
+  document.body.appendChild(container);
 
   const opt = {
-    margin:       0.1,
+    margin:       0,
     filename:     `${(g.hasSubGraph ? g.subName : g.name).replace(/\s+/g, '_')}_Report.pdf`,
     image:        { type: 'jpeg', quality: 1.0 },
-    html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
+    html2canvas:  { scale: 3, useCORS: true, letterRendering: true, scrollX: 0, scrollY: 0 },
     jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
   };
 
-  html2pdf().set(opt).from(template.querySelector('#pdf-container')).save().then(() => {
-    wrapper.remove();
-    toast('PDF successfully generated and downloaded!', 'success');
+  html2pdf().set(opt).from(container.querySelector('#pdf-container')).save().then(() => {
+    container.remove();
+    toast('PDF downloaded successfully!', 'success');
   }).catch(err => {
     console.error(err);
-    wrapper.remove();
-    toast('Failed to generate PDF', 'danger');
+    container.remove();
+    toast('Failed to export PDF.', 'danger');
   });
 }
 
 function generateAllGraphsPDF() {
   if (!S.graphs || S.graphs.length === 0) {
-    toast('No cross section graphs available to download.', 'error');
+    toast('No cross-sections available to compile.', 'danger');
     return;
   }
   
-  toast('Generating PDF for all cross sections, please wait...', 'success');
-
+  toast('Generating multi-page survey booklet, please wait…', 'success');
   const pagesHTML = [];
   
   for (let idx = 0; idx < S.graphs.length; idx++) {
     const g = S.graphs[idx];
     const o = calcGraph(g);
-    
-    let imgPre = '';
-    let imgPost = '';
-    
-    if (g.hasSubGraph) {
-      const canPre = document.createElement('canvas'); canPre.width = 460; canPre.height = 200;
-      const canPost = document.createElement('canvas'); canPost.width = 460; canPost.height = 200;
-      document.body.appendChild(canPre); document.body.appendChild(canPost);
-      canPre.style.display = 'none'; canPost.style.display = 'none';
-
-      const chartPre = buildPdfChartHelper(g, o, 'pre', canPre);
-      const chartPost = buildPdfChartHelper(g, o, 'post', canPost);
-      imgPre = chartPre.toBase64Image();
-      imgPost = chartPost.toBase64Image();
-      chartPre.destroy(); chartPost.destroy();
-      canPre.remove(); canPost.remove();
-    } else {
-      const canPost = document.createElement('canvas'); canPost.width = 600; canPost.height = 280;
-      document.body.appendChild(canPost); canPost.style.display = 'none';
-
-      const chartPost = buildPdfChartHelper(g, o, 'post', canPost);
-      imgPost = chartPost.toBase64Image();
-      chartPost.destroy(); canPost.remove();
-    }
-
-    const pageHTML = buildGraphPdfPageHTML(g, o, imgPost, imgPre, 159 + idx);
-    pagesHTML.push(pageHTML);
+    const { imgPost, imgPre } = _buildChartImages(g, o);
+    pagesHTML.push(buildGraphPdfPageHTML(g, o, imgPost, imgPre, 159 + idx));
   }
 
-  const templateHTML = `
-    <div id="all-pdf-container" style="background:#fff;">
-      ${pagesHTML.join('\n<div class="html2pdf__page-break"></div>\n')}
-    </div>
-  `;
+  const pagesSanitized = pagesHTML.map(html => html.replace('id="pdf-container"', 'class="pdf-page-block"'));
+  const templateHTML = `<div id="all-pdf-container" style="background:#fff; width: 1040px;">${pagesSanitized.join('\n<div class="html2pdf__page-break"></div>\n')}</div>`;
 
-  const template = document.createElement('div');
-  const wrapper = document.createElement('div');
-  wrapper.style.position = 'fixed';
-  wrapper.style.top = '-9999px';
-  wrapper.appendChild(template);
-  template.innerHTML = templateHTML; 
-  document.body.appendChild(wrapper);
+  const container = document.createElement('div');
+  container.style.position = 'absolute';
+  container.style.left = '-9999px';
+  container.style.top = '0';
+  container.style.zIndex = '-100';
+  container.style.opacity = '1';
+  container.innerHTML = templateHTML; 
+  document.body.appendChild(container);
 
   const opt = {
-    margin:       0.1,
-    filename:     `All_Cross_Sections_Report.pdf`,
+    margin:       0,
+    filename:     'All_Cross_Sections_Consolidated_Report.pdf',
     image:        { type: 'jpeg', quality: 1.0 },
-    html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
+    html2canvas:  { scale: 3, useCORS: true, letterRendering: true, scrollX: 0, scrollY: 0 },
     jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' },
     pagebreak:    { mode: ['css', 'legacy'] }
   };
 
-  html2pdf().set(opt).from(template.querySelector('#all-pdf-container')).save().then(() => {
-    wrapper.remove();
-    toast('All cross section graphs PDF generated and downloaded!', 'success');
+  html2pdf().set(opt).from(container.querySelector('#all-pdf-container')).save().then(() => {
+    container.remove();
+    toast('Unified booklet generated successfully!', 'success');
   }).catch(err => {
     console.error(err);
-    wrapper.remove();
-    toast('Failed to generate PDF', 'danger');
+    container.remove();
+    toast('Failed to compile consolidated PDF.', 'danger');
   });
 }

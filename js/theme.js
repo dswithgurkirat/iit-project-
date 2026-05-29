@@ -14,20 +14,22 @@ function getThemePreference() {
   }
 }
 
-function applyTheme(theme) {
+function applyTheme(theme, saveToStorage = true) {
   const isDark = theme === THEME_DARK;
   document.documentElement.classList.toggle('dark', isDark);
   document.documentElement.setAttribute('data-theme', isDark ? THEME_DARK : THEME_LIGHT);
-  try {
-    localStorage.setItem(THEME_STORAGE_KEY, isDark ? THEME_DARK : THEME_LIGHT);
-  } catch {
-    /* storage unavailable */
+  if (saveToStorage) {
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, isDark ? THEME_DARK : THEME_LIGHT);
+    } catch {
+      /* storage unavailable */
+    }
   }
   return isDark;
 }
 
 function initThemeFromStorage() {
-  return applyTheme(getThemePreference());
+  return applyTheme(getThemePreference(), true);
 }
 
 function toggleDarkMode() {
@@ -49,10 +51,10 @@ function updateDarkModeIcon() {
   if (window.lucide) window.lucide.createIcons();
 }
 
-/* Apply before first paint when loaded from <head> */
-initThemeFromStorage();
+/* Apply before first paint when loaded from <head> — always light on login page */
+applyTheme(THEME_LIGHT, false);
 
 document.addEventListener('DOMContentLoaded', () => {
-  initThemeFromStorage();
+  applyTheme(THEME_LIGHT, false);
   updateDarkModeIcon();
 });

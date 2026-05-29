@@ -84,12 +84,21 @@ function doLogout() {
   if (backBtn) backBtn.style.display = 'none';
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-auth').classList.add('active');
-  switchAuthMode('authority');
+  switchAuthMode('faculty');
+  if (typeof applyTheme === 'function') {
+    applyTheme('light', false);
+  }
+  if (typeof updateDarkModeIcon === 'function') {
+    updateDarkModeIcon();
+  }
 }
 
 function showAppScreen() {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-app').classList.add('active');
+  if (typeof initThemeFromStorage === 'function') {
+    initThemeFromStorage();
+  }
   if (typeof updateDarkModeIcon === 'function') updateDarkModeIcon();
   const init = S.user.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
   document.getElementById('sb-avatar').textContent = init;
@@ -104,6 +113,9 @@ function showAuthorityScreen() {
   document.getElementById('screen-authority').classList.add('active');
   document.getElementById('auth-user-label').textContent = S.user.name + ' · Authority';
   renderAuthorityReports();
+  if (typeof initThemeFromStorage === 'function') {
+    initThemeFromStorage();
+  }
   if (typeof updateDarkModeIcon === 'function') updateDarkModeIcon();
   if (window.initLucide) initLucide();
 }
