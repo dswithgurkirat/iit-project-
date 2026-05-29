@@ -1,64 +1,135 @@
 <!-- ═══════════════════════════════════════════════════════════════
      SCREEN 1 — AUTH
-═══════════════════════════════════════════════════════════════ -->
+ ═══════════════════════════════════════════════════════════════ -->
 <div id="screen-auth" class="screen active">
+  <button type="button" class="auth-theme-toggle" id="auth-theme-toggle" data-theme-toggle onclick="toggleDarkMode()" title="Toggle light/dark theme" aria-label="Toggle theme">
+    <i data-lucide="moon"></i>
+  </button>
   <div class="auth-bg"><div class="auth-grid-lines"></div></div>
   <div class="auth-wrap">
     <div class="auth-left">
       <div>
         <div class="iit-emblem">
-          <div class="emblem-mark">IIT</div>
+          <svg viewBox="0 0 100 100" class="iit-logo-svg" style="width:64px; height:64px; fill:none; stroke:#fff; stroke-width:3;">
+            <circle cx="50" cy="50" r="46" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+            <circle cx="50" cy="50" r="42" stroke="#fff" stroke-width="3"/>
+            <path d="M50 15 L50 22 M50 78 L50 85 M15 50 L22 50 M78 50 L85 50 M25 25 L30 30 M70 70 L75 75 M25 75 L30 70 M70 25 L75 30" stroke="#fff" stroke-width="4"/>
+            <path d="M45 40 L55 40 L50 65 Z" fill="#fff"/>
+            <circle cx="50" cy="35" r="5" fill="#fff"/>
+            <path d="M38 52 Q50 48 62 52 L62 58 Q50 54 38 58 Z" fill="#fff" stroke="#0a192f" stroke-width="1.5"/>
+          </svg>
           <div class="emblem-info">
             <h1>Indian Institute of Technology Ropar</h1>
-            <p>District Survey Report Automation System</p>
+            <p>GOVERNMENT OF INDIA</p>
           </div>
         </div>
-        <div class="auth-title">District Survey<br>Report Portal <em>2025-26</em></div>
-        <div class="auth-desc">Prepare, manage, and digitally sign DSRs for sand mining across Punjab districts. Fully EMGSM 2020 compliant.</div>
+        <div class="auth-title">Enterprise<br><em style="color:#2563eb; font-style:normal;">Resource Planning</em><br>Platform</div>
+        <div class="auth-desc">Secure, unified gateway for faculty, administration, and government authorities to manage internal operations.</div>
         <div class="auth-pills">
-          <div class="auth-pill"><div class="pill-icon">📊</div><span>Auto-generated cross section graphs & elevation charts</span></div>
-          <div class="auth-pill"><div class="pill-icon">📋</div><span>All 10 chapters, plates, annexures I–IV fully templated</span></div>
-          <div class="auth-pill"><div class="pill-icon">✍️</div><span>5-level sequential e-signature authority workflow</span></div>
-          <div class="auth-pill"><div class="pill-icon">📥</div><span>Professional government-format PDF export</span></div>
+          <div class="auth-pill">
+            <div class="pill-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                <path d="m9 11 2 2 4-4"/>
+              </svg>
+            </div>
+            <div class="auth-pill-text">
+              <strong>Govt. NIC Secured Network</strong>
+              <span>Trusted. Secure. Reliable.</span>
+            </div>
+          </div>
+          <div class="auth-pill">
+            <div class="pill-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </div>
+            <div class="auth-pill-text">
+              <strong>End-to-End Encrypted Auth</strong>
+              <span>Your data is safe with us.</span>
+            </div>
+          </div>
         </div>
       </div>
-      <div style="font-size:10px;color:rgba(255,255,255,.2);margin-top:32px;">Government of Punjab · EMGSM 2020 · IIT Ropar Research Cell</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:32px;">© 2025 Indian Institute of Technology Ropar. All rights reserved.</div>
     </div>
     <div class="auth-right">
       <div class="auth-tabs">
-        <div class="auth-tab active" onclick="switchAuthTab('login')">Login</div>
-        <div class="auth-tab" onclick="switchAuthTab('signup')">Register</div>
+        <div id="tab-btn-faculty" class="auth-tab" onclick="switchAuthMode('faculty')">Faculty / Staff</div>
+        <div id="tab-btn-authority" class="auth-tab active" onclick="switchAuthMode('authority')">Govt. Authority</div>
       </div>
-      <!-- LOGIN -->
-      <div id="auth-form-login" class="auth-form active">
-        <div class="auth-form-title">Welcome back</div>
-        <div class="auth-form-sub">Sign in to your DSR Portal account</div>
-        <div class="f-field"><label>Email Address</label><input id="login-email" type="email" placeholder="officer@punjab.gov.in" value="demo@iitropar.ac.in"></div>
-        <div class="f-field"><label>Password</label><input id="login-pass" type="password" placeholder="••••••••" value="password123"></div>
+      
+      <!-- FACULTY / STAFF FORM -->
+      <div id="auth-form-faculty" class="auth-form">
+        <div class="auth-form-title">Staff Portal</div>
+        <div class="auth-form-sub">Sign in to your DSR Coordinator / Reviewer account</div>
+        <div class="f-field">
+          <label>Email Address</label>
+          <div class="input-wrap">
+            <i data-lucide="mail" style="position:absolute;left:16px;color:var(--text-soft);width:18px;height:18px;"></i>
+            <input id="login-email" type="email" placeholder="officer@punjab.gov.in" value="demo@iitropar.ac.in">
+          </div>
+        </div>
+        <div class="f-field">
+          <label>Password</label>
+          <div class="input-wrap">
+            <i data-lucide="lock" style="position:absolute;left:16px;color:var(--text-soft);width:18px;height:18px;"></i>
+            <input id="login-pass" type="password" placeholder="••••••••" value="password123">
+          </div>
+        </div>
         <div class="f-field"><label>Login As</label>
           <select id="login-role">
             <option value="user">Report Coordinator / Data Entry</option>
             <option value="reviewer">Section Reviewer</option>
-            <option value="authority">Authority / Signing Officer</option>
             <option value="admin">System Administrator</option>
           </select>
         </div>
         <div class="form-err" id="login-error"></div>
         <button class="btn-primary" onclick="doLogin()">Login to Portal →</button>
-        <div class="auth-divider"><span>OR</span></div>
-        <button class="btn-authority" onclick="doAuthorityQuickLogin()">⚡ Quick Demo — Authority Dashboard</button>
       </div>
-      <!-- REGISTER -->
-      <div id="auth-form-signup" class="auth-form">
-        <div class="auth-form-title">Create account</div>
-        <div class="auth-form-sub">Register as a new DSR portal user</div>
-        <div class="f-field"><label>Full Name</label><input id="signup-name" placeholder="Rajinder Kumar"></div>
-        <div class="f-field"><label>Official Email</label><input id="signup-email" type="email" placeholder="officer@punjab.gov.in"></div>
-        <div class="f-field"><label>Department / Designation</label><input id="signup-dept" placeholder="Sub-Divisional Officer, Jalandhar"></div>
-        <div class="f-field"><label>Password (min 6 chars)</label><input id="signup-pass" type="password" placeholder="••••••••"></div>
-        <div class="form-err" id="signup-error"></div>
-        <div class="form-ok" id="signup-success"></div>
-        <button class="btn-primary" onclick="doSignup()">Create Account →</button>
+
+      <!-- GOVT AUTHORITY FORM -->
+      <div id="auth-form-authority" class="auth-form active">
+        <div class="auth-form-title">Authority Portal</div>
+        <div class="auth-form-sub">Secure access for nodal officers and auditors.</div>
+        
+        <div class="f-field">
+          <label>NIC ID / Authority Token</label>
+          <div class="input-wrap">
+            <i data-lucide="user" style="position:absolute;left:16px;color:var(--text-soft);width:18px;height:18px;"></i>
+            <input id="auth-nic-id" type="text" placeholder="Enter your authorized ID" value="authority-demo">
+          </div>
+        </div>
+        
+        <div class="f-field">
+          <label>Security PIN</label>
+          <div class="input-wrap">
+            <i data-lucide="lock" style="position:absolute;left:16px;color:var(--text-soft);width:18px;height:18px;"></i>
+            <input id="auth-security-pin" type="password" placeholder="••••••" value="123456">
+            <button class="btn-reveal" onclick="togglePinReveal()" type="button" style="position:absolute;right:16px;color:var(--text-soft);background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;">
+              <i data-lucide="eye" style="width:18px;height:18px;"></i>
+            </button>
+          </div>
+        </div>
+        
+        <div class="auth-options">
+          <label class="cb-container">
+            <input type="checkbox" checked> Remember me
+          </label>
+          <a href="#" class="forgot-link" onclick="toast('Please contact your district administrator to reset your PIN.','info'); return false;">Forgot PIN?</a>
+        </div>
+        
+        <div class="form-err" id="auth-error"></div>
+        <button class="btn-primary" onclick="doAuthorityVerify()" style="background:#0a192f; display:flex; align-items:center; justify-content:center; gap:8px;">
+          <i data-lucide="lock" style="width:16px;height:16px;"></i>
+          Verify & Proceed
+        </button>
+        
+        <div class="nic-banner" style="display:flex; align-items:center; gap:8px; background:var(--primary-lt); color:var(--text-mid); font-size:13px; padding:14px; border-radius:var(--r-md); margin-top:16px; border:1px solid rgba(37,99,235,.12); justify-content:center;">
+          <i data-lucide="shield-check" style="width:16px;height:16px;color:var(--primary);"></i>
+          <span>This portal is protected by <strong>NIC Secured Network</strong></span>
+        </div>
       </div>
     </div>
   </div>

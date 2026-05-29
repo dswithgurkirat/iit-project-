@@ -279,8 +279,8 @@ window.addEventListener('DOMContentLoaded', () => {
   // Hook loadFrontMatter to showView
   const originalShowView = window.showView;
   if (typeof originalShowView === 'function') {
-    window.showView = function(id, btn) {
-      originalShowView(id, btn);
+    window.showView = function(id, btn, push) {
+      originalShowView(id, btn, push);
       if (id === 'front-matter') {
         loadFrontMatter();
       }

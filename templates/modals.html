@@ -4,7 +4,7 @@
   <div class="modal-box" style="max-width:400px; max-height: max-content;">
     <div class="modal-hd"><h3>Confirm Action</h3><button class="modal-close" onclick="closeModal('modal-confirm')">×</button></div>
     <div class="modal-bd">
-      <p id="confirm-msg" style="font-size:14px; color:var(--navy); font-weight: 500;"></p>
+      <p id="confirm-msg" style="font-size:14px; color:var(--text); font-weight: 500;"></p>
     </div>
     <div class="modal-ft">
       <button class="btn btn-outline" onclick="closeModal('modal-confirm')">Cancel</button>
@@ -23,11 +23,13 @@
         <div class="field-row">
           <div class="field"><label>District</label>
             <select id="proj-district">
-              <option>Jalandhar</option><option>Ludhiana</option><option>Amritsar</option><option>Patiala</option>
-              <option>Gurdaspur</option><option>Hoshiarpur</option><option>Kapurthala</option><option>SBS Nagar</option>
-              <option>Rupnagar</option><option>Fatehgarh Sahib</option><option>Moga</option><option>Firozpur</option>
-              <option>Fazilka</option><option>Muktsar</option><option>Bathinda</option><option>Sangrur</option>
-              <option>Barnala</option><option>Mansa</option><option>Pathankot</option><option>Tarn Taran</option>
+              <option>Jalandhar</option>
+              <option>Ludhiana</option>
+              <option>Mansa</option>
+              <option>Hoshiarpur</option>
+              <option>Pathankot</option>
+              <option>Rupnagar</option>
+              <option>Tarn Taran</option>
             </select>
           </div>
           <div class="field"><label>Year</label><input id="proj-year" value="2025-26"></div>
@@ -51,10 +53,13 @@
 <!-- Sign Modal -->
 <div id="modal-sign" class="modal-overlay">
   <div class="modal-box">
-    <div class="modal-hd"><h3 id="sign-modal-title">✍️ Digital Signature</h3><button class="modal-close" onclick="closeModal('modal-sign')">×</button></div>
+    <div class="modal-hd"><h3 id="sign-modal-title">Digital Signature</h3><button class="modal-close" onclick="closeModal('modal-sign')">×</button></div>
     <div class="modal-bd">
       <div id="sign-modal-content"></div>
-      <div class="notif notif-warn" style="margin-top:14px">⚠️ By signing, you certify the accuracy of the complete DSR report and EMGSM 2020 compliance.</div>
+      <div class="notif notif-warn" style="margin-top:14px; display:flex; align-items:center; gap:8px;">
+        <i data-lucide="alert-triangle" style="width:16px; height:16px; flex-shrink:0;"></i>
+        <span>By signing, you certify the accuracy of the complete DSR report and EMGSM 2020 compliance.</span>
+      </div>
       <div class="field" style="margin-top:14px"><label>OTP Verification (Demo: 123456)</label><input class="otp-input" id="sign-otp" maxlength="6" placeholder="——————" oninput="this.value=this.value.replace(/\D/g,'')"></div>
     </div>
     <div class="modal-ft">
@@ -67,10 +72,13 @@
 <!-- Authority Sign Modal -->
 <div id="modal-auth-sign" class="modal-overlay">
   <div class="modal-box">
-    <div class="modal-hd"><h3>✍️ Authority E-Signature</h3><button class="modal-close" onclick="closeModal('modal-auth-sign')">×</button></div>
+    <div class="modal-hd"><h3>Authority E-Signature</h3><button class="modal-close" onclick="closeModal('modal-auth-sign')">×</button></div>
     <div class="modal-bd">
       <div id="auth-sign-content"></div>
-      <div class="notif notif-warn" style="margin-top:14px">⚠️ Sequential signing — your approval forwards to the next authority.</div>
+      <div class="notif notif-warn" style="margin-top:14px; display:flex; align-items:center; gap:8px;">
+        <i data-lucide="alert-triangle" style="width:16px; height:16px; flex-shrink:0;"></i>
+        <span>Sequential signing — your approval forwards to the next authority.</span>
+      </div>
       <div class="field" style="margin-top:14px"><label>OTP (Demo: 123456)</label><input class="otp-input" id="auth-otp" maxlength="6" placeholder="——————" oninput="this.value=this.value.replace(/\D/g,'')"></div>
     </div>
     <div class="modal-ft">

@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <meta name="color-scheme" content="light"/>
   <title>DSR Portal — IIT Ropar | District Survey Report Automation System</title>
+  <script src="js/theme.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
@@ -13,69 +15,141 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <link rel="stylesheet" href="css/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.363.0/dist/umd/lucide.min.js"></script>
 </head>
 <body>
 <!-- ═══════════════════════════════════════════════════════════════
      SCREEN 1 — AUTH
-═══════════════════════════════════════════════════════════════ -->
+ ═══════════════════════════════════════════════════════════════ -->
 <div id="screen-auth" class="screen active">
+  <button type="button" class="auth-theme-toggle" id="auth-theme-toggle" data-theme-toggle onclick="toggleDarkMode()" title="Toggle light/dark theme" aria-label="Toggle theme">
+    <i data-lucide="moon"></i>
+  </button>
   <div class="auth-bg"><div class="auth-grid-lines"></div></div>
   <div class="auth-wrap">
     <div class="auth-left">
       <div>
         <div class="iit-emblem">
-          <div class="emblem-mark">IIT</div>
+          <svg viewBox="0 0 100 100" class="iit-logo-svg" style="width:64px; height:64px; fill:none; stroke:#fff; stroke-width:3;">
+            <circle cx="50" cy="50" r="46" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+            <circle cx="50" cy="50" r="42" stroke="#fff" stroke-width="3"/>
+            <path d="M50 15 L50 22 M50 78 L50 85 M15 50 L22 50 M78 50 L85 50 M25 25 L30 30 M70 70 L75 75 M25 75 L30 70 M70 25 L75 30" stroke="#fff" stroke-width="4"/>
+            <path d="M45 40 L55 40 L50 65 Z" fill="#fff"/>
+            <circle cx="50" cy="35" r="5" fill="#fff"/>
+            <path d="M38 52 Q50 48 62 52 L62 58 Q50 54 38 58 Z" fill="#fff" stroke="#0a192f" stroke-width="1.5"/>
+          </svg>
           <div class="emblem-info">
             <h1>Indian Institute of Technology Ropar</h1>
-            <p>District Survey Report Automation System</p>
+            <p>GOVERNMENT OF INDIA</p>
           </div>
         </div>
-        <div class="auth-title">District Survey<br>Report Portal <em>2025-26</em></div>
-        <div class="auth-desc">Prepare, manage, and digitally sign DSRs for sand mining across Punjab districts. Fully EMGSM 2020 compliant.</div>
+        <div class="auth-title">Enterprise<br><em style="color:#2563eb; font-style:normal;">Resource Planning</em><br>Platform</div>
+        <div class="auth-desc">Secure, unified gateway for faculty, administration, and government authorities to manage internal operations.</div>
         <div class="auth-pills">
-          <div class="auth-pill"><div class="pill-icon">📊</div><span>Auto-generated cross section graphs & elevation charts</span></div>
-          <div class="auth-pill"><div class="pill-icon">📋</div><span>All 10 chapters, plates, annexures I–IV fully templated</span></div>
-          <div class="auth-pill"><div class="pill-icon">✍️</div><span>5-level sequential e-signature authority workflow</span></div>
-          <div class="auth-pill"><div class="pill-icon">📥</div><span>Professional government-format PDF export</span></div>
+          <div class="auth-pill">
+            <div class="pill-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                <path d="m9 11 2 2 4-4"/>
+              </svg>
+            </div>
+            <div class="auth-pill-text">
+              <strong>Govt. NIC Secured Network</strong>
+              <span>Trusted. Secure. Reliable.</span>
+            </div>
+          </div>
+          <div class="auth-pill">
+            <div class="pill-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </div>
+            <div class="auth-pill-text">
+              <strong>End-to-End Encrypted Auth</strong>
+              <span>Your data is safe with us.</span>
+            </div>
+          </div>
         </div>
       </div>
-      <div style="font-size:10px;color:rgba(255,255,255,.2);margin-top:32px;">Government of Punjab · EMGSM 2020 · IIT Ropar Research Cell</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:32px;">© 2025 Indian Institute of Technology Ropar. All rights reserved.</div>
     </div>
     <div class="auth-right">
       <div class="auth-tabs">
-        <div class="auth-tab active" onclick="switchAuthTab('login')">Login</div>
-        <div class="auth-tab" onclick="switchAuthTab('signup')">Register</div>
+        <div id="tab-btn-faculty" class="auth-tab" onclick="switchAuthMode('faculty')">Faculty / Staff</div>
+        <div id="tab-btn-authority" class="auth-tab active" onclick="switchAuthMode('authority')">Govt. Authority</div>
       </div>
-      <!-- LOGIN -->
-      <div id="auth-form-login" class="auth-form active">
-        <div class="auth-form-title">Welcome back</div>
-        <div class="auth-form-sub">Sign in to your DSR Portal account</div>
-        <div class="f-field"><label>Email Address</label><input id="login-email" type="email" placeholder="officer@punjab.gov.in" value="demo@iitropar.ac.in"></div>
-        <div class="f-field"><label>Password</label><input id="login-pass" type="password" placeholder="••••••••" value="password123"></div>
+      
+      <!-- FACULTY / STAFF FORM -->
+      <div id="auth-form-faculty" class="auth-form">
+        <div class="auth-form-title">Staff Portal</div>
+        <div class="auth-form-sub">Sign in to your DSR Coordinator / Reviewer account</div>
+        <div class="f-field">
+          <label>Email Address</label>
+          <div class="input-wrap">
+            <i data-lucide="mail" style="position:absolute;left:16px;color:var(--text-soft);width:18px;height:18px;"></i>
+            <input id="login-email" type="email" placeholder="officer@punjab.gov.in" value="demo@iitropar.ac.in">
+          </div>
+        </div>
+        <div class="f-field">
+          <label>Password</label>
+          <div class="input-wrap">
+            <i data-lucide="lock" style="position:absolute;left:16px;color:var(--text-soft);width:18px;height:18px;"></i>
+            <input id="login-pass" type="password" placeholder="••••••••" value="password123">
+          </div>
+        </div>
         <div class="f-field"><label>Login As</label>
           <select id="login-role">
             <option value="user">Report Coordinator / Data Entry</option>
             <option value="reviewer">Section Reviewer</option>
-            <option value="authority">Authority / Signing Officer</option>
             <option value="admin">System Administrator</option>
           </select>
         </div>
         <div class="form-err" id="login-error"></div>
         <button class="btn-primary" onclick="doLogin()">Login to Portal →</button>
-        <div class="auth-divider"><span>OR</span></div>
-        <button class="btn-authority" onclick="doAuthorityQuickLogin()">⚡ Quick Demo — Authority Dashboard</button>
       </div>
-      <!-- REGISTER -->
-      <div id="auth-form-signup" class="auth-form">
-        <div class="auth-form-title">Create account</div>
-        <div class="auth-form-sub">Register as a new DSR portal user</div>
-        <div class="f-field"><label>Full Name</label><input id="signup-name" placeholder="Rajinder Kumar"></div>
-        <div class="f-field"><label>Official Email</label><input id="signup-email" type="email" placeholder="officer@punjab.gov.in"></div>
-        <div class="f-field"><label>Department / Designation</label><input id="signup-dept" placeholder="Sub-Divisional Officer, Jalandhar"></div>
-        <div class="f-field"><label>Password (min 6 chars)</label><input id="signup-pass" type="password" placeholder="••••••••"></div>
-        <div class="form-err" id="signup-error"></div>
-        <div class="form-ok" id="signup-success"></div>
-        <button class="btn-primary" onclick="doSignup()">Create Account →</button>
+
+      <!-- GOVT AUTHORITY FORM -->
+      <div id="auth-form-authority" class="auth-form active">
+        <div class="auth-form-title">Authority Portal</div>
+        <div class="auth-form-sub">Secure access for nodal officers and auditors.</div>
+        
+        <div class="f-field">
+          <label>NIC ID / Authority Token</label>
+          <div class="input-wrap">
+            <i data-lucide="user" style="position:absolute;left:16px;color:var(--text-soft);width:18px;height:18px;"></i>
+            <input id="auth-nic-id" type="text" placeholder="Enter your authorized ID" value="authority-demo">
+          </div>
+        </div>
+        
+        <div class="f-field">
+          <label>Security PIN</label>
+          <div class="input-wrap">
+            <i data-lucide="lock" style="position:absolute;left:16px;color:var(--text-soft);width:18px;height:18px;"></i>
+            <input id="auth-security-pin" type="password" placeholder="••••••" value="123456">
+            <button class="btn-reveal" onclick="togglePinReveal()" type="button" style="position:absolute;right:16px;color:var(--text-soft);background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;">
+              <i data-lucide="eye" style="width:18px;height:18px;"></i>
+            </button>
+          </div>
+        </div>
+        
+        <div class="auth-options">
+          <label class="cb-container">
+            <input type="checkbox" checked> Remember me
+          </label>
+          <a href="#" class="forgot-link" onclick="toast('Please contact your district administrator to reset your PIN.','info'); return false;">Forgot PIN?</a>
+        </div>
+        
+        <div class="form-err" id="auth-error"></div>
+        <button class="btn-primary" onclick="doAuthorityVerify()" style="background:#0a192f; display:flex; align-items:center; justify-content:center; gap:8px;">
+          <i data-lucide="lock" style="width:16px;height:16px;"></i>
+          Verify & Proceed
+        </button>
+        
+        <div class="nic-banner" style="display:flex; align-items:center; gap:8px; background:var(--primary-lt); color:var(--text-mid); font-size:13px; padding:14px; border-radius:var(--r-md); margin-top:16px; border:1px solid rgba(37,99,235,.12); justify-content:center;">
+          <i data-lucide="shield-check" style="width:16px;height:16px;color:var(--primary);"></i>
+          <span>This portal is protected by <strong>NIC Secured Network</strong></span>
+        </div>
       </div>
     </div>
   </div>
@@ -99,16 +173,16 @@
   <nav class="sb-nav">
     <div class="sb-section">
       <div class="sb-section-lbl">Overview</div>
-      <button class="sb-item active" onclick="showView('dashboard',this)"><span class="sb-ico">🏠</span>Dashboard<span class="sb-badge" id="badge-projs">3</span></button>
-      <button class="sb-item" onclick="showView('projects',this)"><span class="sb-ico">📁</span>My Projects</button>
-      <button class="sb-item" onclick="showView('workflow',this)"><span class="sb-ico">🔄</span>Report Workflow</button>
+      <button class="sb-item active" onclick="showView('dashboard',this)"><span class="sb-ico"><i data-lucide="layout-dashboard"></i></span>Dashboard<span class="sb-badge" id="badge-projs">3</span></button>
+      <button class="sb-item" onclick="showView('projects',this)"><span class="sb-ico"><i data-lucide="folder"></i></span>My Projects</button>
+      <button class="sb-item" onclick="showView('workflow',this)"><span class="sb-ico"><i data-lucide="git-branch"></i></span>Report Workflow</button>
     </div>
     <div class="sb-section" id="report-nav" style="display:none">
       <div class="sb-section-lbl">DSR Sections</div>
-      <button class="sb-item" onclick="showView('front-matter',this)"><span class="sb-ico">📋</span>Front Matter</button>
-      <button class="sb-item" onclick="showView('chapters',this)"><span class="sb-ico">📖</span>Chapters (10)</button>
-      <button class="sb-item" onclick="showView('plates',this)"><span class="sb-ico">🗺️</span>Plate Section</button>
-      <button class="sb-item" onclick="showView('graphs',this)" style="padding-left: 24px; font-size: 11px;"><span class="sb-ico" style="width: 24px; height: 24px; font-size: 11px;">📈</span>Cross Section Graphs</button>
+      <button class="sb-item" onclick="showView('front-matter',this)"><span class="sb-ico"><i data-lucide="file-text"></i></span>Front Matter</button>
+      <button class="sb-item" onclick="showView('chapters',this)"><span class="sb-ico"><i data-lucide="book-open"></i></span>Chapters (10)</button>
+      <button class="sb-item" onclick="showView('plates',this)"><span class="sb-ico"><i data-lucide="map"></i></span>Plate Section</button>
+      <button class="sb-item" onclick="showView('graphs',this)" style="padding-left: 24px; font-size: 11px;"><span class="sb-ico" style="width: 24px; height: 24px; font-size: 11px;"><i data-lucide="line-chart"></i></span>Cross Section Graphs</button>
     </div>
     <div class="sb-section" id="annexure-nav" style="display:none">
       <div class="sb-section-lbl">Annexures</div>
@@ -119,26 +193,30 @@
       <button class="sb-item" onclick="showView('anx5',this)"><span class="sb-ico">Ⅴ</span>Annexure V — Bench Mark & CORS</button>
       <button class="sb-item" onclick="showView('anx6',this)"><span class="sb-ico">Ⅵ</span>Annexure VI — Final Cluster Details</button>
       <button class="sb-item" onclick="showView('anx7',this)"><span class="sb-ico">Ⅶ</span>Annexure VII — Final Patta Lands</button>
-      <button class="sb-item" onclick="showView('annexures-extra',this)"><span class="sb-ico">+</span>More Annexures</button>
+      <button class="sb-item" onclick="showView('annexures-extra',this)"><span class="sb-ico"><i data-lucide="paperclip"></i></span>More Annexures</button>
     </div>
     <div class="sb-section" id="tables-nav" style="display:none">
       <div class="sb-section-lbl">Data Tables</div>
-      <button class="sb-item" onclick="showView('demand-table',this)"><span class="sb-ico">📊</span>Demand Table</button>
-      <button class="sb-item" onclick="showView('auction-table',this)"><span class="sb-ico">🏛️</span>Auctioned Sites</button>
-      <button class="sb-item" onclick="showView('summary-table',this)"><span class="sb-ico">📉</span>Source Summary</button>
-      <button class="sb-item" onclick="showView('benchmark-table',this)"><span class="sb-ico">📍</span>Bench Mark & CORS</button>
+      <button class="sb-item" onclick="showView('demand-table',this)"><span class="sb-ico"><i data-lucide="bar-chart-3"></i></span>Demand Table</button>
+      <button class="sb-item" onclick="showView('auction-table',this)"><span class="sb-ico"><i data-lucide="landmark"></i></span>Auctioned Sites</button>
+      <button class="sb-item" onclick="showView('summary-table',this)"><span class="sb-ico"><i data-lucide="pie-chart"></i></span>Source Summary</button>
+      <button class="sb-item" onclick="showView('benchmark-table',this)"><span class="sb-ico"><i data-lucide="map-pin"></i></span>Bench Mark & CORS</button>
     </div>
     <div class="sb-section" id="finalize-nav" style="display:none">
       <div class="sb-section-lbl">Finalize</div>
-      <button class="sb-item" onclick="showView('esign',this)"><span class="sb-ico">✍️</span>E-Signatures<span class="sb-badge sb-badge-red" id="sb-pending-sigs">5</span></button>
-      <button class="btn sb-item" onclick="showView('generate',this)"><span class="sb-ico">📥</span>Generate PDF</button>
-      <button class="sb-item" onclick="showView('history',this)"><span class="sb-ico">🕑</span>Report History</button>
-      <button class="sb-item" onclick="showView('users',this)"><span class="sb-ico">👥</span>User Management</button>
+      <button class="sb-item" onclick="showView('esign',this)"><span class="sb-ico"><i data-lucide="pen-tool"></i></span>E-Signatures<span class="sb-badge sb-badge-red" id="sb-pending-sigs">5</span></button>
+      <button class="btn sb-item" onclick="showView('generate',this)"><span class="sb-ico"><i data-lucide="download"></i></span>Generate PDF</button>
+      <button class="sb-item" onclick="showView('history',this)"><span class="sb-ico"><i data-lucide="history"></i></span>Report History</button>
+      <button class="sb-item" onclick="showView('users',this)"><span class="sb-ico"><i data-lucide="users"></i></span>User Management</button>
+    </div>
+    <div class="sb-section" style="margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border);">
+      <div class="sb-section-lbl">Active Districts</div>
+      <div id="sidebar-districts-legend" style="display: flex; flex-direction: column; gap: 4px; padding: 4px 8px;"></div>
     </div>
   </nav>
   <div class="sb-bottom">
     <div class="sb-status-row"><span class="status-dot"></span><span class="status-txt">EMGSM 2020 Compliant</span></div>
-    <button class="sb-logout" onclick="doLogout()">🚪 Logout</button>
+    <button class="sb-logout" onclick="doLogout()"><i data-lucide="log-out" style="width:14px;height:14px;margin-right:7px;"></i>Logout</button>
   </div>
 </aside>
 
@@ -146,14 +224,22 @@
   <!-- TOPBAR -->
   <!-- TOPBAR -->
 <div class="topbar">
-  <div class="tb-left">
-    <h2 id="topbar-title">Dashboard</h2>
-    <p id="topbar-sub">District Survey Report Management System · IIT Ropar</p>
+  <div class="tb-left" style="display:flex;align-items:center;gap:16px;">
+    <button id="tb-back-btn" class="tb-action-btn" style="display:none;width:36px;height:36px;border-radius:50%;align-items:center;justify-content:center;" onclick="goBackView()">
+      <i data-lucide="arrow-left" style="width:18px;height:18px;"></i>
+    </button>
+    <div>
+      <h2 id="topbar-title">Dashboard</h2>
+      <p id="topbar-sub">District Survey Report Management System · IIT Ropar</p>
+    </div>
   </div>
   <div class="tb-right">
-    <span class="tb-district" id="tb-district-badge">Punjab</span>
-    <button class="btn btn-outline btn-sm" onclick="showView('esign',null)">✍️ E-Sign</button>
-    <button class="btn btn-outline btn-sm" onclick="showView('generate',null)">⬇ PDF</button>
+    <span class="tb-district" id="tb-district-badge" style="border: 1px solid transparent; transition: all .3s;">Punjab</span>
+    <button type="button" class="tb-action-btn" id="dark-mode-toggle" data-theme-toggle onclick="toggleDarkMode()" title="Toggle light/dark theme" aria-label="Toggle theme" style="width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-right:8px;">
+      <i data-lucide="moon" style="width:16px;height:16px;"></i>
+    </button>
+    <button class="btn btn-outline btn-sm" style="display:inline-flex;align-items:center;gap:4px;" onclick="showView('esign',null)"><i data-lucide="pen-tool" style="width:12px;height:12px;"></i>E-Sign</button>
+    <button class="btn btn-outline btn-sm" style="display:inline-flex;align-items:center;gap:4px;" onclick="showView('generate',null)"><i data-lucide="download" style="width:12px;height:12px;"></i>PDF</button>
     <button class="btn btn-saffron btn-sm" onclick="newProjectModal()">+ New Project</button>
   </div>
 </div>
@@ -165,36 +251,63 @@
       <!-- ═══ DASHBOARD ═══ -->
 <div id="view-dashboard" class="view active">
   <div class="hero-banner">
-    <div class="hero-eyebrow">🏛 Government of Punjab · EMGSM 2020 · IIT Ropar Research Cell</div>
+    <div class="hero-eyebrow">Government of Punjab · EMGSM 2020 · IIT Ropar Research Cell</div>
     <div class="hero-title">District Survey Report<br>Automation Portal</div>
     <div class="hero-sub">Prepare, review, and digitally sign DSRs for sand mining across all Punjab districts. Fully automated graph generation, annexure templates, and sequential e-signature workflow.</div>
     <div class="hero-actions">
       <button class="btn btn-saffron" onclick="newProjectModal()">+ Create New DSR Project</button>
-      <button class="btn btn-outline" style="color:rgba(255,255,255,.7);border-color:rgba(255,255,255,.18)" onclick="showView('projects',null)">View All Projects →</button>
+      <button class="btn btn-outline" style="color:rgba(255,255,255,.7);border-color:rgba(255,255,255,.18);background:transparent;" onclick="showView('projects',null)">View All Projects →</button>
     </div>
   </div>
+  
+  <!-- District Filter & Active District Selector -->
+  <div class="card" style="margin-bottom:20px; padding:16px 24px; display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap; background:var(--card); border:1px solid var(--border);">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <i data-lucide="filter" style="width:16px; height:16px; color:var(--text-soft);"></i>
+      <span style="font-size:12.5px; font-weight:700; color:var(--text-mid); text-transform:uppercase; letter-spacing:.05em;">District Context:</span>
+      <select id="dash-district-filter" onchange="filterDashboardByDistrict(this.value)" style="padding:8px 16px; border:1px solid var(--border-2); border-radius:var(--r-md); background:var(--bg); color:var(--text); font-size:13.5px; font-weight:700; outline:none; cursor:pointer; transition:border-color .2s;">
+        <option value="ALL">All Districts (Punjab)</option>
+        <option>Jalandhar</option>
+        <option>Ludhiana</option>
+        <option>Mansa</option>
+        <option>Hoshiarpur</option>
+        <option>Pathankot</option>
+        <option>Rupnagar</option>
+        <option>Tarn Taran</option>
+      </select>
+    </div>
+    <div style="font-size:13px; font-weight:600; color:var(--text-soft); display:flex; align-items:center; gap:8px;">
+      Active District Highlight: <span id="dash-active-district-badge" class="badge" style="background:var(--off); color:var(--text-soft);">None</span>
+    </div>
+  </div>
+
   <div class="g4" style="margin-bottom:20px">
-    <div class="stat-card" style="--accent:var(--teal);--icon-bg:rgba(12,122,114,.1)"><div class="stat-accent"></div><div class="stat-icon">📁</div><div class="stat-lbl">Total Projects</div><div class="stat-val" id="d-total">3</div><div class="stat-info">Active DSR projects</div></div>
-    <div class="stat-card" style="--accent:var(--green);--icon-bg:rgba(21,128,61,.1)"><div class="stat-accent"></div><div class="stat-icon">✅</div><div class="stat-lbl">Completed</div><div class="stat-val" id="d-done">1</div><div class="stat-info">Reports finalized</div></div>
-    <div class="stat-card" style="--accent:#6366f1;--icon-bg:rgba(99,102,241,.1)"><div class="stat-accent"></div><div class="stat-icon">⏳</div><div class="stat-lbl">Pending Signatures</div><div class="stat-val" id="d-sigs">4</div><div class="stat-info">Awaiting authorities</div></div>
-    <div class="stat-card" style="--accent:var(--saffron);--icon-bg:rgba(224,123,0,.1)"><div class="stat-accent"></div><div class="stat-icon">📥</div><div class="stat-lbl">PDFs Generated</div><div class="stat-val" id="d-pdfs">2</div><div class="stat-info">Final reports ready</div></div>
+    <div class="stat-card" style="--accent:var(--teal);--icon-bg:rgba(12,122,114,.1)"><div class="stat-accent"></div><div class="stat-icon"><i data-lucide="folder"></i></div><div class="stat-lbl">Total Projects</div><div class="stat-val" id="d-total">0</div><div class="stat-info">Active DSR projects</div></div>
+    <div class="stat-card" style="--accent:var(--green);--icon-bg:rgba(21,128,61,.1)"><div class="stat-accent"></div><div class="stat-icon"><i data-lucide="check-circle-2"></i></div><div class="stat-lbl">Completed</div><div class="stat-val" id="d-done">0</div><div class="stat-info">Reports finalized</div></div>
+    <div class="stat-card" style="--accent:#6366f1;--icon-bg:rgba(99,102,241,.1)"><div class="stat-accent"></div><div class="stat-icon"><i data-lucide="clock"></i></div><div class="stat-lbl">Pending Signatures</div><div class="stat-val" id="d-sigs">0</div><div class="stat-info">Awaiting authorities</div></div>
+    <div class="stat-card" style="--accent:var(--saffron);--icon-bg:rgba(224,123,0,.1)"><div class="stat-accent"></div><div class="stat-icon"><i data-lucide="file-down"></i></div><div class="stat-lbl">PDFs Generated</div><div class="stat-val" id="d-pdfs">0</div><div class="stat-info">Final reports ready</div></div>
   </div>
-  <div class="g2">
-    <div class="card">
-      <div class="card-hd"><div><div class="card-title">Recent Projects</div><div class="card-sub">Click to open and edit</div></div><button class="btn btn-outline btn-xs" onclick="showView('projects',null)">See All</button></div>
-      <div class="card-bd" id="dash-recent"></div>
-    </div>
-    <div class="card">
-      <div class="card-hd"><div class="card-title">DSR Workflow Overview</div></div>
-      <div class="card-bd">
-        <div class="timeline">
-          <div class="tl-item"><div class="tl-line"></div><div class="tl-dot done">✓</div><div class="tl-content"><div class="tl-title">Project Initialized</div><div class="tl-sub">Basic details, district, year, mineral type</div></div></div>
-          <div class="tl-item"><div class="tl-line"></div><div class="tl-dot active">2</div><div class="tl-content"><div class="tl-title">Data Entry & Upload</div><div class="tl-sub">Front matter, chapters, plates, graphs, annexures, tables</div></div></div>
-          <div class="tl-item"><div class="tl-line"></div><div class="tl-dot">3</div><div class="tl-content"><div class="tl-title">Generate Final PDF</div><div class="tl-sub">Professional government-format report</div></div></div>
-          <div class="tl-item"><div class="tl-line"></div><div class="tl-dot">4</div><div class="tl-content"><div class="tl-title">Submit for Approval</div><div class="tl-sub">Send to authority signing dashboard</div></div></div>
-          <div class="tl-item"><div class="tl-dot">5</div><div class="tl-content"><div class="tl-title">Sequential E-Signing</div><div class="tl-sub">5-level authority hierarchy · Final signed PDF</div></div></div>
+  <div style="display:grid; grid-template-columns: 2.2fr 1fr; gap: 24px; align-items: start;">
+    <div style="display:flex; flex-direction:column; gap:20px;">
+      <div class="card">
+        <div class="card-hd"><div><div class="card-title">Recent Projects</div><div class="card-sub">Click to open and edit</div></div><button class="btn btn-outline btn-xs" onclick="showView('projects',null)">See All</button></div>
+        <div class="card-bd" id="dash-recent"></div>
+      </div>
+      <div class="card">
+        <div class="card-hd"><div class="card-title">DSR Workflow Overview</div></div>
+        <div class="card-bd">
+          <div class="timeline">
+            <div class="tl-item"><div class="tl-line"></div><div class="tl-dot done">✓</div><div class="tl-content"><div class="tl-title">Project Initialized</div><div class="tl-sub">Basic details, district, year, mineral type</div></div></div>
+            <div class="tl-item"><div class="tl-line"></div><div class="tl-dot active">2</div><div class="tl-content"><div class="tl-title">Data Entry & Upload</div><div class="tl-sub">Front matter, chapters, plates, graphs, annexures, tables</div></div></div>
+            <div class="tl-item"><div class="tl-line"></div><div class="tl-dot">3</div><div class="tl-content"><div class="tl-title">Generate Final PDF</div><div class="tl-sub">Professional government-format report</div></div></div>
+            <div class="tl-item"><div class="tl-line"></div><div class="tl-dot">4</div><div class="tl-content"><div class="tl-title">Submit for Approval</div><div class="tl-sub">Send to authority signing dashboard</div></div></div>
+            <div class="tl-item"><div class="tl-dot">5</div><div class="tl-content"><div class="tl-title">Sequential E-Signing</div><div class="tl-sub">5-level authority hierarchy · Final signed PDF</div></div></div>
+          </div>
         </div>
       </div>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:20px;" id="dash-right-sidebar">
+      <!-- District Legend and active district card will be dynamically populated here -->
     </div>
   </div>
 </div>
@@ -205,12 +318,18 @@
     <div><div class="page-title">My DSR Projects</div><div class="page-sub">All district survey reports across Punjab</div></div>
     <button class="btn btn-saffron" onclick="newProjectModal()">+ New Project</button>
   </div>
-  <div id="projects-grid" class="g3"></div>
+  <div style="display:grid; grid-template-columns: 2.2fr 1fr; gap: 24px; align-items: start;">
+    <div id="projects-grid" class="g2"></div>
+    <div style="display:flex; flex-direction:column; gap:20px;" id="projects-right-sidebar">
+      <!-- District Legend will be dynamically populated here -->
+    </div>
+  </div>
 </div>
 
       <!-- ═══ WORKFLOW ═══ -->
 <div id="view-workflow" class="view">
   <div class="header-row"><div><div class="page-title">Report Workflow</div><div class="page-sub">Serial-locked workflow — each stage must be completed before unlocking the next</div></div></div>
+  <div id="workflow-active-district-header" style="margin-bottom: 20px; display:none;"></div>
   <div class="step-bar">
     <div class="step done"><div class="step-dot">✓</div><div class="step-lbl">Project Setup</div></div>
     <div class="step active"><div class="step-dot">2</div><div class="step-lbl">Front Matter</div></div>
@@ -223,13 +342,16 @@
   </div>
   <div class="g2">
     <div class="card">
-      <div class="card-hd"><div class="card-title">📤 Section Completion Status</div></div>
+      <div class="card-hd"><div class="card-title">Section Completion Status</div></div>
       <div class="card-bd" id="workflow-checklist"></div>
     </div>
     <div class="card">
-      <div class="card-hd"><div class="card-title">🔐 E-Signature Hierarchy</div></div>
+      <div class="card-hd"><div class="card-title">E-Signature Hierarchy</div></div>
       <div class="card-bd">
-        <div class="notif notif-warn" style="margin-bottom:14px">⚠️ Signatures must be completed in strict sequential order.</div>
+        <div class="notif notif-warn" style="margin-bottom:14px; display:flex; align-items:center; gap:8px;">
+          <i data-lucide="alert-triangle" style="width:16px; height:16px; flex-shrink:0;"></i>
+          <span>Signatures must be completed in strict sequential order.</span>
+        </div>
         <div class="timeline">
           <div class="tl-item"><div class="tl-line"></div><div class="tl-dot done">1</div><div class="tl-content"><div class="tl-title">Sub-Divisional Officer</div><div class="tl-sub">First signatory · Data verification</div></div></div>
           <div class="tl-item"><div class="tl-line"></div><div class="tl-dot active">2</div><div class="tl-content"><div class="tl-title">District Mining Officer</div><div class="tl-sub">Technical review & approval</div></div></div>
@@ -326,7 +448,7 @@
 <div id="view-chapters" class="view">
   <div class="header-row">
     <div><div class="page-title">Report Chapters</div><div class="page-sub">10 chapters as per EMGSM 2020 · Edit headings and summaries · Upload chapter PDFs</div></div>
-    <div style="display:flex;gap:8px"><button class="btn btn-outline btn-sm" onclick="addChapter()">+ Add Chapter</button><span class="section-status ss-active">⏳ In Progress</span></div>
+    <div style="display:flex;gap:8px;align-items:center;"><button class="btn btn-outline btn-sm" onclick="addChapter()">+ Add Chapter</button><span class="section-status ss-active" style="display:inline-flex;align-items:center;gap:4px;"><i data-lucide="clock" style="width:12px;height:12px;"></i>In Progress</span></div>
   </div>
   <div id="chapter-list"></div>
 </div>
@@ -1123,11 +1245,11 @@
   <div class="g2">
     <div>
       <div class="card" style="margin-bottom:16px">
-        <div class="card-hd"><div class="card-title">📋 Completion Checklist</div></div>
+        <div class="card-hd"><div class="card-title">Completion Checklist</div></div>
         <div class="card-bd" id="final-checklist"></div>
       </div>
       <div class="card">
-        <div class="card-hd"><div class="card-title">⚙️ PDF Options</div></div>
+        <div class="card-hd"><div class="card-title">PDF Options</div></div>
         <div class="card-bd">
           <div class="field-group">
             <div class="field-row">
@@ -1138,15 +1260,15 @@
           </div>
           <div class="divider"></div>
           <div style="display:flex;gap:9px;flex-wrap:wrap">
-            <button class="btn btn-navy" onclick="generateFinalPDF()">📥 Generate Final PDF</button>
-            <button class="btn btn-teal" onclick="submitForReview()">📧 Submit to Authority</button>
+            <button class="btn btn-navy" style="display:inline-flex;align-items:center;gap:4px;" onclick="generateFinalPDF()"><i data-lucide="download" style="width:14px;height:14px;"></i>Generate Final PDF</button>
+            <button class="btn btn-teal" style="display:inline-flex;align-items:center;gap:4px;" onclick="submitForReview()"><i data-lucide="send" style="width:14px;height:14px;"></i>Submit to Authority</button>
           </div>
         </div>
       </div>
     </div>
     <div>
       <div class="card">
-        <div class="card-hd"><div class="card-title">📄 PDF Preview</div></div>
+        <div class="card-hd"><div class="card-title">PDF Preview</div></div>
         <div class="card-bd">
           <div class="pdf-preview">
             <div style="font-size:11px;color:rgba(255,255,255,.6);margin-bottom:10px">Preview — Final DSR Report</div>
@@ -1227,7 +1349,7 @@
   <div class="modal-box" style="max-width:400px; max-height: max-content;">
     <div class="modal-hd"><h3>Confirm Action</h3><button class="modal-close" onclick="closeModal('modal-confirm')">×</button></div>
     <div class="modal-bd">
-      <p id="confirm-msg" style="font-size:14px; color:var(--navy); font-weight: 500;"></p>
+      <p id="confirm-msg" style="font-size:14px; color:var(--text); font-weight: 500;"></p>
     </div>
     <div class="modal-ft">
       <button class="btn btn-outline" onclick="closeModal('modal-confirm')">Cancel</button>
@@ -1246,11 +1368,13 @@
         <div class="field-row">
           <div class="field"><label>District</label>
             <select id="proj-district">
-              <option>Jalandhar</option><option>Ludhiana</option><option>Amritsar</option><option>Patiala</option>
-              <option>Gurdaspur</option><option>Hoshiarpur</option><option>Kapurthala</option><option>SBS Nagar</option>
-              <option>Rupnagar</option><option>Fatehgarh Sahib</option><option>Moga</option><option>Firozpur</option>
-              <option>Fazilka</option><option>Muktsar</option><option>Bathinda</option><option>Sangrur</option>
-              <option>Barnala</option><option>Mansa</option><option>Pathankot</option><option>Tarn Taran</option>
+              <option>Jalandhar</option>
+              <option>Ludhiana</option>
+              <option>Mansa</option>
+              <option>Hoshiarpur</option>
+              <option>Pathankot</option>
+              <option>Rupnagar</option>
+              <option>Tarn Taran</option>
             </select>
           </div>
           <div class="field"><label>Year</label><input id="proj-year" value="2025-26"></div>
@@ -1274,10 +1398,13 @@
 <!-- Sign Modal -->
 <div id="modal-sign" class="modal-overlay">
   <div class="modal-box">
-    <div class="modal-hd"><h3 id="sign-modal-title">✍️ Digital Signature</h3><button class="modal-close" onclick="closeModal('modal-sign')">×</button></div>
+    <div class="modal-hd"><h3 id="sign-modal-title">Digital Signature</h3><button class="modal-close" onclick="closeModal('modal-sign')">×</button></div>
     <div class="modal-bd">
       <div id="sign-modal-content"></div>
-      <div class="notif notif-warn" style="margin-top:14px">⚠️ By signing, you certify the accuracy of the complete DSR report and EMGSM 2020 compliance.</div>
+      <div class="notif notif-warn" style="margin-top:14px; display:flex; align-items:center; gap:8px;">
+        <i data-lucide="alert-triangle" style="width:16px; height:16px; flex-shrink:0;"></i>
+        <span>By signing, you certify the accuracy of the complete DSR report and EMGSM 2020 compliance.</span>
+      </div>
       <div class="field" style="margin-top:14px"><label>OTP Verification (Demo: 123456)</label><input class="otp-input" id="sign-otp" maxlength="6" placeholder="——————" oninput="this.value=this.value.replace(/\D/g,'')"></div>
     </div>
     <div class="modal-ft">
@@ -1290,10 +1417,13 @@
 <!-- Authority Sign Modal -->
 <div id="modal-auth-sign" class="modal-overlay">
   <div class="modal-box">
-    <div class="modal-hd"><h3>✍️ Authority E-Signature</h3><button class="modal-close" onclick="closeModal('modal-auth-sign')">×</button></div>
+    <div class="modal-hd"><h3>Authority E-Signature</h3><button class="modal-close" onclick="closeModal('modal-auth-sign')">×</button></div>
     <div class="modal-bd">
       <div id="auth-sign-content"></div>
-      <div class="notif notif-warn" style="margin-top:14px">⚠️ Sequential signing — your approval forwards to the next authority.</div>
+      <div class="notif notif-warn" style="margin-top:14px; display:flex; align-items:center; gap:8px;">
+        <i data-lucide="alert-triangle" style="width:16px; height:16px; flex-shrink:0;"></i>
+        <span>Sequential signing — your approval forwards to the next authority.</span>
+      </div>
       <div class="field" style="margin-top:14px"><label>OTP (Demo: 123456)</label><input class="otp-input" id="auth-otp" maxlength="6" placeholder="——————" oninput="this.value=this.value.replace(/\D/g,'')"></div>
     </div>
     <div class="modal-ft">
@@ -1315,6 +1445,13 @@
 <script src="js/plates.js"></script>
 <script src="js/graphs.js"></script>
 <script src="js/tables.js"></script>
+<script src="js/anx1.js"></script>
+<script src="js/anx2.js"></script>
+<script src="js/anx3.js"></script>
+<script src="js/anx4.js"></script>
+<script src="js/anx5.js"></script>
+<script src="js/anx6.js"></script>
+<script src="js/anx7.js"></script>
 <script src="js/signatures.js"></script>
 <script src="js/pdf.js"></script>
 <script src="js/main.js"></script>

@@ -1,6 +1,6 @@
 /* ══════════════════════════════════════
    PDF GENERATION & REVIEW
-══════════════════════════════════════ */
+ ══════════════════════════════════════ */
 function generateFinalPDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
@@ -287,14 +287,14 @@ function generateFinalPDF() {
 
   const fname=`DSR-${dist}-${yr.replace('/','-')}-${new Date().toISOString().split('T')[0]}.pdf`;
   doc.save(fname);
-  toast('📥 PDF generated: '+fname,'success');
+  toast('PDF generated: '+fname,'success');
 }
 
-function submitForReview() { toast('📧 Report submitted to authority dashboard!','success'); }
+function submitForReview() { toast('Report submitted to authority dashboard!','success'); }
 
 /* ══════════════════════════════════════
    AUTHORITY DASHBOARD
-══════════════════════════════════════ */
+ ══════════════════════════════════════ */
 function renderAuthorityReports() {
   const el=document.getElementById('authority-reports'); if(!el) return;
   const reports=[
@@ -305,34 +305,38 @@ function renderAuthorityReports() {
   el.innerHTML=reports.map(r=>`
     <div class="review-card">
       <div class="review-card-hd">
-        <div><div style="font-size:14.5px;font-weight:700;color:var(--navy)">${r.title}</div>
+        <div><div style="font-size:14.5px;font-weight:700;color:var(--text)">${r.title}</div>
           <div style="font-size:11px;color:var(--text-soft);margin-top:2px">Submitted by ${r.by} · ${r.at}</div></div>
         <span class="badge ${r.status.includes('Awaiting')?'badge-saffron':'badge-amber'}">${r.status}</span>
       </div>
       <div class="review-card-bd">
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px">
-          <span class="badge badge-navy">📍 ${r.district}</span>
-          <span class="badge badge-teal">✅ ${r.done}/5 signed</span>
-          <span class="badge badge-navy">📋 ${r.sections} sections</span>
+          <span class="badge badge-navy" style="display:inline-flex;align-items:center;gap:4px;"><i data-lucide="map-pin" style="width:12px;height:12px;"></i>${r.district}</span>
+          <span class="badge badge-teal" style="display:inline-flex;align-items:center;gap:4px;"><i data-lucide="check-circle-2" style="width:12px;height:12px;"></i>${r.done}/5 signed</span>
+          <span class="badge badge-navy" style="display:inline-flex;align-items:center;gap:4px;"><i data-lucide="file-text" style="width:12px;height:12px;"></i>${r.sections} sections</span>
           <div style="flex:1"></div>
-          <button class="btn btn-outline btn-sm" onclick="toast('📄 PDF preview opened','info')">👁 Preview</button>
-          <button class="btn btn-navy btn-sm" onclick="toast('⬇ DSR-${r.district}-2025-26.pdf downloading...','info')">⬇ Download</button>
-          <button class="btn btn-saffron btn-sm" onclick="openAuthoritySign(${r.id},'${r.title}')">✍️ Sign Now</button>
+          <button class="btn btn-outline btn-sm" onclick="toast('PDF preview opened','info')">👁 Preview</button>
+          <button class="btn btn-navy btn-sm" onclick="toast('DSR-${r.district}-2025-26.pdf downloading...','info')">Download</button>
+          <button class="btn btn-saffron btn-sm" onclick="openAuthoritySign(${r.id},'${r.title}')">Sign Now</button>
         </div>
         <div style="font-size:11px;font-weight:600;color:var(--text-soft);margin-bottom:7px">Signature Progress:</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
           ${['SDO','DMO','DC','Director','Pr. Secy'].map((role,i)=>`
-            <div style="display:flex;align-items:center;gap:4px;background:${i<r.done?'var(--green-lt)':i===r.done?'var(--saffron-lt)':'var(--bg)'};border:1px solid ${i<r.done?'var(--green)':i===r.done?'var(--saffron)':'var(--border)'};border-radius:99px;padding:4px 10px;font-size:11px;font-weight:600;color:${i<r.done?'var(--green)':i===r.done?'var(--saffron)':'var(--text-faint)'}">${i<r.done?'✅':i===r.done?'⏳':'⭕'} ${role}</div>`).join('')}
+            <div style="display:flex;align-items:center;gap:4px;background:${i<r.done?'var(--green-lt)':i===r.done?'var(--saffron-lt)':'var(--bg)'};border:1px solid ${i<r.done?'var(--green)':i===r.done?'var(--saffron)':'var(--border)'};border-radius:99px;padding:4px 10px;font-size:11px;font-weight:600;color:${i<r.done?'var(--green)':i===r.done?'var(--saffron)':'var(--text-faint)'}">
+              <i data-lucide="${i<r.done?'check-circle-2':i===r.done?'clock':'minus-circle'}" style="width:12px;height:12px;"></i>
+              ${role}
+            </div>`).join('')}
         </div>
       </div>
     </div>`).join('');
+  initLucide();
 }
 
 function openAuthoritySign(id, title) {
   document.getElementById('auth-sign-content').innerHTML=`
     <div style="background:var(--off);border:1px solid var(--border);border-radius:var(--r-md);padding:14px;margin-bottom:14px">
       <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-faint);margin-bottom:4px">Report to Sign</div>
-      <div style="font-size:14px;font-weight:700;color:var(--navy)">${title}</div>
+      <div style="font-size:14px;font-weight:700;color:var(--text)">${title}</div>
       <div style="font-size:11.5px;color:var(--text-soft);margin-top:3px">Your position: District Mining Officer (Authority #2)</div>
     </div>
     <div style="display:flex;flex-direction:column;gap:9px">
@@ -342,10 +346,11 @@ function openAuthoritySign(id, title) {
     </div>`;
   document.getElementById('auth-otp').value='';
   document.getElementById('modal-auth-sign').classList.add('open');
+  initLucide();
 }
 
 function authoritySign() {
-  if (document.getElementById('auth-otp').value!=='123456') { toast('❌ Invalid OTP. Demo: 123456','error'); return; }
+  if (document.getElementById('auth-otp').value!=='123456') { toast('Invalid OTP. Demo: 123456','error'); return; }
   closeModal('modal-auth-sign');
-  toast('✅ Report signed! Deputy Commissioner has been notified.','success');
+  toast('Report signed! Deputy Commissioner has been notified.','success');
 }

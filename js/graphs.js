@@ -2,6 +2,35 @@
    GRAPHS — CROSS SECTION
    ══════════════════════════════════════ */
 
+function isDarkMode() {
+  return document.documentElement.classList.contains('dark');
+}
+
+function chartAxisColor() {
+  return isDarkMode() ? '#ffffff' : '#000000';
+}
+
+function chartGridColor() {
+  return isDarkMode() ? 'rgba(255, 255, 255, 0.12)' : '#eeeeee';
+}
+
+function chartLabelColor() {
+  return isDarkMode() ? '#ffffff' : '#000000';
+}
+
+function chartTooltipOptions() {
+  const dark = isDarkMode();
+  return {
+    mode: 'index',
+    intersect: false,
+    backgroundColor: dark ? '#131f3d' : '#ffffff',
+    titleColor: dark ? '#ffffff' : '#0f172a',
+    bodyColor: dark ? '#e2e8f0' : '#334155',
+    borderColor: dark ? '#3d5294' : '#cbd5e1',
+    borderWidth: 1
+  };
+}
+
 function addGraph() {
   const id = 'g' + Date.now();
   S.graphs.push({ 
@@ -84,8 +113,8 @@ function buildGraphHTML(g) {
   // Layout logic for single vs comparison graphs
   const canvasHTML = g.hasSubGraph 
     ? `<div style="display:flex; flex-direction:column; gap:10px;">
-         <div style="position:relative"><span style="position:absolute; top:4px; left:8px; font-size:10px; font-weight:bold; color:#000; z-index:10">${g.name || 'Post Monsoon'}</span><canvas id="canvas-${g.id}-post" height="120"></canvas></div>
-         <div style="position:relative"><span style="position:absolute; top:4px; left:8px; font-size:10px; font-weight:bold; color:#000; z-index:10">${g.subName || 'Pre Monsoon'}</span><canvas id="canvas-${g.id}-pre" height="120"></canvas></div>
+         <div style="position:relative"><span class="graph-canvas-label">${g.name || 'Post Monsoon'}</span><canvas id="canvas-${g.id}-post" height="120"></canvas></div>
+         <div style="position:relative"><span class="graph-canvas-label">${g.subName || 'Pre Monsoon'}</span><canvas id="canvas-${g.id}-pre" height="120"></canvas></div>
        </div>`
     : `<canvas id="canvas-${g.id}-post" height="200"></canvas>`;
 
@@ -139,7 +168,7 @@ function buildGraphHTML(g) {
       `}
       
       <div style="display:grid;grid-template-columns:1.5fr 0.5fr;gap:16px">
-        <div class="graph-canvas-wrap" style="background:#fff; border-radius:8px; padding:10px;">${canvasHTML}</div>
+        <div class="graph-canvas-wrap" style="background:var(--card); border: 1px solid var(--border); border-radius:8px; padding:10px;">${canvasHTML}</div>
         <div>
           <div class="kpi-grid">
             <div class="kpi-item"><div class="kpi-lbl">Post Avg Thick</div><div class="kpi-val">${o.avgThickPost.toFixed(2)}<span class="kpi-unit"> m</span></div></div>
@@ -190,7 +219,7 @@ function drawGraph(g) {
         if (dataset.label && dataset.label.includes('Elevation')) {
           const meta = chart.getDatasetMeta(i);
           meta.data.forEach((element, index) => {
-            ctx.fillStyle = '#000'; 
+            ctx.fillStyle = chartLabelColor();
             ctx.font = '11px "Times New Roman"'; 
             ctx.textAlign = 'left';
             ctx.textBaseline = 'middle';
@@ -212,14 +241,26 @@ function drawGraph(g) {
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+        plugins: {
+          legend: {
+            display: isDarkMode(),
+            labels: {
+              color: chartAxisColor(),
+              font: { family: 'Inter', size: 11 }
+            }
+          },
+          tooltip: chartTooltipOptions()
+        },
         scales: {
-          x: { ticks: { color: '#000', font: { family: 'Times New Roman' } }, grid: { color: '#eee' } },
-          y: { 
-            min: yMin, 
-            max: yMax, 
-            ticks: { color: '#000', font: { family: 'Times New Roman' } }, 
-            grid: { color: '#eee' } 
+          x: {
+            ticks: { color: chartAxisColor(), font: { family: 'Times New Roman' } },
+            grid: { color: chartGridColor() }
+          },
+          y: {
+            min: yMin,
+            max: yMax,
+            ticks: { color: chartAxisColor(), font: { family: 'Times New Roman' } },
+            grid: { color: chartGridColor() }
           }
         }
       }

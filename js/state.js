@@ -6,11 +6,7 @@ const S = {
   role: 'user',
   activeProject: null,
   pendingOTPsigId: null,
-  projects: [
-    { id:1, title:'District Survey Report for Sand Mining', district:'Jalandhar', year:'2025-26', mineral:'Sand', rivers:'Sutlej, Beas', progress:65, status:'In Progress', createdAt:'May 15, 2026', signatures:1 },
-    { id:2, title:'DSR — Ludhiana Sand Mining Survey', district:'Ludhiana', year:'2025-26', mineral:'Sand', rivers:'Sutlej', progress:30, status:'Draft', createdAt:'May 18, 2026', signatures:0 },
-    { id:3, title:'District Survey Report — Amritsar', district:'Amritsar', year:'2024-25', mineral:'RBM', rivers:'Beas, Ravi', progress:100, status:'Completed', createdAt:'Apr 10, 2026', signatures:5 }
-  ],
+  projects: [],
   chapters: [
     { id:1, name:'CHAPTER 1 — INTRODUCTION', summary:'Overview of the district and purpose of the DSR under EMGSM 2020 guidelines.' },
     { id:2, name:'CHAPTER 2 — OVERVIEW OF MINING ACTIVITIES IN THE DISTRICT', summary:'Current and historical sand mining activities, lease details, and district statistics.' },
@@ -56,7 +52,7 @@ const S = {
     { id:4, role:'Director, Mining', name:'Director of Mines', dept:'Punjab State Mining Directorate', order:4, signed:false, signedAt:null, method:null },
     { id:5, role:'Principal Secretary', name:'Principal Secretary (Mines)', dept:'Govt. of Punjab', order:5, signed:false, signedAt:null, method:null }
   ],
-  demandDistricts: ['Jalandhar','Ludhiana','Amritsar','Patiala','Gurdaspur','Hoshiarpur','Kapurthala','SBS Nagar','Rupnagar','Fatehgarh Sahib','Moga','Firozpur','Fazilka','Muktsar','Bathinda','Sangrur','Barnala','Mansa','Pathankot','Tarn Taran'],
+  demandDistricts: ['Jalandhar', 'Ludhiana', 'Mansa', 'Hoshiarpur', 'Pathankot', 'Rupnagar', 'Tarn Taran'],
   summarySources: [
     'River bed (Existing)','River bed (New Proposed)','Agriculture land, pattas etc. (Existing)',
     'Desilting sites (ponds, lakes, dams etc.) (Proposed)','Desilting sites (ponds, lakes, dams etc.) (Existing)',

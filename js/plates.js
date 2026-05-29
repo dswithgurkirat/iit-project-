@@ -15,10 +15,10 @@ function renderPlates() {
     let fileInfoHTML = '';
     if (p.fileName) {
       fileInfoHTML = `
-        <div class="file-item" style="margin-top:10px; background:#fff; max-width:400px;">
+        <div class="file-item" style="margin-top:10px; background:var(--off); border:1px solid var(--border); max-width:400px;">
           <div class="file-icon" style="background:var(--teal-lt); color:var(--teal);">📄</div>
           <div class="file-info">
-            <div class="file-name" style="font-size:11.5px; font-weight:600; color:var(--navy);">${p.fileName}</div>
+            <div class="file-name" style="font-size:11.5px; font-weight:600; color:var(--text);">${p.fileName}</div>
             <div class="file-meta" style="font-size:9.5px; color:var(--text-faint);">${p.fileSize || ''} · ${p.pages ? p.pages.length : 0} Page(s)</div>
           </div>
           <span class="badge badge-green" style="margin-left:auto;">✓ Ready</span>
@@ -33,7 +33,7 @@ function renderPlates() {
         <textarea class="ch-summary" rows="2" oninput="S.plates[${i}].summary=this.value" placeholder="Plate Description...">${p.summary}</textarea>
         <div style="margin-top:8px; display:flex; flex-direction:column; gap:6px;">
           <div>
-            <label class="btn btn-xs btn-outline" style="cursor:pointer; background: #fff">
+            <label class="btn btn-xs btn-outline" style="cursor:pointer;">
               📎 Upload PDF/Image <input type="file" accept=".pdf,image/*" hidden onchange="handlePlateUpload(event,${p.id})">
             </label>
           </div>

@@ -1,13 +1,15 @@
 /* ══════════════════════════════════════
    SIGNATURES & CHECKLISTS
-══════════════════════════════════════ */
+ ══════════════════════════════════════ */
 function renderSignatures() {
   const el=document.getElementById('sig-list'); if(!el) return;
   el.innerHTML=S.signatures.map((s,i)=>{
     const prevSigned=i===0||S.signatures[i-1].signed;
     const canSign=prevSigned&&!s.signed;
     return `<div class="sig-card">
-      <div class="sig-num" style="background:${s.signed?'var(--green-lt)':canSign?'var(--saffron-lt)':'var(--bg)'};color:${s.signed?'var(--green)':canSign?'var(--saffron)':'var(--text-faint)'};font-size:13px">${s.signed?'✅':canSign?'⏳':'🔒'}</div>
+      <div class="sig-num" style="background:${s.signed?'var(--green-lt)':canSign?'var(--saffron-lt)':'var(--bg)'};color:${s.signed?'var(--green)':canSign?'var(--saffron)':'var(--text-faint)'};display:flex;align-items:center;justify-content:center;">
+        <i data-lucide="${s.signed?'check':canSign?'clock':'lock'}" style="width:16px;height:16px;"></i>
+      </div>
       <div class="sig-info">
         <div class="sig-role">Authority ${s.order} — ${s.role}</div>
         <div class="sig-name">${s.name}</div>
@@ -15,7 +17,10 @@ function renderSignatures() {
         ${s.signed?`<div style="font-size:10.5px;color:var(--green);margin-top:3px">Signed: ${s.signedAt} via ${s.method}</div>`:''}
       </div>
       <div class="sig-status">
-        <span class="badge ${s.signed?'badge-green':canSign?'badge-saffron':'badge-gray'}">${s.signed?'✅ Signed':canSign?'⏳ Pending':'🔒 Locked'}</span>
+        <span class="badge ${s.signed?'badge-green':canSign?'badge-saffron':'badge-gray'}" style="display:inline-flex;align-items:center;gap:4px;">
+          <i data-lucide="${s.signed?'check':canSign?'clock':'lock'}" style="width:12px;height:12px;"></i>
+          ${s.signed?'Signed':canSign?'Pending':'Locked'}
+        </span>
         ${canSign?`<button class="btn btn-saffron btn-xs" onclick="openSign(${s.id})">Sign Now</button>`:''}
       </div>
     </div>`;
@@ -23,15 +28,16 @@ function renderSignatures() {
   
   const pendingCountEl = document.getElementById('sb-pending-sigs');
   if (pendingCountEl) pendingCountEl.textContent=S.signatures.filter(s=>!s.signed).length;
+  initLucide();
 }
 
 function openSign(id) {
   const s=S.signatures.find(x=>x.id===id);
-  document.getElementById('sign-modal-title').textContent=`✍️ Sign — ${s.role}`;
+  document.getElementById('sign-modal-title').textContent=`Sign — ${s.role}`;
   document.getElementById('sign-modal-content').innerHTML=`
     <div style="background:var(--off);border:1px solid var(--border);border-radius:var(--r-md);padding:14px;margin-bottom:14px">
       <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-faint);margin-bottom:4px">Signing as</div>
-      <div style="font-size:14px;font-weight:700;color:var(--navy)">${s.name}</div>
+      <div style="font-size:14px;font-weight:700;color:var(--text)">${s.name}</div>
       <div style="font-size:11.5px;color:var(--text-soft)">${s.dept}</div>
     </div>
     <div style="display:flex;flex-direction:column;gap:9px">
@@ -49,11 +55,12 @@ function openSign(id) {
   S.pendingOTPsigId=id;
   document.getElementById('sign-otp').value='';
   document.getElementById('modal-sign').classList.add('open');
+  initLucide();
 }
 
 function doSign() {
   const otp=document.getElementById('sign-otp').value;
-  if (otp!=='123456') { toast('❌ Invalid OTP. Demo: 123456','error'); return; }
+  if (otp!=='123456') { toast('Invalid OTP. Demo: 123456','error'); return; }
   const s=S.signatures.find(x=>x.id===S.pendingOTPsigId);
   if (s) {
     s.signed=true; s.signedAt=new Date().toLocaleString('en-IN',{dateStyle:'medium',timeStyle:'short'});
@@ -62,10 +69,10 @@ function doSign() {
   }
   closeModal('modal-sign');
   renderSignatures(); renderFinalChecklist();
-  toast('✅ Signed successfully! Next authority has been notified.','success');
+  toast('Signed successfully! Next authority has been notified.','success');
   const nextSig=S.signatures.find(x=>!x.signed);
-  if (nextSig) toast(`📧 Notification sent to ${nextSig.role}`,'info');
-  else toast('🎉 All signatures complete! PDF can now be generated.','success');
+  if (nextSig) toast(`Notification sent to ${nextSig.role}`,'info');
+  else toast('All signatures complete! PDF can now be generated.','success');
 }
 
 function renderFinalChecklist() {
@@ -86,7 +93,9 @@ function renderFinalChecklist() {
   el.innerHTML=items.map(it=>`
     <div class="checklist-item ${it.ok?'done':''}" style="margin-bottom:8px">
       <div class="ci-left">
-        <div class="ci-icon" style="background:${it.ok?'var(--green-lt)':'var(--bg)'};">${it.ok?'✅':'⬜'}</div>
+        <div class="ci-icon" style="background:${it.ok?'var(--green-lt)':'var(--bg)'};color:${it.ok?'var(--green)':'var(--text-faint)'};display:flex;align-items:center;justify-content:center;">
+          <i data-lucide="${it.ok?'check':'minus'}" style="width:16px;height:16px;"></i>
+        </div>
         <div><div class="ci-name">${it.name}</div><div class="ci-sub">${it.sub}</div></div>
       </div>
       <span class="badge ${it.ok?'badge-green':'badge-gray'}">${it.ok?'Ready':'Pending'}</span>
@@ -94,6 +103,7 @@ function renderFinalChecklist() {
   const total=10;
   const countEl = document.getElementById('pdf-page-count');
   if (countEl) countEl.textContent=`~${(S.chapters.length*4)+(S.plates.length*1)+32} estimated`;
+  initLucide();
 }
 
 function renderWorkflowChecklist() {
@@ -110,8 +120,11 @@ function renderWorkflowChecklist() {
   ];
   el.innerHTML=items.map(it=>`
     <div style="display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid var(--border)">
-      <span style="font-size:15px">${it.ok?'✅':'⬜'}</span>
-      <div style="flex:1"><div style="font-size:12.5px;font-weight:600;color:var(--navy)">${it.n}</div><div style="font-size:10.5px;color:var(--text-soft)">${it.note}</div></div>
+      <span style="display:flex;align-items:center;color:${it.ok?'var(--green)':'var(--text-faint)'}">
+        <i data-lucide="${it.ok?'check-circle-2':'circle'}" style="width:16px;height:16px;"></i>
+      </span>
+      <div style="flex:1"><div style="font-size:12.5px;font-weight:600;color:var(--text)">${it.n}</div><div style="font-size:10.5px;color:var(--text-soft)">${it.note}</div></div>
       <span class="badge ${it.ok?'badge-green':'badge-amber'}">${it.ok?'Done':'Pending'}</span>
     </div>`).join('');
+  initLucide();
 }

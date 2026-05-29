@@ -10,4 +10,5 @@ window.addEventListener('DOMContentLoaded',()=>{
   
   // Clean up overlays and other elements on load
   console.log("DSR Portal initialized successfully.");
+  if (window.initLucide) initLucide();
 });

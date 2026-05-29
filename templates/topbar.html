@@ -1,13 +1,21 @@
 <!-- TOPBAR -->
 <div class="topbar">
-  <div class="tb-left">
-    <h2 id="topbar-title">Dashboard</h2>
-    <p id="topbar-sub">District Survey Report Management System · IIT Ropar</p>
+  <div class="tb-left" style="display:flex;align-items:center;gap:16px;">
+    <button id="tb-back-btn" class="tb-action-btn" style="display:none;width:36px;height:36px;border-radius:50%;align-items:center;justify-content:center;" onclick="goBackView()">
+      <i data-lucide="arrow-left" style="width:18px;height:18px;"></i>
+    </button>
+    <div>
+      <h2 id="topbar-title">Dashboard</h2>
+      <p id="topbar-sub">District Survey Report Management System · IIT Ropar</p>
+    </div>
   </div>
   <div class="tb-right">
-    <span class="tb-district" id="tb-district-badge">Punjab</span>
-    <button class="btn btn-outline btn-sm" onclick="showView('esign',null)">✍️ E-Sign</button>
-    <button class="btn btn-outline btn-sm" onclick="showView('generate',null)">⬇ PDF</button>
+    <span class="tb-district" id="tb-district-badge" style="border: 1px solid transparent; transition: all .3s;">Punjab</span>
+    <button type="button" class="tb-action-btn" id="dark-mode-toggle" data-theme-toggle onclick="toggleDarkMode()" title="Toggle light/dark theme" aria-label="Toggle theme" style="width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-right:8px;">
+      <i data-lucide="moon" style="width:16px;height:16px;"></i>
+    </button>
+    <button class="btn btn-outline btn-sm" style="display:inline-flex;align-items:center;gap:4px;" onclick="showView('esign',null)"><i data-lucide="pen-tool" style="width:12px;height:12px;"></i>E-Sign</button>
+    <button class="btn btn-outline btn-sm" style="display:inline-flex;align-items:center;gap:4px;" onclick="showView('generate',null)"><i data-lucide="download" style="width:12px;height:12px;"></i>PDF</button>
     <button class="btn btn-saffron btn-sm" onclick="newProjectModal()">+ New Project</button>
   </div>
 </div>

@@ -1,10 +1,25 @@
 /* ══════════════════════════════════════
    AUTH
-══════════════════════════════════════ */
+ ══════════════════════════════════════ */
+function switchAuthMode(mode) {
+  const facultyTab = document.getElementById('tab-btn-faculty');
+  const authorityTab = document.getElementById('tab-btn-authority');
+  const facultyForm = document.getElementById('auth-form-faculty');
+  const authorityForm = document.getElementById('auth-form-authority');
+
+  if (facultyTab && authorityTab && facultyForm && authorityForm) {
+    facultyTab.classList.toggle('active', mode === 'faculty');
+    authorityTab.classList.toggle('active', mode === 'authority');
+    facultyForm.classList.toggle('active', mode === 'faculty');
+    authorityForm.classList.toggle('active', mode === 'authority');
+  }
+  
+  if (window.initLucide) initLucide();
+}
+
+// Keep legacy switchAuthTab for backward compatibility or signup redirection
 function switchAuthTab(t) {
-  document.querySelectorAll('.auth-tab').forEach((el,i) => el.classList.toggle('active', i===0?t==='login':t==='signup'));
-  document.getElementById('auth-form-login').classList.toggle('active', t==='login');
-  document.getElementById('auth-form-signup').classList.toggle('active', t==='signup');
+  switchAuthMode(t === 'signup' ? 'faculty' : 'faculty');
 }
 
 function doLogin() {
@@ -20,10 +35,33 @@ function doLogin() {
   else showAppScreen();
 }
 
+function doAuthorityVerify() {
+  const nicId = document.getElementById('auth-nic-id').value.trim();
+  const pin = document.getElementById('auth-security-pin').value;
+  const err = document.getElementById('auth-error');
+  if (!nicId || !pin) {
+    err.style.display = 'block';
+    err.textContent = 'Please enter both NIC ID and Security PIN.';
+    return;
+  }
+  err.style.display = 'none';
+  // Demo Login verification - sets authority credentials
+  S.user = { name: 'Dr. Suresh Verma', email: 'dmo@punjab.gov.in', role: 'authority' };
+  S.role = 'authority';
+  showAuthorityScreen();
+}
+
 function doAuthorityQuickLogin() {
   S.user = { name:'Dr. Suresh Verma', email:'dmo@punjab.gov.in', role:'authority' };
   S.role = 'authority';
   showAuthorityScreen();
+}
+
+function togglePinReveal() {
+  const pinInput = document.getElementById('auth-security-pin');
+  if (pinInput) {
+    pinInput.type = pinInput.type === 'password' ? 'text' : 'password';
+  }
 }
 
 function doSignup() {
@@ -34,24 +72,31 @@ function doSignup() {
   const ok = document.getElementById('signup-success');
   if (!name||!email||!pass) { err.style.display='block'; err.textContent='Please fill all required fields.'; return; }
   if (pass.length<6) { err.style.display='block'; err.textContent='Password must be at least 6 characters.'; return; }
-  err.style.display='none'; ok.style.display='block'; ok.textContent='✅ Account created! You can now log in.';
-  setTimeout(()=>switchAuthTab('login'),1500);
+  err.style.display='none'; ok.style.display='block'; ok.textContent='Account created! You can now log in.';
+  setTimeout(()=>switchAuthMode('faculty'),1500);
 }
 
 function doLogout() {
   S.user=null; S.role='user';
+  viewHistory = [];
+  currentViewId = 'dashboard';
+  const backBtn = document.getElementById('tb-back-btn');
+  if (backBtn) backBtn.style.display = 'none';
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-auth').classList.add('active');
+  switchAuthMode('authority');
 }
 
 function showAppScreen() {
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-app').classList.add('active');
+  if (typeof updateDarkModeIcon === 'function') updateDarkModeIcon();
   const init = S.user.name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
   document.getElementById('sb-avatar').textContent = init;
   document.getElementById('sb-uname').textContent = S.user.name;
   document.getElementById('sb-urole').textContent = S.role==='admin'?'System Admin':S.role==='reviewer'?'Section Reviewer':'Report Coordinator';
   initApp();
+  if (window.initLucide) initLucide();
 }
 
 function showAuthorityScreen() {
@@ -59,4 +104,6 @@ function showAuthorityScreen() {
   document.getElementById('screen-authority').classList.add('active');
   document.getElementById('auth-user-label').textContent = S.user.name + ' · Authority';
   renderAuthorityReports();
+  if (typeof updateDarkModeIcon === 'function') updateDarkModeIcon();
+  if (window.initLucide) initLucide();
 }
