@@ -108,7 +108,7 @@ function processExcelDataAnx2(rows, sectionType, tableId) {
     while (rowData.length < 18) rowData.push(""); 
 
     let cellDataArray = [];
-    const actionBtn = "<button class='btn btn-xs btn-danger' onclick='delRowAnx2(this)'>✕</button>";
+    const actionBtn = "<button class='btn btn-xs btn-danger' onclick='delRowAnx2(this)' style='display:inline-flex;align-items:center;justify-content:center;padding:4px;'><i data-lucide='trash-2' style='width:12px;height:12px;'></i></button>";
 
     if (sectionType === 'A') {
       let slNo = String(index + 1);
@@ -265,6 +265,7 @@ function addRowAnx2(tableId, cellDataArray) {
   }
 
   tbody.appendChild(tr);
+  if (window.initLucide) window.initLucide();
 }
 
 // --- 3. DYNAMIC CALCULATIONS ---
@@ -352,7 +353,7 @@ function delRowAnx2(btn) {
 
 function addNewLeaseRow(btn) {
   const tableId = btn.closest('.anx-section').querySelector('table').id;
-  addRowAnx2(tableId, ['', '', '', '', '0', '', '', '', '', '1.54', '3.00', '0.00', '0.00', 'Sand', '<select><option>Existing</option><option>Proposed</option></select>', '', "<button class='btn btn-xs btn-danger' onclick='delRowAnx2(this)'>✕</button>"]);
+  addRowAnx2(tableId, ['', '', '', '', '0', '', '', '', '', '1.54', '3.00', '0.00', '0.00', 'Sand', '<select><option>Existing</option><option>Proposed</option></select>', '', "<button class='btn btn-xs btn-danger' onclick='delRowAnx2(this)' style='display:inline-flex;align-items:center;justify-content:center;padding:4px;'><i data-lucide='trash-2' style='width:12px;height:12px;'></i></button>"]);
 }
 
 let sectionACount = 1;
@@ -563,25 +564,194 @@ function exportAnx2PDF() {
 }
 
 // --- 5. HANDLE PDF UPLOAD & PREVIEW ---
+// --- 5. HANDLE PDF UPLOAD & PREVIEW ---
+function renderPdfUploadUIAnx2() {
+  const nameEl = document.getElementById('anx2-uploaded-filename');
+  const dlBtn = document.getElementById('anx2-download-btn');
+  const delBtn = document.getElementById('anx2-delete-btn');
+  const previewBtn = document.getElementById('anx2-preview-btn');
+  const previewSection = document.getElementById('pdf-preview-section-anx2');
+  const iframe = document.getElementById('pdf-iframe-anx2');
+  
+  if (!nameEl || !dlBtn) return;
+
+  if (!S.activeProject) {
+    nameEl.style.display = 'none';
+    dlBtn.style.display = 'none';
+    if (delBtn) delBtn.style.display = 'none';
+    if (previewBtn) previewBtn.style.display = 'none';
+    if (previewSection) previewSection.style.display = 'none';
+    return;
+  }
+
+  const pdfName = S.activeProject.anx2PdfName;
+
+  if (!pdfName) {
+    nameEl.style.display = 'none';
+    dlBtn.style.display = 'none';
+    if (delBtn) delBtn.style.display = 'none';
+    if (previewBtn) previewBtn.style.display = 'none';
+    if (previewSection) {
+      previewSection.style.display = 'none';
+      if (iframe) iframe.src = '';
+    }
+  } else {
+    nameEl.textContent = pdfName;
+    nameEl.style.display = 'inline-block';
+    dlBtn.style.display = 'inline-flex';
+    if (delBtn) delBtn.style.display = 'inline-flex';
+    if (previewBtn) previewBtn.style.display = 'inline-flex';
+    
+    if (previewSection && previewSection.style.display === 'block' && iframe) {
+      const fileURL = `/api/download-pdf?projectId=${S.activeProject.id}&annexureId=anx2&inline=true`;
+      if (iframe.src !== window.location.origin + fileURL && !iframe.src.includes(fileURL)) {
+        iframe.src = fileURL;
+      }
+    }
+  }
+
+  if (window.initLucide) window.initLucide();
+}
+
+function togglePDFPreviewAnx2() {
+  const previewSection = document.getElementById('pdf-preview-section-anx2');
+  const iframe = document.getElementById('pdf-iframe-anx2');
+  if (!previewSection || !iframe) return;
+
+  if (previewSection.style.display === 'block') {
+    previewSection.style.display = 'none';
+    if (iframe.src.startsWith('blob:')) {
+      URL.revokeObjectURL(iframe.src);
+    }
+    iframe.src = '';
+  } else {
+    if (S.activeProject && S.activeProject.anx2PdfName) {
+      const fileURL = `/api/download-pdf?projectId=${S.activeProject.id}&annexureId=anx2&inline=true`;
+      iframe.src = fileURL;
+      previewSection.style.display = 'block';
+    }
+  }
+}
+
+async function deletePdfAnx2() {
+  if (!S.activeProject) return;
+  
+  if (!confirm("Are you sure you want to delete the uploaded PDF? This will remove the file from the server.")) {
+    return;
+  }
+  
+  toast("Deleting PDF...", "info");
+  try {
+    const res = await fetch(`/api/upload-pdf`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        projectId: S.activeProject.id,
+        fileName: null,
+        pdf: null,
+        annexureId: 'anx2'
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      S.activeProject.anx2PdfName = null;
+      const pIdx = S.projects.findIndex(p => p.id === S.activeProject.id);
+      if (pIdx !== -1) {
+        S.projects[pIdx].anx2PdfName = null;
+      }
+      
+      renderPdfUploadUIAnx2();
+      toast("PDF deleted successfully.", "success");
+    } else {
+      toast("Failed to delete PDF: " + (data.error || "Unknown error"), "danger");
+    }
+  } catch(err) {
+    toast("Error deleting PDF: " + err.message, "danger");
+  }
+}
+
 function handlePDFUploadAnx2(event) {
   const file = event.target.files[0];
-  if (file) {
-    const fileURL = URL.createObjectURL(file);
-    document.getElementById('pdf-iframe-anx2').src = fileURL;
-    document.getElementById('pdf-preview-section-anx2').style.display = 'block';
-    toast('PDF uploaded and preview loaded!', 'success');
-    event.target.value = ''; 
+  if (!file) return;
+
+  if (!file.name.toLowerCase().endsWith('.pdf')) {
+    toast('Error: Only PDF files are allowed.', 'danger');
+    event.target.value = '';
+    return;
   }
+
+  toast('Uploading PDF...', 'info');
+
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    const base64Data = e.target.result.split(',')[1];
+    try {
+      const res = await fetch('/api/upload-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          projectId: S.activeProject.id,
+          fileName: file.name,
+          pdf: base64Data,
+          annexureId: 'anx2'
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        S.activeProject.anx2PdfName = file.name;
+        const pIdx = S.projects.findIndex(p => p.id === S.activeProject.id);
+        if (pIdx !== -1) {
+          S.projects[pIdx].anx2PdfName = file.name;
+        }
+        
+        const fileURL = URL.createObjectURL(file);
+        const iframe = document.getElementById('pdf-iframe-anx2');
+        const previewSection = document.getElementById('pdf-preview-section-anx2');
+        if (iframe && previewSection) {
+          iframe.src = fileURL;
+          previewSection.style.display = 'block';
+        }
+        
+        renderPdfUploadUIAnx2();
+        toast('PDF uploaded and preview loaded!', 'success');
+      } else {
+        toast('Failed to upload PDF: ' + (data.error || 'Unknown error'), 'danger');
+      }
+    } catch(err) {
+      toast('Error uploading PDF: ' + err.message, 'danger');
+    }
+    event.target.value = '';
+  };
+  reader.readAsDataURL(file);
 }
 
 function closePDFPreviewAnx2() {
   const previewSection = document.getElementById('pdf-preview-section-anx2');
   const iframe = document.getElementById('pdf-iframe-anx2');
   
-  previewSection.style.display = 'none';
-  
-  if (iframe.src) {
-    URL.revokeObjectURL(iframe.src);
+  if (previewSection) previewSection.style.display = 'none';
+  if (iframe) {
+    if (iframe.src.startsWith('blob:')) {
+      URL.revokeObjectURL(iframe.src);
+    }
     iframe.src = '';
   }
+}
+
+function downloadPdfAnx2() {
+  if (!S.activeProject) {
+    toast('Please select and open a project first.', 'warn');
+    return;
+  }
+  if (!S.activeProject.anx2PdfName) {
+    toast('No PDF has been uploaded for this project yet. Please upload a PDF first.', 'warn');
+    return;
+  }
+  const a = document.createElement('a');
+  a.href = `/api/download-pdf?projectId=${S.activeProject.id}&annexureId=anx2`;
+  a.download = S.activeProject.anx2PdfName;
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }

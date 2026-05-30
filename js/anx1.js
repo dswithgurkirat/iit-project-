@@ -102,7 +102,7 @@ function processExcelData(rows, sectionType) {
     while (rowData.length < 8) rowData.push(""); 
 
     let cellDataArray = [];
-    const actionBtn = "<button class='btn btn-xs btn-danger' onclick='delRow(this)'>✕</button>";
+    const actionBtn = "<button class='btn btn-xs btn-danger' onclick='delRow(this)' style='display:inline-flex;align-items:center;justify-content:center;padding:4px;'><i data-lucide='trash-2' style='width:12px;height:12px;'></i></button>";
 
     if (sectionType === 'A') {
       let typeVal = String(rowData[2] || "").trim();
@@ -149,6 +149,7 @@ function addRowAnx1(tableId, cellDataArray) {
   });
   
   tbody.appendChild(tr);
+  if (window.initLucide) window.initLucide();
 }
 
 // --- 3. FLAWLESS PAGINATED PDF GENERATOR ---
@@ -274,25 +275,193 @@ function executePDFExport() {
 }
 
 // --- 4. HANDLE PDF UPLOAD & PREVIEW ---
+function renderPdfUploadUIAnx1() {
+  const nameEl = document.getElementById('anx1-uploaded-filename');
+  const dlBtn = document.getElementById('anx1-download-btn');
+  const delBtn = document.getElementById('anx1-delete-btn');
+  const previewBtn = document.getElementById('anx1-preview-btn');
+  const previewSection = document.getElementById('pdf-preview-section');
+  const iframe = document.getElementById('pdf-iframe');
+  
+  if (!nameEl || !dlBtn) return;
+
+  if (!S.activeProject) {
+    nameEl.style.display = 'none';
+    dlBtn.style.display = 'none';
+    if (delBtn) delBtn.style.display = 'none';
+    if (previewBtn) previewBtn.style.display = 'none';
+    if (previewSection) previewSection.style.display = 'none';
+    return;
+  }
+
+  const pdfName = S.activeProject.anx1PdfName;
+
+  if (!pdfName) {
+    nameEl.style.display = 'none';
+    dlBtn.style.display = 'none';
+    if (delBtn) delBtn.style.display = 'none';
+    if (previewBtn) previewBtn.style.display = 'none';
+    if (previewSection) {
+      previewSection.style.display = 'none';
+      if (iframe) iframe.src = '';
+    }
+  } else {
+    nameEl.textContent = pdfName;
+    nameEl.style.display = 'inline-block';
+    dlBtn.style.display = 'inline-flex';
+    if (delBtn) delBtn.style.display = 'inline-flex';
+    if (previewBtn) previewBtn.style.display = 'inline-flex';
+    
+    if (previewSection && previewSection.style.display === 'block' && iframe) {
+      const fileURL = `/api/download-pdf?projectId=${S.activeProject.id}&annexureId=anx1&inline=true`;
+      if (iframe.src !== window.location.origin + fileURL && !iframe.src.includes(fileURL)) {
+        iframe.src = fileURL;
+      }
+    }
+  }
+
+  if (window.initLucide) window.initLucide();
+}
+
+function togglePDFPreviewAnx1() {
+  const previewSection = document.getElementById('pdf-preview-section');
+  const iframe = document.getElementById('pdf-iframe');
+  if (!previewSection || !iframe) return;
+
+  if (previewSection.style.display === 'block') {
+    previewSection.style.display = 'none';
+    if (iframe.src.startsWith('blob:')) {
+      URL.revokeObjectURL(iframe.src);
+    }
+    iframe.src = '';
+  } else {
+    if (S.activeProject && S.activeProject.anx1PdfName) {
+      const fileURL = `/api/download-pdf?projectId=${S.activeProject.id}&annexureId=anx1&inline=true`;
+      iframe.src = fileURL;
+      previewSection.style.display = 'block';
+    }
+  }
+}
+
+async function deletePdfAnx1() {
+  if (!S.activeProject) return;
+  
+  if (!confirm("Are you sure you want to delete the uploaded PDF? This will remove the file from the server.")) {
+    return;
+  }
+  
+  toast("Deleting PDF...", "info");
+  try {
+    const res = await fetch(`/api/upload-pdf`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        projectId: S.activeProject.id,
+        fileName: null,
+        pdf: null,
+        annexureId: 'anx1'
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      S.activeProject.anx1PdfName = null;
+      const pIdx = S.projects.findIndex(p => p.id === S.activeProject.id);
+      if (pIdx !== -1) {
+        S.projects[pIdx].anx1PdfName = null;
+      }
+      
+      renderPdfUploadUIAnx1();
+      toast("PDF deleted successfully.", "success");
+    } else {
+      toast("Failed to delete PDF: " + (data.error || "Unknown error"), "danger");
+    }
+  } catch(err) {
+    toast("Error deleting PDF: " + err.message, "danger");
+  }
+}
+
 function handlePDFUpload(event) {
   const file = event.target.files[0];
-  if (file) {
-    const fileURL = URL.createObjectURL(file);
-    document.getElementById('pdf-iframe').src = fileURL;
-    document.getElementById('pdf-preview-section').style.display = 'block';
-    toast('PDF uploaded and preview loaded!', 'success');
-    event.target.value = ''; 
+  if (!file) return;
+
+  if (!file.name.toLowerCase().endsWith('.pdf')) {
+    toast('Error: Only PDF files are allowed.', 'danger');
+    event.target.value = '';
+    return;
   }
+
+  toast('Uploading PDF...', 'info');
+
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    const base64Data = e.target.result.split(',')[1];
+    try {
+      const res = await fetch('/api/upload-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          projectId: S.activeProject.id,
+          fileName: file.name,
+          pdf: base64Data,
+          annexureId: 'anx1'
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        S.activeProject.anx1PdfName = file.name;
+        const pIdx = S.projects.findIndex(p => p.id === S.activeProject.id);
+        if (pIdx !== -1) {
+          S.projects[pIdx].anx1PdfName = file.name;
+        }
+        
+        const fileURL = URL.createObjectURL(file);
+        const iframe = document.getElementById('pdf-iframe');
+        const previewSection = document.getElementById('pdf-preview-section');
+        if (iframe && previewSection) {
+          iframe.src = fileURL;
+          previewSection.style.display = 'block';
+        }
+        
+        renderPdfUploadUIAnx1();
+        toast('PDF uploaded and preview loaded!', 'success');
+      } else {
+        toast('Failed to upload PDF: ' + (data.error || 'Unknown error'), 'danger');
+      }
+    } catch(err) {
+      toast('Error uploading PDF: ' + err.message, 'danger');
+    }
+    event.target.value = '';
+  };
+  reader.readAsDataURL(file);
 }
 
 function closePDFPreview() {
   const previewSection = document.getElementById('pdf-preview-section');
   const iframe = document.getElementById('pdf-iframe');
   
-  previewSection.style.display = 'none';
-  
-  if (iframe.src) {
-    URL.revokeObjectURL(iframe.src);
+  if (previewSection) previewSection.style.display = 'none';
+  if (iframe) {
+    if (iframe.src.startsWith('blob:')) {
+      URL.revokeObjectURL(iframe.src);
+    }
     iframe.src = '';
   }
+}
+
+function downloadPdfAnx1() {
+  if (!S.activeProject) {
+    toast('Please select and open a project first.', 'warn');
+    return;
+  }
+  if (!S.activeProject.anx1PdfName) {
+    toast('No PDF has been uploaded for this project yet. Please upload a PDF first.', 'warn');
+    return;
+  }
+  const a = document.createElement('a');
+  a.href = `/api/download-pdf?projectId=${S.activeProject.id}&annexureId=anx1`;
+  a.download = S.activeProject.anx1PdfName;
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }

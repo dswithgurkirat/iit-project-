@@ -5,10 +5,20 @@
       <div class="page-title">Annexure VI — Final Cluster Details</div>
       <div class="page-sub">Finalized cluster summaries and total area computations</div>
     </div>
-    <div style="display:flex;gap:8px">
-      <button class="btn btn-teal btn-sm" onclick="downloadAnxTemplate(6)">⬇ Excel Template</button>
-      <label class="btn btn-navy btn-sm" style="cursor:pointer">📤 Upload Excel <input type="file" accept=".xlsx,.xls" hidden onchange="handleAnxUpload(event,6)"></label>
-      <button class="btn btn-saffron btn-sm" onclick="exportAnxPDF(6)">📄 Export PDF</button>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="btn btn-excel-template btn-sm" onclick="downloadAnxTemplate(6)">
+        <i data-lucide="file-spreadsheet" style="width:14px; height:14px;"></i>
+        <span>Excel Template</span>
+      </button>
+      <label class="btn btn-excel-upload btn-sm" style="cursor:pointer; margin-bottom:0; display:inline-flex; align-items:center; gap:6px;">
+        <i data-lucide="upload" style="width:14px; height:14px;"></i>
+        <span>Upload Excel</span>
+        <input type="file" accept=".xlsx,.xls" hidden onchange="handleAnxUpload(event,6)">
+      </label>
+      <button class="btn btn-pdf-upload btn-sm" onclick="exportAnxPDF(6)">
+        <i data-lucide="file-text" style="width:14px; height:14px;"></i>
+        <span>Export PDF</span>
+      </button>
     </div>
   </div>
   <div class="card">
@@ -25,12 +35,19 @@
               <td contenteditable>1074334.80</td>
               <td contenteditable>644600.88</td>
               <td><select><option>Approved</option><option>Pending</option></select></td>
-              <td><button class="btn btn-xs btn-danger" onclick="delRow(this)">✕</button></td>
+              <td>
+                <button class="btn btn-xs btn-danger" onclick="delRow(this)" style="display:inline-flex; align-items:center; justify-content:center; padding:4px;">
+                  <i data-lucide="trash-2" style="width:12px; height:12px;"></i>
+                </button>
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
-      <button class="btn btn-xs btn-outline" style="margin-top:8px" onclick="addRow('anx6-final-clusters',['','', '0.00','0','0','<select><option>Approved</option><option>Pending</option></select>','<button class=\'btn btn-xs btn-danger\' onclick=\'delRow(this)\'>✕</button>'])">+ Add Cluster</button>
+      <button class="btn btn-xs btn-outline" style="margin-top:8px; display:inline-flex; align-items:center; gap:6px;" onclick="addRow('anx6-final-clusters',['','', '0.00','0','0','<select><option>Approved</option><option>Pending</option></select>','<button class=\'btn btn-xs btn-danger\' onclick=\'delRow(this)\' style=\'display:inline-flex;align-items:center;justify-content:center;padding:4px;\'><i data-lucide=\'trash-2\' style=\'width:12px;height:12px;\'></i\></button>']);">
+        <i data-lucide="plus" style="width:12px; height:12px;"></i>
+        <span>Add Cluster</span>
+      </button>
     </div>
   </div>
 </div>

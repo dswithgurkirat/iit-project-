@@ -483,11 +483,15 @@
       <div class="page-title">Annexure I — Sand Sources</div>
       <div class="page-sub">Details of Sand/M-Sand Sources · EMGSM 2020</div>
     </div>
-    <div style="display:flex;gap:8px">
-      <!-- Global Upload PDF Button -->
-      <label class="btn btn-saffron btn-sm" style="cursor:pointer">
-        📤 Upload PDF
-        <input type="file" accept="application/pdf" hidden onchange="handlePDFUpload(event)">
+    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+      <span id="anx1-uploaded-filename" style="font-size:12px; color:var(--text-soft); font-weight:600; display:none; padding:4px 8px; background:var(--off); border-radius:var(--r-xs); border:1px solid var(--border);"></span>
+      <button id="anx1-preview-btn" class="btn btn-outline btn-sm" style="display:none; align-items:center; gap:6px;" onclick="togglePDFPreviewAnx1()"><i data-lucide="eye" style="width:14px; height:14px;"></i> Preview PDF</button>
+      <button id="anx1-download-btn" class="btn btn-pdf-download btn-sm" style="display:none;" onclick="downloadPdfAnx1()"><i data-lucide="download" style="width:14px; height:14px;"></i> Download PDF</button>
+      <button id="anx1-delete-btn" class="btn btn-danger btn-sm" style="display:none; align-items:center; gap:6px;" onclick="deletePdfAnx1()"><i data-lucide="trash-2" style="width:14px; height:14px;"></i> Delete PDF</button>
+      <label class="btn btn-pdf-upload btn-sm" style="cursor:pointer; margin-bottom:0; display:inline-flex; align-items:center; gap:6px;">
+        <i data-lucide="upload" style="width:14px; height:14px;"></i>
+        <span>Upload PDF</span>
+        <input type="file" accept="application/pdf" id="anx1-pdf-input" hidden onchange="handlePDFUpload(event)">
       </label>
     </div>
   </div>
@@ -501,7 +505,10 @@
     <div class="card-bd">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
         <h3 style="margin: 0; font-size: 18px; color: #0369a1;">Uploaded PDF Preview</h3>
-        <button class="btn btn-sm btn-danger" onclick="closePDFPreview()">✕ Close Preview</button>
+        <button class="btn btn-sm btn-danger" onclick="closePDFPreview()" style="display:inline-flex; align-items:center; gap:6px;">
+          <i data-lucide="x" style="width:14px; height:14px;"></i>
+          <span>Close Preview</span>
+        </button>
       </div>
       <iframe id="pdf-iframe" style="width: 100%; height: 600px; border: 1px solid #e5e7eb; border-radius: 6px; background: #f9fafb;"></iframe>
     </div>
@@ -512,9 +519,12 @@
       
       <!-- Section A -->
       <div class="anx-section">
-        <div class="anx-section-header">
-          <div class="anx-section-title">a) Rivers:</div>
-          <button class="btn btn-teal btn-xs" onclick="downloadSectionTemplate('A')">⬇ Excel Template (Rivers)</button>
+        <div class="anx-section-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+          <div class="anx-section-title" style="font-weight:bold; font-size:14px;">a) Rivers:</div>
+          <button class="btn btn-excel-template btn-xs" onclick="downloadSectionTemplate('A')" style="display:inline-flex; align-items:center; gap:6px;">
+            <i data-lucide="file-spreadsheet" style="width:12px; height:12px;"></i>
+            <span>Excel Template (Rivers)</span>
+          </button>
         </div>
         
         <div class="tbl-wrap">
@@ -524,7 +534,7 @@
                 <th>River Name/M-Sand Plant</th>
                 <th>Total Stretch of River (in KM)</th>
                 <th>Type of River (Perennial or Non Perennial)</th>
-                <th>Action</th>
+                <th style="width:50px;">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -532,32 +542,47 @@
                 <td contenteditable="true">Sutlej</td>
                 <td contenteditable="true">90.66</td>
                 <td><select><option>Perennial</option><option>Non-Perennial</option></select></td>
-                <td><button class="btn btn-xs btn-danger" onclick="delRow(this)">✕</button></td>
+                <td>
+                  <button class="btn btn-xs btn-danger" onclick="delRow(this)" style="display:inline-flex; align-items:center; justify-content:center; padding:4px;">
+                    <i data-lucide="trash-2" style="width:12px; height:12px;"></i>
+                  </button>
+                </td>
               </tr>
               <tr>
                 <td contenteditable="true">Beas</td>
                 <td contenteditable="true">65.20</td>
                 <td><select><option>Perennial</option><option>Non-Perennial</option></select></td>
-                <td><button class="btn btn-xs btn-danger" onclick="delRow(this)">✕</button></td>
+                <td>
+                  <button class="btn btn-xs btn-danger" onclick="delRow(this)" style="display:inline-flex; align-items:center; justify-content:center; padding:4px;">
+                    <i data-lucide="trash-2" style="width:12px; height:12px;"></i>
+                  </button>
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
         
-        <div class="section-footer">
-          <button class="btn btn-xs btn-outline" onclick="addRowAnx1('anx1-rivers',['','','<select><option>Perennial</option><option>Non-Perennial</option></select>','<button class=\'btn btn-xs btn-danger\' onclick=\'delRow(this)\'>✕</button>'])">+ Add River</button>
-          <label class="btn btn-navy btn-xs" style="cursor:pointer">
-            📤 Upload Excel (Rivers) 
+        <div class="section-footer" style="margin-top:12px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <button class="btn btn-xs btn-outline" onclick="addRowAnx1('anx1-rivers',['','','<select><option>Perennial</option><option>Non-Perennial</option></select>','<button class=\'btn btn-xs btn-danger\' onclick=\'delRow(this)\' style=\'display:inline-flex;align-items:center;justify-content:center;padding:4px;\'><i data-lucide=\'trash-2\' style=\'width:12px;height:12px;\'></i></button>'])" style="display:inline-flex; align-items:center; gap:6px;">
+            <i data-lucide="plus" style="width:12px; height:12px;"></i>
+            <span>Add River</span>
+          </button>
+          <label class="btn btn-excel-upload btn-xs" style="cursor:pointer; display:inline-flex; align-items:center; gap:6px; margin-bottom:0;">
+            <i data-lucide="upload" style="width:12px; height:12px;"></i>
+            <span>Upload Excel (Rivers)</span>
             <input type="file" accept=".xlsx,.xls,.csv" hidden onchange="handleSectionUpload(event, 'A')">
           </label>
         </div>
       </div>
 
       <!-- Section B -->
-      <div class="anx-section">
-        <div class="anx-section-header">
-          <div class="anx-section-title">b) De-Siltation Location (Lakes/Ponds/Dams etc.):</div>
-          <button class="btn btn-teal btn-xs" onclick="downloadSectionTemplate('B')">⬇ Excel Template (De-Siltation)</button>
+      <div class="anx-section" style="margin-top:32px;">
+        <div class="anx-section-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+          <div class="anx-section-title" style="font-weight:bold; font-size:14px;">b) De-Siltation Location (Lakes/Ponds/Dams etc.):</div>
+          <button class="btn btn-excel-template btn-xs" onclick="downloadSectionTemplate('B')" style="display:inline-flex; align-items:center; gap:6px;">
+            <i data-lucide="file-spreadsheet" style="width:12px; height:12px;"></i>
+            <span>Excel Template (De-Siltation)</span>
+          </button>
         </div>
 
         <div class="tbl-wrap">
@@ -572,7 +597,7 @@
                 <th>Tehsil</th>
                 <th>Village</th>
                 <th>Size (Ha)</th>
-                <th>Action</th>
+                <th style="width:50px;">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -585,7 +610,11 @@
                 <td contenteditable="true">Phillaur</td>
                 <td contenteditable="true">Powari</td>
                 <td contenteditable="true">10.93</td>
-                <td><button class="btn btn-xs btn-danger" onclick="delRow(this)">✕</button></td>
+                <td>
+                  <button class="btn btn-xs btn-danger" onclick="delRow(this)" style="display:inline-flex; align-items:center; justify-content:center; padding:4px;">
+                    <i data-lucide="trash-2" style="width:12px; height:12px;"></i>
+                  </button>
+                </td>
               </tr>
               <tr>
                 <td contenteditable="true">Sutlej</td>
@@ -596,26 +625,37 @@
                 <td contenteditable="true">Phillaur</td>
                 <td contenteditable="true">Kadiana</td>
                 <td contenteditable="true">12.42</td>
-                <td><button class="btn btn-xs btn-danger" onclick="delRow(this)">✕</button></td>
+                <td>
+                  <button class="btn btn-xs btn-danger" onclick="delRow(this)" style="display:inline-flex; align-items:center; justify-content:center; padding:4px;">
+                    <i data-lucide="trash-2" style="width:12px; height:12px;"></i>
+                  </button>
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
         
-        <div class="section-footer">
-          <button class="btn btn-xs btn-outline" onclick="addRowAnx1('anx1-desilt',['','','','','','','','','<button class=\'btn btn-xs btn-danger\' onclick=\'delRow(this)\'>✕</button>'])">+ Add Location</button>
-          <label class="btn btn-navy btn-xs" style="cursor:pointer">
-            📤 Upload Excel (De-Siltation) 
+        <div class="section-footer" style="margin-top:12px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <button class="btn btn-xs btn-outline" onclick="addRowAnx1('anx1-desilt',['','','','','','','','','<button class=\'btn btn-xs btn-danger\' onclick=\'delRow(this)\' style=\'display:inline-flex;align-items:center;justify-content:center;padding:4px;\'><i data-lucide=\'trash-2\' style=\'width:12px;height:12px;\'></i></button>'])" style="display:inline-flex; align-items:center; gap:6px;">
+            <i data-lucide="plus" style="width:12px; height:12px;"></i>
+            <span>Add Location</span>
+          </button>
+          <label class="btn btn-excel-upload btn-xs" style="cursor:pointer; display:inline-flex; align-items:center; gap:6px; margin-bottom:0;">
+            <i data-lucide="upload" style="width:12px; height:12px;"></i>
+            <span>Upload Excel (De-Siltation)</span>
             <input type="file" accept=".xlsx,.xls,.csv" hidden onchange="handleSectionUpload(event, 'B')">
           </label>
         </div>
       </div>
 
       <!-- Section C -->
-      <div class="anx-section">
-        <div class="anx-section-header">
-          <div class="anx-section-title">c) Patta lands/Khatedari land:</div>
-          <button class="btn btn-teal btn-xs" onclick="downloadSectionTemplate('C')">⬇ Excel Template (Patta Lands)</button>
+      <div class="anx-section" style="margin-top:32px;">
+        <div class="anx-section-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+          <div class="anx-section-title" style="font-weight:bold; font-size:14px;">c) Patta lands/Khatedari land:</div>
+          <button class="btn btn-excel-template btn-xs" onclick="downloadSectionTemplate('C')" style="display:inline-flex; align-items:center; gap:6px;">
+            <i data-lucide="file-spreadsheet" style="width:12px; height:12px;"></i>
+            <span>Excel Template (Patta Lands)</span>
+          </button>
         </div>
 
         <div class="tbl-wrap">
@@ -629,7 +669,7 @@
                 <th>Tehsil</th>
                 <th>Village</th>
                 <th>Agricultural Land (Yes/No)</th>
-                <th>Action</th>
+                <th style="width:50px;">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -641,26 +681,37 @@
                 <td contenteditable="true">Phillaur</td>
                 <td contenteditable="true">Kadiana</td>
                 <td><select><option>Yes</option><option>No</option></select></td>
-                <td><button class="btn btn-xs btn-danger" onclick="delRow(this)">✕</button></td>
+                <td>
+                  <button class="btn btn-xs btn-danger" onclick="delRow(this)" style="display:inline-flex; align-items:center; justify-content:center; padding:4px;">
+                    <i data-lucide="trash-2" style="width:12px; height:12px;"></i>
+                  </button>
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
         
-        <div class="section-footer">
-          <button class="btn btn-xs btn-outline" onclick="addRowAnx1('anx1-patta',['','','','','','','<select><option>Yes</option><option>No</option></select>','<button class=\'btn btn-xs btn-danger\' onclick=\'delRow(this)\'>✕</button>'])">+ Add Patta Land</button>
-          <label class="btn btn-navy btn-xs" style="cursor:pointer">
-            📤 Upload Excel (Patta Lands)
+        <div class="section-footer" style="margin-top:12px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <button class="btn btn-xs btn-outline" onclick="addRowAnx1('anx1-patta',['','','','','','','<select><option>Yes</option><option>No</option></select>','<button class=\'btn btn-xs btn-danger\' onclick=\'delRow(this)\' style=\'display:inline-flex;align-items:center;justify-content:center;padding:4px;\'><i data-lucide=\'trash-2\' style=\'width:12px;height:12px;\'></i></button>'])" style="display:inline-flex; align-items:center; gap:6px;">
+            <i data-lucide="plus" style="width:12px; height:12px;"></i>
+            <span>Add Patta Land</span>
+          </button>
+          <label class="btn btn-excel-upload btn-xs" style="cursor:pointer; display:inline-flex; align-items:center; gap:6px; margin-bottom:0;">
+            <i data-lucide="upload" style="width:12px; height:12px;"></i>
+            <span>Upload Excel (Patta Lands)</span>
             <input type="file" accept=".xlsx,.xls,.csv" hidden onchange="handleSectionUpload(event, 'C')">
           </label>
         </div>
       </div>
 
       <!-- Section D -->
-      <div class="anx-section">
-        <div class="anx-section-header">
-          <div class="anx-section-title">d) M-Sand Plants:</div>
-          <button class="btn btn-teal btn-xs" onclick="downloadSectionTemplate('D')">⬇ Excel Template (M-Sand)</button>
+      <div class="anx-section" style="margin-top:32px;">
+        <div class="anx-section-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+          <div class="anx-section-title" style="font-weight:bold; font-size:14px;">d) M-Sand Plants:</div>
+          <button class="btn btn-excel-template btn-xs" onclick="downloadSectionTemplate('D')" style="display:inline-flex; align-items:center; gap:6px;">
+            <i data-lucide="file-spreadsheet" style="width:12px; height:12px;"></i>
+            <span>Excel Template (M-Sand)</span>
+          </button>
         </div>
 
         <div class="tbl-wrap">
@@ -674,7 +725,7 @@
                 <th>Village</th>
                 <th>Geo-location</th>
                 <th>Quantity Tonnes/Annum</th>
-                <th>Action</th>
+                <th style="width:50px;">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -686,24 +737,35 @@
                 <td contenteditable="true">Not Available</td>
                 <td contenteditable="true" class="coord-input">Not Available</td>
                 <td contenteditable="true">Not Available</td>
-                <td><button class="btn btn-xs btn-danger" onclick="delRow(this)">✕</button></td>
+                <td>
+                  <button class="btn btn-xs btn-danger" onclick="delRow(this)" style="display:inline-flex; align-items:center; justify-content:center; padding:4px;">
+                    <i data-lucide="trash-2" style="width:12px; height:12px;"></i>
+                  </button>
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
         
-        <div class="section-footer">
-          <button class="btn btn-xs btn-outline" onclick="addRowAnx1('anx1-msand',['','','','','','','','<button class=\'btn btn-xs btn-danger\' onclick=\'delRow(this)\'>✕</button>'])">+ Add M-Sand Plant</button>
-          <label class="btn btn-navy btn-xs" style="cursor:pointer">
-            📤 Upload Excel (M-Sand)
+        <div class="section-footer" style="margin-top:12px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <button class="btn btn-xs btn-outline" onclick="addRowAnx1('anx1-msand',['','','','','','','','<button class=\'btn btn-xs btn-danger\' onclick=\'delRow(this)\' style=\'display:inline-flex;align-items:center;justify-content:center;padding:4px;\'><i data-lucide=\'trash-2\' style=\'width:12px;height:12px;\'></i></button>'])" style="display:inline-flex; align-items:center; gap:6px;">
+            <i data-lucide="plus" style="width:12px; height:12px;"></i>
+            <span>Add M-Sand Plant</span>
+          </button>
+          <label class="btn btn-excel-upload btn-xs" style="cursor:pointer; display:inline-flex; align-items:center; gap:6px; margin-bottom:0;">
+            <i data-lucide="upload" style="width:12px; height:12px;"></i>
+            <span>Upload Excel (M-Sand)</span>
             <input type="file" accept=".xlsx,.xls,.csv" hidden onchange="handleSectionUpload(event, 'D')">
           </label>
         </div>
       </div>
 
       <!-- Final Action Area -->
-      <div class="final-actions">
-        <button class="btn btn-saffron btn-lg" onclick="exportAnx1PDF(this)">📄 Download Final Annexure 1 PDF</button>
+      <div class="final-actions" style="margin-top:32px; display:flex; justify-content:center;">
+        <button class="btn btn-pdf-upload btn-lg" onclick="exportAnx1PDF(this)" style="display:inline-flex; align-items:center; gap:8px;">
+          <i data-lucide="file-text" style="width:18px; height:18px;"></i>
+          <span>Download Final Annexure 1 PDF</span>
+        </button>
       </div>
       
     </div>
@@ -716,11 +778,15 @@
       <div class="page-title">Annexure II — Mining Leases</div>
       <div class="page-sub">Details of Mining Leases, Patta Lands, De-siltation & M-Sand Plants · EMGSM 2020</div>
     </div>
-    <div style="display:flex;gap:8px">
-      <!-- Global Upload PDF Button -->
-      <label class="btn btn-saffron btn-sm" style="cursor:pointer">
-        📤 Upload PDF
-        <input type="file" accept="application/pdf" hidden onchange="handlePDFUploadAnx2(event)">
+    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+      <span id="anx2-uploaded-filename" style="font-size:12px; color:var(--text-soft); font-weight:600; display:none; padding:4px 8px; background:var(--off); border-radius:var(--r-xs); border:1px solid var(--border);"></span>
+      <button id="anx2-preview-btn" class="btn btn-outline btn-sm" style="display:none; align-items:center; gap:6px;" onclick="togglePDFPreviewAnx2()"><i data-lucide="eye" style="width:14px; height:14px;"></i> Preview PDF</button>
+      <button id="anx2-download-btn" class="btn btn-pdf-download btn-sm" style="display:none;" onclick="downloadPdfAnx2()"><i data-lucide="download" style="width:14px; height:14px;"></i> Download PDF</button>
+      <button id="anx2-delete-btn" class="btn btn-danger btn-sm" style="display:none; align-items:center; gap:6px;" onclick="deletePdfAnx2()"><i data-lucide="trash-2" style="width:14px; height:14px;"></i> Delete PDF</button>
+      <label class="btn btn-pdf-upload btn-sm" style="cursor:pointer; margin-bottom:0; display:inline-flex; align-items:center; gap:6px;">
+        <i data-lucide="upload" style="width:14px; height:14px;"></i>
+        <span>Upload PDF</span>
+        <input type="file" accept="application/pdf" id="anx2-pdf-input" hidden onchange="handlePDFUploadAnx2(event)">
       </label>
     </div>
   </div>
@@ -734,7 +800,10 @@
     <div class="card-bd">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
         <h3 style="margin: 0; font-size: 18px; color: #0369a1;">Uploaded PDF Preview</h3>
-        <button class="btn btn-sm btn-danger" onclick="closePDFPreviewAnx2()">✕ Close Preview</button>
+        <button class="btn btn-sm btn-danger" onclick="closePDFPreviewAnx2()" style="display:inline-flex; align-items:center; gap:6px;">
+          <i data-lucide="x" style="width:14px; height:14px;"></i>
+          <span>Close Preview</span>
+        </button>
       </div>
       <iframe id="pdf-iframe-anx2" style="width: 100%; height: 600px; border: 1px solid #e5e7eb; border-radius: 6px; background: #f9fafb;"></iframe>
     </div>
@@ -746,9 +815,12 @@
       <!-- Section A: Mining Leases -->
       <div id="section-a-wrapper">
         <div class="anx-section section-a-block">
-          <div class="anx-section-header">
-            <div class="anx-section-title">a) Potential Mining Leases (Existing & Proposed) Rivers:</div>
-            <button class="btn btn-teal btn-xs" onclick="downloadSectionTemplateAnx2('A')">⬇ Excel Template (Leases)</button>
+          <div class="anx-section-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+            <div class="anx-section-title" style="font-weight:bold; font-size:14px;">a) Potential Mining Leases (Existing & Proposed) Rivers:</div>
+            <button class="btn btn-excel-template btn-xs" onclick="downloadSectionTemplateAnx2('A')" style="display:inline-flex; align-items:center; gap:6px;">
+              <i data-lucide="file-spreadsheet" style="width:12px; height:12px;"></i>
+              <span>Excel Template (Leases)</span>
+            </button>
           </div>
           
           <div class="tbl-wrap">
@@ -830,32 +902,49 @@
                     <select><option selected>Existing</option><option>Proposed</option></select>
                   </td>
                   <td contenteditable="true">EC Granted Area 4.8 Ha (whole)</td>
-                  <td><button class="btn btn-xs btn-danger" onclick="delRowAnx2(this)">✕</button></td>
+                  <td>
+                    <button class="btn btn-xs btn-danger" onclick="delRowAnx2(this)" style="display:inline-flex; align-items:center; justify-content:center; padding:4px;">
+                      <i data-lucide="trash-2" style="width:12px; height:12px;"></i>
+                    </button>
+                  </td>
                 </tr>
               </tbody>
             </table>
           </div>
           
-          <div class="section-footer">
-            <button class="btn btn-xs btn-outline" onclick="addNewLeaseRow(this)">+ Add Lease</button>
-            <label class="btn btn-navy btn-xs" style="cursor:pointer">
-              📤 Upload Excel (Leases)
+          <div class="section-footer" style="margin-top:12px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <button class="btn btn-xs btn-outline" onclick="addNewLeaseRow(this)" style="display:inline-flex; align-items:center; gap:6px;">
+              <i data-lucide="plus" style="width:12px; height:12px;"></i>
+              <span>Add Lease</span>
+            </button>
+            <label class="btn btn-excel-upload btn-xs" style="cursor:pointer; display:inline-flex; align-items:center; gap:6px; margin-bottom:0;">
+              <i data-lucide="upload" style="width:12px; height:12px;"></i>
+              <span>Upload Excel (Leases)</span>
               <input type="file" accept=".xlsx,.xls,.csv" hidden onchange="handleSectionUploadAnx2(event, 'A')">
             </label>
-            <button class="btn btn-xs btn-danger rm-sec-a-btn" onclick="this.closest('.section-a-block').remove()" style="display:none;">✕ Remove This Table</button>
+            <button class="btn btn-xs btn-danger rm-sec-a-btn" onclick="this.closest('.section-a-block').remove()" style="display:none; align-items:center; gap:6px;">
+              <i data-lucide="trash-2" style="width:12px; height:12px;"></i>
+              <span>Remove This Table</span>
+            </button>
           </div>
         </div>
       </div>
       
-      <div style="margin-bottom: 30px;">
-        <button class="btn btn-sm btn-saffron" onclick="addSectionABlock()">➕ Add Another Section A Page/Table</button>
+      <div style="margin-bottom:30px; margin-top:12px;">
+        <button class="btn btn-sm btn-pdf-upload" onclick="addSectionABlock()" style="display:inline-flex; align-items:center; gap:6px;">
+          <i data-lucide="plus-circle" style="width:14px; height:14px;"></i>
+          <span>Add Another Section A Page/Table</span>
+        </button>
       </div>
 
       <!-- Section B: Patta Lands -->
-      <div class="anx-section">
-        <div class="anx-section-header">
-          <div class="anx-section-title">b) Patta lands/Khatedari land (Existing & Proposed):</div>
-          <button class="btn btn-teal btn-xs" onclick="downloadSectionTemplateAnx2('B')">⬇ Excel Template (Patta Lands)</button>
+      <div class="anx-section" style="margin-top:32px;">
+        <div class="anx-section-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+          <div class="anx-section-title" style="font-weight:bold; font-size:14px;">b) Patta lands/Khatedari land (Existing & Proposed):</div>
+          <button class="btn btn-excel-template btn-xs" onclick="downloadSectionTemplateAnx2('B')" style="display:inline-flex; align-items:center; gap:6px;">
+            <i data-lucide="file-spreadsheet" style="width:12px; height:12px;"></i>
+            <span>Excel Template (Patta Lands)</span>
+          </button>
         </div>
 
         <div class="tbl-wrap">
@@ -910,7 +999,11 @@
                   <select><option selected>Existing</option><option>Proposed</option></select>
                 </td>
                 <td contenteditable="true">EC Granted area 2.77 ha (whole)</td>
-                <td><button class="btn btn-xs btn-danger" onclick="delRowAnx2(this)">✕</button></td>
+                <td>
+                  <button class="btn btn-xs btn-danger" onclick="delRowAnx2(this)" style="display:inline-flex; align-items:center; justify-content:center; padding:4px;">
+                    <i data-lucide="trash-2" style="width:12px; height:12px;"></i>
+                  </button>
+                </td>
               </tr>
             </tbody>
             <tfoot>
@@ -927,20 +1020,27 @@
           </table>
         </div>
         
-        <div class="section-footer">
-          <button class="btn btn-xs btn-outline" onclick="addRowAnx2('anx2-patta',['','','','0','','','Jalandhar','','','0','0','<select><option>Existing</option><option>Proposed</option></select>','','<button class=\'btn btn-xs btn-danger\' onclick=\'delRowAnx2(this)\'>✕</button>']); updatePattaTotals();">+ Add Patta Land</button>
-          <label class="btn btn-navy btn-xs" style="cursor:pointer">
-            📤 Upload Excel (Patta Lands)
+        <div class="section-footer" style="margin-top:12px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <button class="btn btn-xs btn-outline" onclick="addRowAnx2('anx2-patta',['','','','0','','','Jalandhar','','','0','0','<select><option>Existing</option><option>Proposed</option></select>','','<button class=\'btn btn-xs btn-danger\' onclick=\'delRowAnx2(this)\' style=\'display:inline-flex;align-items:center;justify-content:center;padding:4px;\'><i data-lucide=\'trash-2\' style=\'width:12px;height:12px;\'></i></button>']); updatePattaTotals();" style="display:inline-flex; align-items:center; gap:6px;">
+            <i data-lucide="plus" style="width:12px; height:12px;"></i>
+            <span>Add Patta Land</span>
+          </button>
+          <label class="btn btn-excel-upload btn-xs" style="cursor:pointer; display:inline-flex; align-items:center; gap:6px; margin-bottom:0;">
+            <i data-lucide="upload" style="width:12px; height:12px;"></i>
+            <span>Upload Excel (Patta Lands)</span>
             <input type="file" accept=".xlsx,.xls,.csv" hidden onchange="handleSectionUploadAnx2(event, 'B')">
           </label>
         </div>
       </div>
 
       <!-- Section C: De-Siltation Location -->
-      <div class="anx-section">
-        <div class="anx-section-header">
-          <div class="anx-section-title">c) De-Siltation Location (Lakes/Ponds/Dams etc.) (Existing & Proposed):</div>
-          <button class="btn btn-teal btn-xs" onclick="downloadSectionTemplateAnx2('C')">⬇ Excel Template (De-Siltation)</button>
+      <div class="anx-section" style="margin-top:32px;">
+        <div class="anx-section-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+          <div class="anx-section-title" style="font-weight:bold; font-size:14px;">c) De-Siltation Location (Lakes/Ponds/Dams etc.) (Existing & Proposed):</div>
+          <button class="btn btn-excel-template btn-xs" onclick="downloadSectionTemplateAnx2('C')" style="display:inline-flex; align-items:center; gap:6px;">
+            <i data-lucide="file-spreadsheet" style="width:12px; height:12px;"></i>
+            <span>Excel Template (De-Siltation)</span>
+          </button>
         </div>
 
         <div class="tbl-wrap">
@@ -972,7 +1072,11 @@
                 <td contenteditable="true" oninput="updateDesiltTotals()">10.93</td>
                 <td contenteditable="true">-</td>
                 <td><select><option selected>Existing</option><option>Proposed</option></select></td>
-                <td><button class="btn btn-xs btn-danger" onclick="delRowAnx2(this)">✕</button></td>
+                <td>
+                  <button class="btn btn-xs btn-danger" onclick="delRowAnx2(this)" style="display:inline-flex; align-items:center; justify-content:center; padding:4px;">
+                    <i data-lucide="trash-2" style="width:12px; height:12px;"></i>
+                  </button>
+                </td>
               </tr>
             </tbody>
             <tfoot>
@@ -986,20 +1090,27 @@
           </table>
         </div>
         
-        <div class="section-footer">
-          <button class="btn btn-xs btn-outline" onclick="addRowAnx2('anx2-desilt',['','','','','Jalandhar','','','0.00','-','<select><option>Existing</option><option>Proposed</option></select>','<button class=\'btn btn-xs btn-danger\' onclick=\'delRow(this)\'>✕</button>']); updateDesiltTotals();">+ Add Location</button>
-          <label class="btn btn-navy btn-xs" style="cursor:pointer">
-            📤 Upload Excel (De-Siltation)
+        <div class="section-footer" style="margin-top:12px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <button class="btn btn-xs btn-outline" onclick="addRowAnx2('anx2-desilt',['','','','','Jalandhar','','','0.00','-','<select><option>Existing</option><option>Proposed</option></select>','<button class=\'btn btn-xs btn-danger\' onclick=\'delRowAnx2(this)\' style=\'display:inline-flex;align-items:center;justify-content:center;padding:4px;\'><i data-lucide=\'trash-2\' style=\'width:12px;height:12px;\'></i></button>']); updateDesiltTotals();" style="display:inline-flex; align-items:center; gap:6px;">
+            <i data-lucide="plus" style="width:12px; height:12px;"></i>
+            <span>Add Location</span>
+          </button>
+          <label class="btn btn-excel-upload btn-xs" style="cursor:pointer; display:inline-flex; align-items:center; gap:6px; margin-bottom:0;">
+            <i data-lucide="upload" style="width:12px; height:12px;"></i>
+            <span>Upload Excel (De-Siltation)</span>
             <input type="file" accept=".xlsx,.xls,.csv" hidden onchange="handleSectionUploadAnx2(event, 'C')">
           </label>
         </div>
       </div>
 
       <!-- Section D: M-Sand Plants -->
-      <div class="anx-section">
-        <div class="anx-section-header">
-          <div class="anx-section-title">d) M-Sand Plants (Existing & Proposed):</div>
-          <button class="btn btn-teal btn-xs" onclick="downloadSectionTemplateAnx2('D')">⬇ Excel Template (M-Sand)</button>
+      <div class="anx-section" style="margin-top:32px;">
+        <div class="anx-section-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+          <div class="anx-section-title" style="font-weight:bold; font-size:14px;">d) M-Sand Plants (Existing & Proposed):</div>
+          <button class="btn btn-excel-template btn-xs" onclick="downloadSectionTemplateAnx2('D')" style="display:inline-flex; align-items:center; gap:6px;">
+            <i data-lucide="file-spreadsheet" style="width:12px; height:12px;"></i>
+            <span>Excel Template (M-Sand)</span>
+          </button>
         </div>
 
         <div class="tbl-wrap">
@@ -1027,24 +1138,35 @@
                 <td contenteditable="true" class="coord-input">Not Available</td>
                 <td contenteditable="true">Not Available</td>
                 <td><select><option selected>Existing</option><option>Proposed</option></select></td>
-                <td><button class="btn btn-xs btn-danger" onclick="delRowAnx2(this)">✕</button></td>
+                <td>
+                  <button class="btn btn-xs btn-danger" onclick="delRowAnx2(this)" style="display:inline-flex; align-items:center; justify-content:center; padding:4px;">
+                    <i data-lucide="trash-2" style="width:12px; height:12px;"></i>
+                  </button>
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
         
-        <div class="section-footer">
-          <button class="btn btn-xs btn-outline" onclick="addRowAnx2('anx2-msand',['','','Jalandhar','','','','','<select><option>Existing</option><option>Proposed</option></select>','<button class=\'btn btn-xs btn-danger\' onclick=\'delRowAnx2(this)\'>✕</button>'])">+ Add M-Sand Plant</button>
-          <label class="btn btn-navy btn-xs" style="cursor:pointer">
-            📤 Upload Excel (M-Sand)
+        <div class="section-footer" style="margin-top:12px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <button class="btn btn-xs btn-outline" onclick="addRowAnx2('anx2-msand',['','','Jalandhar','','','','','<select><option>Existing</option><option>Proposed</option></select>','<button class=\'btn btn-xs btn-danger\' onclick=\'delRowAnx2(this)\' style=\'display:inline-flex;align-items:center;justify-content:center;padding:4px;\'><i data-lucide=\'trash-2\' style=\'width:12px;height:12px;\'></i></button>'])" style="display:inline-flex; align-items:center; gap:6px;">
+            <i data-lucide="plus" style="width:12px; height:12px;"></i>
+            <span>Add M-Sand Plant</span>
+          </button>
+          <label class="btn btn-excel-upload btn-xs" style="cursor:pointer; display:inline-flex; align-items:center; gap:6px; margin-bottom:0;">
+            <i data-lucide="upload" style="width:12px; height:12px;"></i>
+            <span>Upload Excel (M-Sand)</span>
             <input type="file" accept=".xlsx,.xls,.csv" hidden onchange="handleSectionUploadAnx2(event, 'D')">
           </label>
         </div>
       </div>
 
       <!-- Final Action Area -->
-      <div class="final-actions">
-        <button class="btn btn-saffron btn-lg" onclick="exportAnx2PDF(this)">📄 Download Final Annexure 2 PDF</button>
+      <div class="final-actions" style="margin-top:32px; display:flex; justify-content:center;">
+        <button class="btn btn-pdf-upload btn-lg" onclick="exportAnx2PDF(this)" style="display:inline-flex; align-items:center; gap:8px;">
+          <i data-lucide="file-text" style="width:18px; height:18px;"></i>
+          <span>Download Final Annexure 2 PDF</span>
+        </button>
       </div>
       
     </div>
@@ -1057,9 +1179,30 @@
       <div class="page-title">Annexure III — Cluster Details</div>
       <div class="page-sub">Cluster &amp; Contiguous Cluster Details · EMGSM 2020</div>
     </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn btn-teal btn-sm" onclick="dlTemplate('cluster')">⬇ Cluster Template</button>
-      <button class="btn btn-teal btn-sm" onclick="dlTemplate('contiguous')">⬇ Contiguous Template</button>
+    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+      <span id="anx3-uploaded-filename" style="font-size:12px; color:var(--text-soft); font-weight:600; display:none; padding:4px 8px; background:var(--off); border-radius:var(--r-xs); border:1px solid var(--border);"></span>
+      <button id="anx3-preview-btn" class="btn btn-outline btn-sm" style="display:none; align-items:center; gap:6px;" onclick="togglePDFPreviewAnx3()"><i data-lucide="eye" style="width:14px; height:14px;"></i> Preview PDF</button>
+      <button id="anx3-download-btn" class="btn btn-pdf-download btn-sm" style="display:none;" onclick="downloadPdf()"><i data-lucide="download" style="width:14px; height:14px;"></i> Download PDF</button>
+      <button id="anx3-delete-btn" class="btn btn-danger btn-sm" style="display:none; align-items:center; gap:6px;" onclick="deletePdfAnx3()"><i data-lucide="trash-2" style="width:14px; height:14px;"></i> Delete PDF</button>
+      <label class="btn btn-pdf-upload btn-sm" style="cursor:pointer; margin-bottom:0; display:inline-flex; align-items:center; gap:6px;">
+        <i data-lucide="upload" style="width:14px; height:14px;"></i>
+        <span>Upload PDF</span>
+        <input type="file" accept="application/pdf" id="anx3-pdf-input" hidden onchange="handlePdfUpload(event)">
+      </label>
+    </div>
+  </div>
+
+  <!-- PDF Preview Section (Hidden by default) -->
+  <div id="pdf-preview-section-anx3" class="card" style="display: none; border-color: #0ea5e9; margin-bottom: 24px;">
+    <div class="card-bd">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="margin: 0; font-size: 18px; color: #0369a1;">Uploaded PDF Preview</h3>
+        <button class="btn btn-sm btn-danger" onclick="closePDFPreviewAnx3()" style="display:inline-flex; align-items:center; gap:6px;">
+          <i data-lucide="x" style="width:14px; height:14px;"></i>
+          <span>Close Preview</span>
+        </button>
+      </div>
+      <iframe id="pdf-iframe-anx3" style="width: 100%; height: 600px; border: 1px solid #e5e7eb; border-radius: 6px; background: #f9fafb;"></iframe>
     </div>
   </div>
 
@@ -1075,9 +1218,13 @@
         <div class="anx-section-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
           <div class="anx-section-title" style="font-weight:bold; font-size:14px;">a) Cluster Details:</div>
           <div style="display:flex; gap:8px;">
-            <button class="btn btn-teal btn-xs" onclick="exportClusterXlsx()">⬇ Export to Excel</button>
-            <label class="btn btn-navy btn-xs" style="cursor:pointer">
-              📤 Upload Cluster Excel
+            <button class="btn btn-excel-template btn-xs" onclick="exportClusterXlsx()" style="display:inline-flex; align-items:center; gap:6px;">
+              <i data-lucide="download" style="width:12px; height:12px;"></i>
+              <span>Export to Excel</span>
+            </button>
+            <label class="btn btn-excel-upload btn-xs" style="cursor:pointer; display:inline-flex; align-items:center; gap:6px; margin-bottom:0;">
+              <i data-lucide="upload" style="width:12px; height:12px;"></i>
+              <span>Upload Cluster Excel</span>
               <input type="file" accept=".xlsx,.xls" hidden onchange="uploadExcel(event,'cluster')">
             </label>
           </div>
@@ -1107,8 +1254,11 @@
           </table>
         </div>
 
-        <div class="section-footer" style="margin-top:8px">
-          <button class="btn btn-xs btn-outline" onclick="addClusterRow()">+ Add Cluster Row</button>
+        <div class="section-footer" style="margin-top:12px;">
+          <button class="btn btn-xs btn-outline" onclick="addClusterRow()" style="display:inline-flex; align-items:center; gap:6px;">
+            <i data-lucide="plus" style="width:12px; height:12px;"></i>
+            <span>Add Cluster Row</span>
+          </button>
         </div>
       </div>
 
@@ -1117,9 +1267,13 @@
         <div class="anx-section-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
           <div class="anx-section-title" style="font-weight:bold; font-size:14px;">b) Contiguous Clusters:</div>
           <div style="display:flex; gap:8px;">
-            <button class="btn btn-teal btn-xs" onclick="exportContXlsx()">⬇ Export to Excel</button>
-            <label class="btn btn-navy btn-xs" style="cursor:pointer">
-              📤 Upload Contiguous Excel
+            <button class="btn btn-excel-template btn-xs" onclick="exportContXlsx()" style="display:inline-flex; align-items:center; gap:6px;">
+              <i data-lucide="download" style="width:12px; height:12px;"></i>
+              <span>Export to Excel</span>
+            </button>
+            <label class="btn btn-excel-upload btn-xs" style="cursor:pointer; display:inline-flex; align-items:center; gap:6px; margin-bottom:0;">
+              <i data-lucide="upload" style="width:12px; height:12px;"></i>
+              <span>Upload Contiguous Excel</span>
               <input type="file" accept=".xlsx,.xls" hidden onchange="uploadExcel(event,'contiguous')">
             </label>
           </div>
@@ -1150,9 +1304,20 @@
           </table>
         </div>
 
-        <div class="section-footer" style="margin-top:8px">
-          <button class="btn btn-xs btn-outline" onclick="addContRow()">+ Add Contiguous Row</button>
+        <div class="section-footer" style="margin-top:12px;">
+          <button class="btn btn-xs btn-outline" onclick="addContRow()" style="display:inline-flex; align-items:center; gap:6px;">
+            <i data-lucide="plus" style="width:12px; height:12px;"></i>
+            <span>Add Contiguous Row</span>
+          </button>
         </div>
+      </div>
+
+      <!-- Final Action Area -->
+      <div class="final-actions" style="margin-top: 32px; display: flex; justify-content: center;">
+        <button class="btn btn-pdf-upload btn-lg" onclick="exportAnx3PDF(this)" style="display:inline-flex; align-items:center; gap:8px;">
+          <i data-lucide="file-text" style="width:18px; height:18px;"></i>
+          <span>Download Final Annexure 3 PDF</span>
+        </button>
       </div>
 
     </div>
@@ -1165,65 +1330,65 @@
       <div class="page-title">Annexure IV — Transportation Routes</div>
       <div class="page-sub">Transportation routes for individual leases and leases in clusters</div>
     </div>
-    <div style="display:flex;gap:8px">
-      <button class="btn btn-teal btn-sm" onclick="downloadAnxTemplate(4)">⬇ Excel Template</button>
-      <label class="btn btn-navy btn-sm" style="cursor:pointer">📤 Upload Excel <input type="file" accept=".xlsx,.xls" hidden onchange="handleAnxUpload(event,4)"></label>
-      <button class="btn btn-saffron btn-sm" onclick="exportAnxPDF(4)">📄 Export PDF</button>
+    <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+      <span id="anx4-uploaded-filename" style="font-size:12px; color:var(--text-soft); font-weight:600; display:none; padding:4px 8px; background:var(--off); border-radius:var(--r-xs); border:1px solid var(--border);"></span>
+      <button id="anx4-preview-btn" class="btn btn-outline btn-sm" style="display:none; align-items:center; gap:6px;" onclick="togglePDFPreviewAnx4()"><i data-lucide="eye" style="width:14px; height:14px;"></i> Preview PDF</button>
+      <button id="anx4-download-btn" class="btn btn-pdf-download btn-sm" style="display:none;" onclick="downloadPdfAnx4()"><i data-lucide="download" style="width:14px; height:14px;"></i> Download PDF</button>
+      <button id="anx4-delete-btn" class="btn btn-danger btn-sm" style="display:none; align-items:center; gap:6px;" onclick="deletePdfAnx4()"><i data-lucide="trash-2" style="width:14px; height:14px;"></i> Delete PDF</button>
+      <label class="btn btn-pdf-upload btn-sm" style="cursor:pointer; margin-bottom:0; display:inline-flex; align-items:center; gap:6px;">
+        <i data-lucide="upload" style="width:14px; height:14px;"></i>
+        <span>Upload PDF</span>
+        <input type="file" accept="application/pdf" id="anx4-pdf-input" hidden onchange="handlePDFUploadAnx4(event)">
+      </label>
     </div>
   </div>
-  <div class="card" style="margin-bottom:16px">
-    <div class="card-hd"><div class="card-title">Individual Lease Routes</div></div>
+
+  <!-- PDF Preview Section (Hidden by default) -->
+  <div id="pdf-preview-section-anx4" class="card" style="display: none; border-color: #0ea5e9; margin-bottom: 24px;">
     <div class="card-bd">
-      <div class="tbl-wrap">
-        <table class="anx-tbl" id="anx4-routes" style="min-width:1100px">
-          <thead><tr><th>Sl. No.</th><th>Lease No.</th><th>Route No.</th><th>Tippers/day (Lease)</th><th>Tippers/day (All Leases)</th><th>Length (KM)</th><th>Type of Road</th><th>Recommendation</th><th>Constructed By</th><th>Route Map</th><th>Action</th></tr></thead>
-          <tbody>
-            <tr>
-              <td contenteditable>1</td>
-              <td contenteditable>Jalandhar Sutlej-1<br>Vill-Kadiana, Block-Phillaur</td>
-              <td contenteditable>A-A'<br>B-B'<br>C-C'</td>
-              <td contenteditable>45</td>
-              <td contenteditable>120</td>
-              <td contenteditable>0.73</td>
-              <td><select><option>Black Topped</option><option>Unpaved</option></select></td>
-              <td><select><option>Black Topped</option><option>Unpaved</option></select></td>
-              <td><select><option>Govt</option><option>Lease Owner</option></select></td>
-              <td contenteditable>Route Map attached</td>
-              <td><button class="btn btn-xs btn-danger" onclick="delRow(this)">✕</button></td>
-            </tr>
-          </tbody>
-        </table>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="margin: 0; font-size: 18px; color: #0369a1;">Uploaded PDF Preview</h3>
+        <button class="btn btn-sm btn-danger" onclick="closePDFPreviewAnx4()" style="display:inline-flex; align-items:center; gap:6px;">
+          <i data-lucide="x" style="width:14px; height:14px;"></i>
+          <span>Close Preview</span>
+        </button>
       </div>
-      <button class="btn btn-xs btn-outline" style="margin-top:8px" onclick="addAnx4Row()">+ Add Route</button>
+      <iframe id="pdf-iframe-anx4" style="width: 100%; height: 600px; border: 1px solid #e5e7eb; border-radius: 6px; background: #f9fafb;"></iframe>
     </div>
   </div>
-  <div class="card">
-    <div class="card-hd"><div class="card-title">Cluster Transportation Routes</div></div>
-    <div class="card-bd">
-      <div class="tbl-wrap">
-        <table class="anx-tbl" id="anx4-cluster-routes" style="min-width:1000px">
-          <thead><tr><th>Cluster No.</th><th>Route No.</th><th>Tippers/day (Cluster)</th><th>Tippers/day (All Clusters)</th><th>Length (KM)</th><th>Type of Road</th><th>Recommendation</th><th>Constructed By</th><th>Route Map</th><th>Action</th></tr></thead>
-          <tbody>
-            <tr>
-              <td contenteditable>Jalandhar Sutlej 1,2</td>
-              <td contenteditable>A-A', B-B'<br>C-C' TO F-F'</td>
-              <td contenteditable>90</td>
-              <td contenteditable>350</td>
-              <td contenteditable>8.21</td>
-              <td><select><option>Black Topped</option><option>Unpaved</option></select></td>
-              <td><select><option>Black Topped</option><option>Unpaved</option></select></td>
-              <td><select><option>Govt</option><option>Lease Owner</option></select></td>
-              <td contenteditable>Route Map attached</td>
-              <td><button class="btn btn-xs btn-danger" onclick="delRow(this)">✕</button></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <button class="btn btn-xs btn-outline" style="margin-top:8px" onclick="addAnx4ClusterRow()">+ Add Cluster Route</button>
-    </div>
+
+  <!-- SECTION A: INDIVIDUAL LEASE ROUTES -->
+  <div style="font-weight:bold; font-size:15px; color:var(--text-mid); margin-bottom:12px;">Individual Lease Routes:</div>
+  <div id="individual-routes-container">
+    <!-- table blocks injected dynamically -->
+  </div>
+  <div style="margin-bottom:30px; margin-top:12px;">
+    <button class="btn btn-sm btn-pdf-upload" onclick="addRouteTableBlock()" style="display:inline-flex; align-items:center; gap:6px;">
+      <i data-lucide="plus-circle" style="width:14px; height:14px;"></i>
+      <span>Add Another Table / Section</span>
+    </button>
+  </div>
+
+  <!-- SECTION B: CLUSTER TRANSPORTATION ROUTES -->
+  <div style="font-weight:bold; font-size:15px; color:var(--text-mid); margin-bottom:12px; margin-top:32px;">Cluster Transportation Routes:</div>
+  <div id="cluster-routes-container">
+    <!-- table blocks injected dynamically -->
+  </div>
+  <div style="margin-bottom:30px; margin-top:12px;">
+    <button class="btn btn-sm btn-pdf-upload" onclick="addClusterTableBlock()" style="display:inline-flex; align-items:center; gap:6px;">
+      <i data-lucide="plus-circle" style="width:14px; height:14px;"></i>
+      <span>Add Another Table / Section</span>
+    </button>
+  </div>
+
+  <!-- Final Action Area -->
+  <div class="final-actions" style="margin-top:32px; display:flex; justify-content:center;">
+    <button class="btn btn-pdf-upload btn-lg" onclick="exportPDF()" style="display:inline-flex; align-items:center; gap:8px;">
+      <i data-lucide="file-text" style="width:18px; height:18px;"></i>
+      <span>Download Final Annexure 4 PDF</span>
+    </button>
   </div>
 </div>
-
       <!-- ═══ ANNEXURE V ═══ -->
 <div id="view-anx5" class="view">
   <div class="header-row">
@@ -1231,10 +1396,20 @@
       <div class="page-title">Annexure V — Bench Mark & CORS</div>
       <div class="page-sub">Permanent bench mark records and CORS station coordinates</div>
     </div>
-    <div style="display:flex;gap:8px">
-      <button class="btn btn-teal btn-sm" onclick="downloadAnxTemplate(5)">⬇ Excel Template</button>
-      <label class="btn btn-navy btn-sm" style="cursor:pointer">📤 Upload Excel <input type="file" accept=".xlsx,.xls" hidden onchange="handleAnxUpload(event,5)"></label>
-      <button class="btn btn-saffron btn-sm" onclick="exportAnxPDF(5)">📄 Export PDF</button>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="btn btn-excel-template btn-sm" onclick="downloadAnxTemplate(5)">
+        <i data-lucide="file-spreadsheet" style="width:14px; height:14px;"></i>
+        <span>Excel Template</span>
+      </button>
+      <label class="btn btn-excel-upload btn-sm" style="cursor:pointer; margin-bottom:0; display:inline-flex; align-items:center; gap:6px;">
+        <i data-lucide="upload" style="width:14px; height:14px;"></i>
+        <span>Upload Excel</span>
+        <input type="file" accept=".xlsx,.xls" hidden onchange="handleAnxUpload(event,5)">
+      </label>
+      <button class="btn btn-pdf-upload btn-sm" onclick="exportAnxPDF(5)">
+        <i data-lucide="file-text" style="width:14px; height:14px;"></i>
+        <span>Export PDF</span>
+      </button>
     </div>
   </div>
   <div class="card">
@@ -1251,12 +1426,19 @@
               <td contenteditable class="coord-input">75.304797 E</td>
               <td contenteditable>236.45</td>
               <td contenteditable>Riverbank reference point</td>
-              <td><button class="btn btn-xs btn-danger" onclick="delRow(this)">✕</button></td>
+              <td>
+                <button class="btn btn-xs btn-danger" onclick="delRow(this)" style="display:inline-flex; align-items:center; justify-content:center; padding:4px;">
+                  <i data-lucide="trash-2" style="width:12px; height:12px;"></i>
+                </button>
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
-      <button class="btn btn-xs btn-outline" style="margin-top:8px" onclick="addRow('anx5-benchmarks',['','<select><option>Bench Mark</option><option>CORS</option></select>','','','','','<button class=\'btn btn-xs btn-danger\' onclick=\'delRow(this)\'>✕</button>'])">+ Add Point</button>
+      <button class="btn btn-xs btn-outline" style="margin-top:8px; display:inline-flex; align-items:center; gap:6px;" onclick="addRow('anx5-benchmarks',['','<select><option>Bench Mark</option><option>CORS</option></select>','','','','','<button class=\'btn btn-xs btn-danger\' onclick=\'delRow(this)\' style=\'display:inline-flex;align-items:center;justify-content:center;padding:4px;\'><i data-lucide=\'trash-2\' style=\'width:12px;height:12px;\'></i\></button>']);">
+        <i data-lucide="plus" style="width:12px; height:12px;"></i>
+        <span>Add Point</span>
+      </button>
     </div>
   </div>
 </div>
@@ -1268,10 +1450,20 @@
       <div class="page-title">Annexure VI — Final Cluster Details</div>
       <div class="page-sub">Finalized cluster summaries and total area computations</div>
     </div>
-    <div style="display:flex;gap:8px">
-      <button class="btn btn-teal btn-sm" onclick="downloadAnxTemplate(6)">⬇ Excel Template</button>
-      <label class="btn btn-navy btn-sm" style="cursor:pointer">📤 Upload Excel <input type="file" accept=".xlsx,.xls" hidden onchange="handleAnxUpload(event,6)"></label>
-      <button class="btn btn-saffron btn-sm" onclick="exportAnxPDF(6)">📄 Export PDF</button>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="btn btn-excel-template btn-sm" onclick="downloadAnxTemplate(6)">
+        <i data-lucide="file-spreadsheet" style="width:14px; height:14px;"></i>
+        <span>Excel Template</span>
+      </button>
+      <label class="btn btn-excel-upload btn-sm" style="cursor:pointer; margin-bottom:0; display:inline-flex; align-items:center; gap:6px;">
+        <i data-lucide="upload" style="width:14px; height:14px;"></i>
+        <span>Upload Excel</span>
+        <input type="file" accept=".xlsx,.xls" hidden onchange="handleAnxUpload(event,6)">
+      </label>
+      <button class="btn btn-pdf-upload btn-sm" onclick="exportAnxPDF(6)">
+        <i data-lucide="file-text" style="width:14px; height:14px;"></i>
+        <span>Export PDF</span>
+      </button>
     </div>
   </div>
   <div class="card">
@@ -1288,12 +1480,19 @@
               <td contenteditable>1074334.80</td>
               <td contenteditable>644600.88</td>
               <td><select><option>Approved</option><option>Pending</option></select></td>
-              <td><button class="btn btn-xs btn-danger" onclick="delRow(this)">✕</button></td>
+              <td>
+                <button class="btn btn-xs btn-danger" onclick="delRow(this)" style="display:inline-flex; align-items:center; justify-content:center; padding:4px;">
+                  <i data-lucide="trash-2" style="width:12px; height:12px;"></i>
+                </button>
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
-      <button class="btn btn-xs btn-outline" style="margin-top:8px" onclick="addRow('anx6-final-clusters',['','', '0.00','0','0','<select><option>Approved</option><option>Pending</option></select>','<button class=\'btn btn-xs btn-danger\' onclick=\'delRow(this)\'>✕</button>'])">+ Add Cluster</button>
+      <button class="btn btn-xs btn-outline" style="margin-top:8px; display:inline-flex; align-items:center; gap:6px;" onclick="addRow('anx6-final-clusters',['','', '0.00','0','0','<select><option>Approved</option><option>Pending</option></select>','<button class=\'btn btn-xs btn-danger\' onclick=\'delRow(this)\' style=\'display:inline-flex;align-items:center;justify-content:center;padding:4px;\'><i data-lucide=\'trash-2\' style=\'width:12px;height:12px;\'></i\></button>']);">
+        <i data-lucide="plus" style="width:12px; height:12px;"></i>
+        <span>Add Cluster</span>
+      </button>
     </div>
   </div>
 </div>
@@ -1305,10 +1504,20 @@
       <div class="page-title">Annexure VII — Final Patta Lands</div>
       <div class="page-sub">Final patta land summary with ownership and area details</div>
     </div>
-    <div style="display:flex;gap:8px">
-      <button class="btn btn-teal btn-sm" onclick="downloadAnxTemplate(7)">⬇ Excel Template</button>
-      <label class="btn btn-navy btn-sm" style="cursor:pointer">📤 Upload Excel <input type="file" accept=".xlsx,.xls" hidden onchange="handleAnxUpload(event,7)"></label>
-      <button class="btn btn-saffron btn-sm" onclick="exportAnxPDF(7)">📄 Export PDF</button>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="btn btn-excel-template btn-sm" onclick="downloadAnxTemplate(7)">
+        <i data-lucide="file-spreadsheet" style="width:14px; height:14px;"></i>
+        <span>Excel Template</span>
+      </button>
+      <label class="btn btn-excel-upload btn-sm" style="cursor:pointer; margin-bottom:0; display:inline-flex; align-items:center; gap:6px;">
+        <i data-lucide="upload" style="width:14px; height:14px;"></i>
+        <span>Upload Excel</span>
+        <input type="file" accept=".xlsx,.xls" hidden onchange="handleAnxUpload(event,7)">
+      </label>
+      <button class="btn btn-pdf-upload btn-sm" onclick="exportAnxPDF(7)">
+        <i data-lucide="file-text" style="width:14px; height:14px;"></i>
+        <span>Export PDF</span>
+      </button>
     </div>
   </div>
   <div class="card">
@@ -1326,12 +1535,19 @@
               <td contenteditable>Phillaur</td>
               <td contenteditable>Kadiana</td>
               <td contenteditable>Agricultural</td>
-              <td><button class="btn btn-xs btn-danger" onclick="delRow(this)">✕</button></td>
+              <td>
+                <button class="btn btn-xs btn-danger" onclick="delRow(this)" style="display:inline-flex; align-items:center; justify-content:center; padding:4px;">
+                  <i data-lucide="trash-2" style="width:12px; height:12px;"></i>
+                </button>
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
-      <button class="btn btn-xs btn-outline" style="margin-top:8px" onclick="addRow('anx7-patta-final',['','','0.00','','','','','<button class=\'btn btn-xs btn-danger\' onclick=\'delRow(this)\'>✕</button>'])">+ Add Patta Land</button>
+      <button class="btn btn-xs btn-outline" style="margin-top:8px; display:inline-flex; align-items:center; gap:6px;" onclick="addRow('anx7-patta-final',['','','0.00','','','','','<button class=\'btn btn-xs btn-danger\' onclick=\'delRow(this)\' style=\'display:inline-flex;align-items:center;justify-content:center;padding:4px;\'><i data-lucide=\'trash-2\' style=\'width:12px;height:12px;\'></i\></button>']);">
+        <i data-lucide="plus" style="width:12px; height:12px;"></i>
+        <span>Add Patta Land</span>
+      </button>
     </div>
   </div>
 </div>
@@ -1363,7 +1579,11 @@
                 <option value="anx6-final-clusters">Annexure VI — Final Clusters</option>
                 <option value="anx7-patta-final">Annexure VII — Final Patta Lands</option>
               </select>
-              <label class="btn btn-navy btn-sm" style="cursor:pointer">📤 Upload Excel for Selected Table <input type="file" accept=".xlsx,.xls" hidden onchange="handleTableUpload(event)"></label>
+              <label class="btn btn-excel-upload btn-sm" style="cursor:pointer; margin-bottom:0; display:inline-flex; align-items:center; gap:6px;">
+                <i data-lucide="upload" style="width:14px; height:14px;"></i>
+                <span>Upload Excel for Selected Table</span>
+                <input type="file" accept=".xlsx,.xls" hidden onchange="handleTableUpload(event)">
+              </label>
               <div style="font-size:12px;color:var(--text-faint)">Select table → Upload Excel sheet (first sheet will be used)</div>
             </div>
           </div>
@@ -1379,9 +1599,15 @@
   <div id="anx-tab-coords">
     <div class="card">
       <div class="card-hd"><div class="card-title">Final Block Sand Ghats Coordinates</div>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-teal btn-xs" onclick="toast('Template downloaded','success')">⬇ Excel</button>
-          <button class="btn btn-saffron btn-xs" onclick="exportAnxPDF('coords')">📄 PDF</button>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button class="btn btn-excel-template btn-xs" onclick="toast('Template downloaded','success')" style="display:inline-flex; align-items:center; gap:4px;">
+            <i data-lucide="file-spreadsheet" style="width:12px; height:12px;"></i>
+            <span>Excel</span>
+          </button>
+          <button class="btn btn-pdf-upload btn-xs" onclick="exportAnxPDF('coords')" style="display:inline-flex; align-items:center; gap:4px;">
+            <i data-lucide="file-text" style="width:12px; height:12px;"></i>
+            <span>PDF</span>
+          </button>
         </div>
       </div>
       <div class="card-bd">
@@ -1395,12 +1621,19 @@
                 <td contenteditable>12.50</td>
                 <td contenteditable class="coord-input">31°04'48.886"N<br>31°04'18.121"N<br>31°04'07.214"N</td>
                 <td contenteditable class="coord-input">75°53'39.686"E<br>75°53'37.489"E<br>75°53'34.086"E</td>
-                <td><button class="btn btn-xs btn-danger" onclick="delRow(this)">✕</button></td>
+                <td>
+                  <button class="btn btn-xs btn-danger" onclick="delRow(this)" style="display:inline-flex; align-items:center; justify-content:center; padding:4px;">
+                    <i data-lucide="trash-2" style="width:12px; height:12px;"></i>
+                  </button>
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <button class="btn btn-xs btn-outline" style="margin-top:8px" onclick="addRow('anx-coords-tbl',['','','','','','','','<button class=\'btn btn-xs btn-danger\' onclick=\'delRow(this)\'>✕</button>'])">+ Add Row</button>
+        <button class="btn btn-xs btn-outline" style="margin-top:8px; display:inline-flex; align-items:center; gap:6px;" onclick="addRow('anx-coords-tbl',['','','','','','','','<button class=\'btn btn-xs btn-danger\' onclick=\'delRow(this)\' style=\'display:inline-flex;align-items:center;justify-content:center;padding:4px;\'><i data-lucide=\'trash-2\' style=\'width:12px;height:12px;\'></i\></button>']);">
+          <i data-lucide="plus" style="width:12px; height:12px;"></i>
+          <span>Add Row</span>
+        </button>
       </div>
     </div>
   </div>
@@ -1413,11 +1646,14 @@
             <table class="anx-tbl" id="anx-benchmark-tbl" style="min-width:800px">
               <thead><tr><th>Permanent Bench Mark</th><th>Coordinates</th><th>Elevation (m)</th><th>Sandbar Code</th><th>Action</th></tr></thead>
               <tbody>
-                <tr><td contenteditable>BM-JAL-01</td><td contenteditable class="coord-input">31.025890 N<br>75.304797 E</td><td contenteditable>236.45</td><td contenteditable>JL-ST-01 to JL-ST-05</td><td><button class="btn btn-xs btn-danger" onclick="delRow(this)">✕</button></td></tr>
+                <tr><td contenteditable>BM-JAL-01</td><td contenteditable class="coord-input">31.025890 N<br>75.304797 E</td><td contenteditable>236.45</td><td contenteditable>JL-ST-01 to JL-ST-05</td><td><button class="btn btn-xs btn-danger" onclick="delRow(this)" style="display:inline-flex; align-items:center; justify-content:center; padding:4px;"><i data-lucide="trash-2" style="width:12px; height:12px;"></i></button></td></tr>
               </tbody>
             </table>
           </div>
-          <button class="btn btn-xs btn-outline" style="margin-top:8px" onclick="addRow('anx-benchmark-tbl',['','','','','<button class=\'btn btn-xs btn-danger\' onclick=\'delRow(this)\'>✕</button>'])">+ Add Row</button>
+          <button class="btn btn-xs btn-outline" style="margin-top:8px; display:inline-flex; align-items:center; gap:6px;" onclick="addRow('anx-benchmark-tbl',['','','','','<button class=\'btn btn-xs btn-danger\' onclick=\'delRow(this)\' style=\'display:inline-flex;align-items:center;justify-content:center;padding:4px;\'><i data-lucide=\'trash-2\' style=\'width:12px;height:12px;\'></i\></button>']);">
+            <i data-lucide="plus" style="width:12px; height:12px;"></i>
+            <span>Add Row</span>
+          </button>
         </div>
       </div>
       <div class="card">
@@ -1427,11 +1663,14 @@
             <table class="anx-tbl" id="anx-cors-tbl" style="min-width:800px">
               <thead><tr><th>CORS Station Name</th><th>Lat</th><th>Lon</th><th>Height (m)</th><th>Station Code</th><th>Action</th></tr></thead>
               <tbody>
-                <tr><td contenteditable>ANANDPURSAHIB</td><td contenteditable class="coord-input">N 31°14'31.68332"</td><td contenteditable class="coord-input">E 76°29'17.88727"</td><td contenteditable>263.387</td><td contenteditable>ANAD</td><td><button class="btn btn-xs btn-danger" onclick="delRow(this)">✕</button></td></tr>
+                <tr><td contenteditable>ANANDPURSAHIB</td><td contenteditable class="coord-input">N 31°14'31.68332"</td><td contenteditable class="coord-input">E 76°29'17.88727"</td><td contenteditable>263.387</td><td contenteditable>ANAD</td><td><button class="btn btn-xs btn-danger" onclick="delRow(this)" style="display:inline-flex; align-items:center; justify-content:center; padding:4px;"><i data-lucide="trash-2" style="width:12px; height:12px;"></i></button></td></tr>
               </tbody>
             </table>
           </div>
-          <button class="btn btn-xs btn-outline" style="margin-top:8px" onclick="addRow('anx-cors-tbl',['','','','','','<button class=\'btn btn-xs btn-danger\' onclick=\'delRow(this)\'>✕</button>'])">+ Add Row</button>
+          <button class="btn btn-xs btn-outline" style="margin-top:8px; display:inline-flex; align-items:center; gap:6px;" onclick="addRow('anx-cors-tbl',['','','','','','<button class=\'btn btn-xs btn-danger\' onclick=\'delRow(this)\' style=\'display:inline-flex;align-items:center;justify-content:center;padding:4px;\'><i data-lucide=\'trash-2\' style=\'width:12px;height:12px;\'></i\></button>']);">
+            <i data-lucide="plus" style="width:12px; height:12px;"></i>
+            <span>Add Row</span>
+          </button>
         </div>
       </div>
     </div>
@@ -1444,11 +1683,14 @@
           <table class="anx-tbl" id="anx-final-clusters-tbl" style="min-width:1000px">
             <thead><tr><th>River Name</th><th>Cluster No.</th><th>Lease No.</th><th>Location</th><th>Village</th><th>Area (Ha)</th><th>Total Excav. (MT)</th><th>Mineral Excav. @60% (MT)</th><th>Action</th></tr></thead>
             <tbody>
-              <tr><td contenteditable>Sutlej</td><td contenteditable>1</td><td contenteditable>NPRO_JL_PL_ST_01<br>NPRO_JL_PL_ST_02</td><td><select><option>Riverbed</option><option>Patta Land</option></select></td><td contenteditable>Kadiana,<br>Phillaur</td><td contenteditable oninput="calcClusterRow(this)">45.20</td><td contenteditable oninput="calcClusterRow(this)">1074334.80</td><td class="anx3-mineral">644600.88</td><td><button class="btn btn-xs btn-danger" onclick="delRow(this)">✕</button></td></tr>
+              <tr><td contenteditable>Sutlej</td><td contenteditable>1</td><td contenteditable>NPRO_JL_PL_ST_01<br>NPRO_JL_PL_ST_02</td><td><select><option>Riverbed</option><option>Patta Land</option></select></td><td contenteditable>Kadiana,<br>Phillaur</td><td contenteditable oninput="calcClusterRow(this)">45.20</td><td contenteditable oninput="calcClusterRow(this)">1074334.80</td><td class="anx3-mineral">644600.88</td><td><button class="btn btn-xs btn-danger" onclick="delRow(this)" style="display:inline-flex; align-items:center; justify-content:center; padding:4px;"><i data-lucide="trash-2" style="width:12px; height:12px;"></i></button></td></tr>
             </tbody>
           </table>
         </div>
-        <button class="btn btn-xs btn-outline" style="margin-top:8px" onclick="addAnx3Row('anx-final-clusters-tbl')">+ Add Row</button>
+        <button class="btn btn-xs btn-outline" style="margin-top:8px; display:inline-flex; align-items:center; gap:6px;" onclick="addAnx3Row('anx-final-clusters-tbl')">
+          <i data-lucide="plus" style="width:12px; height:12px;"></i>
+          <span>Add Row</span>
+        </button>
       </div>
     </div>
   </div>
@@ -1460,11 +1702,14 @@
           <table class="anx-tbl" id="anx-patta-final-tbl" style="min-width:1200px">
             <thead><tr><th>Sl.No.</th><th>Owner</th><th>Sy.No (Khasra)</th><th>Area</th><th>Latitude</th><th>Longitude</th><th>District</th><th>Tehsil</th><th>Village</th><th>Total Reserve (MT) @BD 1.52</th><th>Mineral Mined (MT) @60%</th><th>Existing/Proposed</th><th>Remarks</th><th>Action</th></tr></thead>
             <tbody>
-              <tr><td contenteditable>1</td><td contenteditable>Jaswinder Singh</td><td contenteditable>123/1<br>124/2</td><td contenteditable>2.50</td><td contenteditable class="coord-input">31°00'56"N</td><td contenteditable class="coord-input">75°54'59"E</td><td contenteditable>Jalandhar</td><td contenteditable>Phillaur</td><td contenteditable>Kadiana</td><td contenteditable>57000</td><td contenteditable>34200</td><td><select><option>Existing</option><option>Proposed</option></select></td><td contenteditable>—</td><td><button class="btn btn-xs btn-danger" onclick="delRow(this)">✕</button></td></tr>
+              <tr><td contenteditable>1</td><td contenteditable>Jaswinder Singh</td><td contenteditable>123/1<br>124/2</td><td contenteditable>2.50</td><td contenteditable class="coord-input">31°00'56"N</td><td contenteditable class="coord-input">75°54'59"E</td><td contenteditable>Jalandhar</td><td contenteditable>Phillaur</td><td contenteditable>Kadiana</td><td contenteditable>57000</td><td contenteditable>34200</td><td><select><option>Existing</option><option>Proposed</option></select></td><td contenteditable>—</td><td><button class="btn btn-xs btn-danger" onclick="delRow(this)" style="display:inline-flex; align-items:center; justify-content:center; padding:4px;"><i data-lucide="trash-2" style="width:12px; height:12px;"></i></button></td></tr>
             </tbody>
           </table>
         </div>
-        <button class="btn btn-xs btn-outline" style="margin-top:8px" onclick="toast('Row added','info')">+ Add Row</button>
+        <button class="btn btn-xs btn-outline" style="margin-top:8px; display:inline-flex; align-items:center; gap:6px;" onclick="toast('Row added','info')">
+          <i data-lucide="plus" style="width:12px; height:12px;"></i>
+          <span>Add Row</span>
+        </button>
       </div>
     </div>
   </div>
@@ -1476,11 +1721,14 @@
           <table class="anx-tbl" id="anx-desilt-final-tbl" style="min-width:1000px">
             <thead><tr><th>Name of Reservoir/Dams</th><th>Controlled By</th><th>Latitude</th><th>Longitude</th><th>District</th><th>Tehsil</th><th>Village</th><th>Size (Ha)</th><th>Quantity MT/Year</th><th>Existing/Proposed</th><th>Action</th></tr></thead>
             <tbody>
-              <tr><td contenteditable>Harike Dam</td><td contenteditable>State Govt.</td><td contenteditable class="coord-input">31°10'22"N</td><td contenteditable class="coord-input">74°57'48"E</td><td contenteditable>Ferozepur</td><td contenteditable>Harike</td><td contenteditable>Harike</td><td contenteditable>10.93</td><td contenteditable>15000</td><td><select><option>Existing</option><option>Proposed</option></select></td><td><button class="btn btn-xs btn-danger" onclick="delRow(this)">✕</button></td></tr>
+              <tr><td contenteditable>Harike Dam</td><td contenteditable>State Govt.</td><td contenteditable class="coord-input">31°10'22"N</td><td contenteditable class="coord-input">74°57'48"E</td><td contenteditable>Ferozepur</td><td contenteditable>Harike</td><td contenteditable>Harike</td><td contenteditable>10.93</td><td contenteditable>15000</td><td><select><option>Existing</option><option>Proposed</option></select></td><td><button class="btn btn-xs btn-danger" onclick="delRow(this)" style="display:inline-flex; align-items:center; justify-content:center; padding:4px;"><i data-lucide="trash-2" style="width:12px; height:12px;"></i></button></td></tr>
             </tbody>
           </table>
         </div>
-        <button class="btn btn-xs btn-outline" style="margin-top:8px" onclick="toast('Row added','info')">+ Add Row</button>
+        <button class="btn btn-xs btn-outline" style="margin-top:8px; display:inline-flex; align-items:center; gap:6px;" onclick="toast('Row added','info')">
+          <i data-lucide="plus" style="width:12px; height:12px;"></i>
+          <span>Add Row</span>
+        </button>
       </div>
     </div>
   </div>

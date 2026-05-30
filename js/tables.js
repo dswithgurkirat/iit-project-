@@ -15,6 +15,7 @@ function addRow(tableId, cells) {
     return `<td contenteditable>${val}</td>`;
   }).join('');
   tbody.appendChild(tr);
+  if (window.initLucide) window.initLucide();
 }
 
 
@@ -125,10 +126,11 @@ function populateTableFromSheet(tableId, rows) {
       tr.insertAdjacentHTML('beforeend', `<td contenteditable>${escaped}</td>`);
     });
     if (headers.includes('action')) {
-      tr.insertAdjacentHTML('beforeend', `<td><button class="btn btn-xs btn-danger" onclick="delRow(this)">✕</button></td>`);
+      tr.insertAdjacentHTML('beforeend', `<td><button class="btn btn-xs btn-danger" onclick="delRow(this)" style="display:inline-flex;align-items:center;justify-content:center;padding:4px;"><i data-lucide="trash-2" style="width:12px;height:12px;"></i></button></td>`);
     }
     tbody.appendChild(tr);
   });
+  if (window.initLucide) window.initLucide();
   return true;
 }
 
@@ -213,8 +215,9 @@ function initSummaryTable() {
       <td contenteditable class="num" oninput="updateSummaryTotals()">0</td>
       <td contenteditable class="num" oninput="updateSummaryTotals()">0</td>
       <td contenteditable class="num" oninput="updateSummaryTotals()">0</td>
-      <td><button class="btn btn-xs btn-danger" onclick="delRow(this)">✕</button></td>
+      <td><button class="btn btn-xs btn-danger" onclick="delRow(this)" style="display:inline-flex;align-items:center;justify-content:center;padding:4px;"><i data-lucide="trash-2" style="width:12px;height:12px;"></i></button></td>
     </tr>`).join('');
+  if (window.initLucide) window.initLucide();
 }
 
 function addSummaryRow() {
@@ -226,8 +229,9 @@ function addSummaryRow() {
     <td contenteditable class="num" oninput="updateSummaryTotals()">0</td>
     <td contenteditable class="num" oninput="updateSummaryTotals()">0</td>
     <td contenteditable class="num" oninput="updateSummaryTotals()">0</td>
-    <td><button class="btn btn-xs btn-danger" onclick="delRow(this)">✕</button></td>
+    <td><button class="btn btn-xs btn-danger" onclick="delRow(this)" style="display:inline-flex;align-items:center;justify-content:center;padding:4px;"><i data-lucide="trash-2" style="width:12px;height:12px;"></i></button></td>
   </tr>`);
+  if (window.initLucide) window.initLucide();
 }
 
 function updateSummaryTotals() {
@@ -255,8 +259,9 @@ function initAuctionTable() {
     <td contenteditable>285000</td><td contenteditable>142500</td><td contenteditable>142500</td>
     <td contenteditable>Active</td><td contenteditable>—</td><td contenteditable>—</td>
     <td contenteditable>Running as per schedule</td>
-    <td><button class="btn btn-xs btn-danger" onclick="delRow(this)">✕</button></td>
+    <td><button class="btn btn-xs btn-danger" onclick="delRow(this)" style="display:inline-flex;align-items:center;justify-content:center;padding:4px;"><i data-lucide="trash-2" style="width:12px;height:12px;"></i></button></td>
   </tr>`;
+  if (window.initLucide) window.initLucide();
 }
 
 function addAuctionRow() {
@@ -271,8 +276,9 @@ function addAuctionRow() {
     <td contenteditable>0</td><td contenteditable>0</td><td contenteditable>0</td>
     <td contenteditable>Pending</td><td contenteditable>—</td><td contenteditable>—</td>
     <td contenteditable>—</td>
-    <td><button class="btn btn-xs btn-danger" onclick="delRow(this)">✕</button></td>
+    <td><button class="btn btn-xs btn-danger" onclick="delRow(this)" style="display:inline-flex;align-items:center;justify-content:center;padding:4px;"><i data-lucide="trash-2" style="width:12px;height:12px;"></i></button></td>
   </tr>`);
+  if (window.initLucide) window.initLucide();
 }
 
 function exportAuctionPDF() { toast('📄 Auctioned sites PDF exported','success'); }

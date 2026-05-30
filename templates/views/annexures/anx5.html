@@ -5,10 +5,20 @@
       <div class="page-title">Annexure V — Bench Mark & CORS</div>
       <div class="page-sub">Permanent bench mark records and CORS station coordinates</div>
     </div>
-    <div style="display:flex;gap:8px">
-      <button class="btn btn-teal btn-sm" onclick="downloadAnxTemplate(5)">⬇ Excel Template</button>
-      <label class="btn btn-navy btn-sm" style="cursor:pointer">📤 Upload Excel <input type="file" accept=".xlsx,.xls" hidden onchange="handleAnxUpload(event,5)"></label>
-      <button class="btn btn-saffron btn-sm" onclick="exportAnxPDF(5)">📄 Export PDF</button>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="btn btn-excel-template btn-sm" onclick="downloadAnxTemplate(5)">
+        <i data-lucide="file-spreadsheet" style="width:14px; height:14px;"></i>
+        <span>Excel Template</span>
+      </button>
+      <label class="btn btn-excel-upload btn-sm" style="cursor:pointer; margin-bottom:0; display:inline-flex; align-items:center; gap:6px;">
+        <i data-lucide="upload" style="width:14px; height:14px;"></i>
+        <span>Upload Excel</span>
+        <input type="file" accept=".xlsx,.xls" hidden onchange="handleAnxUpload(event,5)">
+      </label>
+      <button class="btn btn-pdf-upload btn-sm" onclick="exportAnxPDF(5)">
+        <i data-lucide="file-text" style="width:14px; height:14px;"></i>
+        <span>Export PDF</span>
+      </button>
     </div>
   </div>
   <div class="card">
@@ -25,12 +35,19 @@
               <td contenteditable class="coord-input">75.304797 E</td>
               <td contenteditable>236.45</td>
               <td contenteditable>Riverbank reference point</td>
-              <td><button class="btn btn-xs btn-danger" onclick="delRow(this)">✕</button></td>
+              <td>
+                <button class="btn btn-xs btn-danger" onclick="delRow(this)" style="display:inline-flex; align-items:center; justify-content:center; padding:4px;">
+                  <i data-lucide="trash-2" style="width:12px; height:12px;"></i>
+                </button>
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
-      <button class="btn btn-xs btn-outline" style="margin-top:8px" onclick="addRow('anx5-benchmarks',['','<select><option>Bench Mark</option><option>CORS</option></select>','','','','','<button class=\'btn btn-xs btn-danger\' onclick=\'delRow(this)\'>✕</button>'])">+ Add Point</button>
+      <button class="btn btn-xs btn-outline" style="margin-top:8px; display:inline-flex; align-items:center; gap:6px;" onclick="addRow('anx5-benchmarks',['','<select><option>Bench Mark</option><option>CORS</option></select>','','','','','<button class=\'btn btn-xs btn-danger\' onclick=\'delRow(this)\' style=\'display:inline-flex;align-items:center;justify-content:center;padding:4px;\'><i data-lucide=\'trash-2\' style=\'width:12px;height:12px;\'></i\></button>']);">
+        <i data-lucide="plus" style="width:12px; height:12px;"></i>
+        <span>Add Point</span>
+      </button>
     </div>
   </div>
 </div>

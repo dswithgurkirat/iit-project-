@@ -77,6 +77,33 @@ html.dark {
   --sidebar-w: 280px;
   --topbar-h:  72px;
   --preview-w: 360px;
+
+  /* Excel Template */
+  --excel-tmpl-border: #3dbf80;
+  --excel-tmpl-text: #299f6b;
+  --excel-tmpl-bg: transparent;
+  --excel-tmpl-hover-bg: rgba(61, 191, 128, 0.08);
+  
+  /* Excel Upload */
+  --excel-up-bg: #3dbf80;
+  --excel-up-border: #3dbf80;
+  --excel-up-text: #0d1d36;
+  --excel-up-hover-bg: #299f6b;
+  --excel-up-hover-border: #299f6b;
+  
+  /* PDF Upload */
+  --pdf-up-bg: var(--primary);
+  --pdf-up-border: var(--primary);
+  --pdf-up-text: #ffffff;
+  --pdf-up-hover-bg: var(--primary-2);
+  --pdf-up-hover-border: var(--primary-2);
+  
+  /* PDF Download / Export */
+  --pdf-down-border: var(--primary);
+  --pdf-down-text: var(--primary);
+  --pdf-down-bg: transparent;
+  --pdf-down-hover-bg: var(--primary-lt);
+  --pdf-down-hover-text: var(--primary-2);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -109,6 +136,33 @@ html.dark {
   --sh-md: 0 4px 6px -1px rgb(0 0 0 / 0.6), 0 2px 4px -2px rgb(0 0 0 / 0.6);
   --sh-lg: 0 10px 15px -3px rgb(0 0 0 / 0.6), 0 4px 6px -4px rgb(0 0 0 / 0.6);
   --sh-xl: 0 25px 50px -12px rgb(0 0 0 / 0.8);
+
+  /* Excel Template */
+  --excel-tmpl-border: #3dbf80;
+  --excel-tmpl-text: #3dbf80;
+  --excel-tmpl-bg: rgba(61, 191, 128, 0.08);
+  --excel-tmpl-hover-bg: rgba(61, 191, 128, 0.16);
+  
+  /* Excel Upload */
+  --excel-up-bg: #3dbf80;
+  --excel-up-border: #3dbf80;
+  --excel-up-text: #0d1d36;
+  --excel-up-hover-bg: #5fe4a3;
+  --excel-up-hover-border: #5fe4a3;
+  
+  /* PDF Upload */
+  --pdf-up-bg: var(--primary);
+  --pdf-up-border: var(--primary);
+  --pdf-up-text: #0d1d36;
+  --pdf-up-hover-bg: var(--primary-2);
+  --pdf-up-hover-border: var(--primary-2);
+  
+  /* PDF Download / Export */
+  --pdf-down-border: var(--primary);
+  --pdf-down-text: var(--primary);
+  --pdf-down-bg: rgba(96, 165, 250, 0.08);
+  --pdf-down-hover-bg: rgba(96, 165, 250, 0.16);
+  --pdf-down-hover-text: var(--primary-2);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1748,5 +1802,74 @@ html.dark .layout-btn { color: var(--text-soft); }
 .layout-btn:not(.active):hover {
   background: rgba(59,130,246,0.1);
   color: var(--primary);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PREMIUM PROFESSIONAL THEME-AWARE EXCEL & PDF BUTTONS
+═══════════════════════════════════════════════════════════════ */
+.btn-excel-template {
+  background: var(--excel-tmpl-bg) !important;
+  border: 1.5px solid var(--excel-tmpl-border) !important;
+  color: var(--excel-tmpl-text) !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.btn-excel-template:hover {
+  background: var(--excel-tmpl-hover-bg) !important;
+  color: var(--excel-tmpl-text) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.15) !important;
+}
+.btn-excel-template:active {
+  transform: translateY(0);
+}
+
+.btn-excel-upload {
+  background: var(--excel-up-bg) !important;
+  border: 1.5px solid var(--excel-up-border) !important;
+  color: var(--excel-up-text) !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.btn-excel-upload:hover {
+  background: var(--excel-up-hover-bg) !important;
+  border-color: var(--excel-up-hover-border) !important;
+  color: var(--excel-up-text) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25) !important;
+}
+.btn-excel-upload:active {
+  transform: translateY(0);
+}
+
+.btn-pdf-upload {
+  background: var(--pdf-up-bg) !important;
+  border: 1.5px solid var(--pdf-up-border) !important;
+  color: var(--pdf-up-text) !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.btn-pdf-upload:hover {
+  background: var(--pdf-up-hover-bg) !important;
+  border-color: var(--pdf-up-hover-border) !important;
+  color: var(--pdf-up-text) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25) !important;
+}
+.btn-pdf-upload:active {
+  transform: translateY(0);
+}
+
+.btn-pdf-download {
+  background: var(--pdf-down-bg) !important;
+  border: 1.5px solid var(--pdf-down-border) !important;
+  color: var(--pdf-down-text) !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.btn-pdf-download:hover {
+  background: var(--pdf-down-hover-bg) !important;
+  color: var(--pdf-down-hover-text) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15) !important;
+}
+.btn-pdf-download:active {
+  transform: translateY(0);
 }
 

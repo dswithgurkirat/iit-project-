@@ -72,9 +72,10 @@ function renderCluster() {
       <td contenteditable="true" onblur="clusterData[${i}].area=parseFloat(this.innerText.replace(/,/g,''))||0;renderCluster()">${(+row.area).toFixed(2)}</td>
       <td contenteditable="true" onblur="clusterData[${i}].excav=parseFloat(this.innerText.replace(/,/g,''))||0;renderCluster()">${(+row.excav).toFixed(2)}</td>
       <td>${fmtN(mineral,2)}</td>
-      <td><button class="btn btn-xs btn-danger" onclick="delCluster(${i})">✕</button></td>`;
+      <td><button class="btn btn-xs btn-danger" onclick="delCluster(${i})" style="display:inline-flex;align-items:center;justify-content:center;padding:4px;"><i data-lucide="trash-2" style="width:12px;height:12px;"></i></button></td>`;
     tbody.appendChild(tr);
   });
+  if (window.initLucide) window.initLucide();
 
   // totals row
   tfoot.innerHTML = `<tr class="total-row">
@@ -156,9 +157,10 @@ function renderCont() {
       <td contenteditable="true" style="text-align:left;white-space:pre-wrap;min-width:100px;" onblur="contData[${i}].village=this.innerText.trim()">${row.village}</td>
       <td contenteditable="true" onblur="contData[${i}].area=parseFloat(this.innerText.replace(/,/g,''))||0;renderCont()">${(+row.area).toFixed(2)}</td>
       <td contenteditable="true" onblur="contData[${i}].mineral=parseFloat(this.innerText.replace(/,/g,''))||0;renderCont()">${(+row.mineral).toFixed(2)}</td>
-      <td><button class="btn btn-xs btn-danger" onclick="delCont(${i})">✕</button></td>`;
+      <td><button class="btn btn-xs btn-danger" onclick="delCont(${i})" style="display:inline-flex;align-items:center;justify-content:center;padding:4px;"><i data-lucide="trash-2" style="width:12px;height:12px;"></i></button></td>`;
     tbody.appendChild(tr);
   });
+  if (window.initLucide) window.initLucide();
 
   tfoot.innerHTML = `<tr class="total-row">
     <td colspan="7" style="text-align:right;font-weight:bold;">Total</td>
@@ -268,8 +270,9 @@ function addAnx3Row(tblId='anx3-clusters') {
     <td contenteditable="true" oninput="calcClusterRow(this)">0</td>
     <td contenteditable="true" oninput="calcClusterRow(this)">0</td>
     <td class="anx3-mineral">0</td>
-    <td><button class="btn btn-xs btn-danger" onclick="delRow(this)">✕</button></td>
+    <td><button class="btn btn-xs btn-danger" onclick="delRow(this)" style="display:inline-flex;align-items:center;justify-content:center;padding:4px;"><i data-lucide="trash-2" style="width:12px;height:12px;"></i></button></td>
   </tr>`);
+  if (window.initLucide) window.initLucide();
 }
 
 function addAnx3ContRow() {
@@ -281,8 +284,9 @@ function addAnx3ContRow() {
     <td><select><option>Riverbed</option><option>Patta Land</option></select></td>
     <td contenteditable="true">0.55km</td><td contenteditable="true">Village Name</td>
     <td contenteditable="true">0</td><td contenteditable="true">0</td>
-    <td><button class="btn btn-xs btn-danger" onclick="delRow(this)">✕</button></td>
+    <td><button class="btn btn-xs btn-danger" onclick="delRow(this)" style="display:inline-flex;align-items:center;justify-content:center;padding:4px;"><i data-lucide="trash-2" style="width:12px;height:12px;"></i></button></td>
   </tr>`);
+  if (window.initLucide) window.initLucide();
 }
 
 function calcClusterRow(el) {
@@ -295,8 +299,329 @@ function calcClusterRow(el) {
   if (mineralCell) mineralCell.textContent=fmtN(excav*0.6,2);
 }
 
+/* ══════════════════════════════════════
+   PDF UPLOAD & MANAGEMENT (ANNEXURE III)
+   ══════════════════════════════════════ */
+function renderPdfUploadUI() {
+  const nameEl = document.getElementById('anx3-uploaded-filename');
+  const dlBtn = document.getElementById('anx3-download-btn');
+  const delBtn = document.getElementById('anx3-delete-btn');
+  const previewBtn = document.getElementById('anx3-preview-btn');
+  const previewSection = document.getElementById('pdf-preview-section-anx3');
+  const iframe = document.getElementById('pdf-iframe-anx3');
+  
+  if (!nameEl || !dlBtn) return;
+
+  if (!S.activeProject) {
+    nameEl.style.display = 'none';
+    dlBtn.style.display = 'none';
+    if (delBtn) delBtn.style.display = 'none';
+    if (previewBtn) previewBtn.style.display = 'none';
+    if (previewSection) previewSection.style.display = 'none';
+    return;
+  }
+
+  const pdfName = S.activeProject.annexure3PdfName;
+
+  if (!pdfName) {
+    nameEl.style.display = 'none';
+    dlBtn.style.display = 'none';
+    if (delBtn) delBtn.style.display = 'none';
+    if (previewBtn) previewBtn.style.display = 'none';
+    if (previewSection) {
+      previewSection.style.display = 'none';
+      if (iframe) iframe.src = '';
+    }
+  } else {
+    nameEl.textContent = pdfName;
+    nameEl.style.display = 'inline-block';
+    dlBtn.style.display = 'inline-flex';
+    if (delBtn) delBtn.style.display = 'inline-flex';
+    if (previewBtn) previewBtn.style.display = 'inline-flex';
+    
+    if (previewSection && previewSection.style.display === 'block' && iframe) {
+      const fileURL = `/api/download-pdf?projectId=${S.activeProject.id}&annexureId=anx3&inline=true`;
+      if (iframe.src !== window.location.origin + fileURL && !iframe.src.includes(fileURL)) {
+        iframe.src = fileURL;
+      }
+    }
+  }
+
+  if (window.initLucide) window.initLucide();
+}
+
+function togglePDFPreviewAnx3() {
+  const previewSection = document.getElementById('pdf-preview-section-anx3');
+  const iframe = document.getElementById('pdf-iframe-anx3');
+  if (!previewSection || !iframe) return;
+
+  if (previewSection.style.display === 'block') {
+    previewSection.style.display = 'none';
+    if (iframe.src.startsWith('blob:')) {
+      URL.revokeObjectURL(iframe.src);
+    }
+    iframe.src = '';
+  } else {
+    if (S.activeProject && S.activeProject.annexure3PdfName) {
+      const fileURL = `/api/download-pdf?projectId=${S.activeProject.id}&annexureId=anx3&inline=true`;
+      iframe.src = fileURL;
+      previewSection.style.display = 'block';
+    }
+  }
+}
+
+async function deletePdfAnx3() {
+  if (!S.activeProject) return;
+  
+  if (!confirm("Are you sure you want to delete the uploaded PDF? This will remove the file from the server.")) {
+    return;
+  }
+  
+  toast("Deleting PDF...", "info");
+  try {
+    const res = await fetch(`/api/upload-pdf`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        projectId: S.activeProject.id,
+        fileName: null,
+        pdf: null,
+        annexureId: 'anx3'
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      S.activeProject.annexure3PdfName = null;
+      const pIdx = S.projects.findIndex(p => p.id === S.activeProject.id);
+      if (pIdx !== -1) {
+        S.projects[pIdx].annexure3PdfName = null;
+      }
+      
+      renderPdfUploadUI();
+      toast("PDF deleted successfully.", "success");
+    } else {
+      toast("Failed to delete PDF: " + (data.error || "Unknown error"), "danger");
+    }
+  } catch(err) {
+    toast("Error deleting PDF: " + err.message, "danger");
+  }
+}
+
+function handlePdfUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  if (!file.name.toLowerCase().endsWith('.pdf')) {
+    toast('Error: Only PDF files are allowed.', 'danger');
+    event.target.value = '';
+    return;
+  }
+
+  toast('Uploading PDF...', 'info');
+
+  const reader = new FileReader();
+  reader.onload = async function(e) {
+    const base64Data = e.target.result.split(',')[1];
+    try {
+      const res = await fetch('/api/upload-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          projectId: S.activeProject.id,
+          fileName: file.name,
+          pdf: base64Data,
+          annexureId: 'anx3'
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        S.activeProject.annexure3PdfName = file.name;
+        const pIdx = S.projects.findIndex(p => p.id === S.activeProject.id);
+        if (pIdx !== -1) {
+          S.projects[pIdx].annexure3PdfName = file.name;
+        }
+        
+        const fileURL = URL.createObjectURL(file);
+        const iframe = document.getElementById('pdf-iframe-anx3');
+        const previewSection = document.getElementById('pdf-preview-section-anx3');
+        if (iframe && previewSection) {
+          iframe.src = fileURL;
+          previewSection.style.display = 'block';
+        }
+        
+        renderPdfUploadUI();
+        toast('PDF uploaded and preview loaded!', 'success');
+      } else {
+        toast('Failed to upload PDF: ' + (data.error || 'Unknown error'), 'danger');
+      }
+    } catch(err) {
+      toast('Error uploading PDF: ' + err.message, 'danger');
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function viewPdf() {
+  if (!S.activeProject || !S.activeProject.annexure3PdfName) return;
+  window.open(`/api/download-pdf?projectId=${S.activeProject.id}&annexureId=anx3&inline=true`, '_blank');
+}
+
+function downloadPdf() {
+  if (!S.activeProject) {
+    toast('Please select and open a project first.', 'warn');
+    return;
+  }
+  if (!S.activeProject.annexure3PdfName) {
+    toast('No PDF has been uploaded for this project yet. Please upload a PDF first.', 'warn');
+    return;
+  }
+  const a = document.createElement('a');
+  a.href = `/api/download-pdf?projectId=${S.activeProject.id}&annexureId=anx3`;
+  a.download = S.activeProject.annexure3PdfName;
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+function closePDFPreviewAnx3() {
+  const previewSection = document.getElementById('pdf-preview-section-anx3');
+  const iframe = document.getElementById('pdf-iframe-anx3');
+  
+  if (previewSection) previewSection.style.display = 'none';
+  if (iframe) {
+    if (iframe.src.startsWith('blob:')) {
+      URL.revokeObjectURL(iframe.src);
+    }
+    iframe.src = '';
+  }
+}
+
+function exportAnx3PDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('l', 'pt', 'a4'); 
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  
+  let startY = 80;
+
+  const district = S.activeProject ? S.activeProject.district : 'JALANDHAR';
+  const districtUpper = district.toUpperCase();
+
+  // Generic Header/Footer Function
+  const drawHeaderFooter = (data) => {
+    // Header text right-aligned
+    doc.setFont("times", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(59, 130, 246); // Blue color matching UI
+    doc.text("Enforcement & Monitoring Guidelines for Sand Mining", pageWidth - 40, 40, { align: "right" });
+    
+    // Footer Text
+    doc.setFont("times", "bold");
+    doc.setFontSize(9);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`PREPARED BY: SUB-DIVISIONAL COMMITTEE OF ${districtUpper} DISTRICT`, pageWidth / 2, pageHeight - 40, { align: "center" });
+    doc.text("ASSISTED BY: RSP GREEN DEVELOPMENT AND LABORATORIES PVT. LTD", pageWidth / 2, pageHeight - 30, { align: "center" });
+    
+    // Page Number
+    doc.text(String(296 + data.pageNumber), pageWidth - 40, pageHeight - 30, {align: "right"});
+  };
+
+  const getCellTextLocal = (td) => {
+    const select = td.querySelector('select');
+    if (select) return select.value;
+    return td.innerText.trim();
+  };
+
+  const extractData = (tableId) => {
+    const tbl = document.getElementById(tableId);
+    if (!tbl) return { headers: [], rows: [] };
+    const headers = Array.from(tbl.querySelectorAll('thead th')).slice(0, -1).map(th => th.innerText.trim().replace(/\n/g, ' '));
+    const rows = [];
+    tbl.querySelectorAll('tbody tr').forEach(tr => {
+      const row = [];
+      const tds = tr.querySelectorAll('td');
+      for (let i = 0; i < tds.length - 1; i++) {
+        row.push(getCellTextLocal(tds[i]));
+      }
+      rows.push(row);
+    });
+    
+    // Add tfoot row
+    const tfoot = tbl.querySelector('tfoot');
+    if (tfoot) {
+      tfoot.querySelectorAll('tr').forEach(tr => {
+        const row = [];
+        const tds = tr.querySelectorAll('td');
+        for (let i = 0; i < tds.length; i++) {
+          const colSpan = parseInt(tds[i].getAttribute('colspan') || '1');
+          row.push(tds[i].innerText.trim());
+          for (let c = 1; c < colSpan; c++) {
+            row.push('');
+          }
+        }
+        if (row.length > headers.length) {
+          rows.push(row.slice(0, headers.length));
+        } else {
+          rows.push(row);
+        }
+      });
+    }
+    return { headers, rows };
+  };
+
+  // Title
+  doc.setFont("times", "bold");
+  doc.setFontSize(12);
+  doc.setTextColor(0, 0, 0);
+  doc.text("Annexure-III", pageWidth - 40, 55, { align: "right" });
+
+  doc.setFont("times", "bold");
+  doc.setFontSize(11);
+  doc.text("> a) Cluster Details:", 40, startY);
+  startY += 15;
+
+  const clusterDataPdf = extractData('anx3-clusters');
+  doc.autoTable({
+    startY: startY,
+    head: [clusterDataPdf.headers],
+    body: clusterDataPdf.rows,
+    theme: 'grid',
+    styles: { font: 'times', fontSize: 8, textColor: 0, lineColor: 0, lineWidth: 0.5, cellPadding: 4, valign: 'middle', halign: 'center' },
+    headStyles: { fillColor: false, fontStyle: 'bold', halign: 'center', textColor: 0 },
+    didDrawPage: (data) => drawHeaderFooter(data)
+  });
+
+  startY = doc.lastAutoTable.finalY + 30;
+
+  if (startY > pageHeight - 120) {
+    doc.addPage();
+    startY = 80;
+  }
+
+  doc.setFont("times", "bold");
+  doc.setFontSize(11);
+  doc.text("> b) Contiguous Clusters:", 40, startY);
+  startY += 15;
+
+  const contDataPdf = extractData('anx3-contiguous');
+  doc.autoTable({
+    startY: startY,
+    head: [contDataPdf.headers],
+    body: contDataPdf.rows,
+    theme: 'grid',
+    styles: { font: 'times', fontSize: 8, textColor: 0, lineColor: 0, lineWidth: 0.5, cellPadding: 4, valign: 'middle', halign: 'center' },
+    headStyles: { fillColor: false, fontStyle: 'bold', halign: 'center', textColor: 0 },
+    didDrawPage: (data) => drawHeaderFooter(data)
+  });
+
+  doc.save('Annexure_III_Cluster_Details.pdf');
+  toast('PDF downloaded successfully!', 'success');
+}
+
 /* ─── DOMContentLoaded initialization ─── */
 window.addEventListener('DOMContentLoaded', () => {
   renderCluster();
   renderCont();
+  renderPdfUploadUI();
 });

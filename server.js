@@ -25,10 +25,215 @@ const MIME_TYPES = {
   '.ico': 'image/x-icon'
 };
 
+const PROJECTS_FILE = path.join(__dirname, 'projects.json');
+const UPLOADS_DIR = path.join(__dirname, 'uploads');
+
+function readProjects() {
+  try {
+    if (fs.existsSync(PROJECTS_FILE)) {
+      return JSON.parse(fs.readFileSync(PROJECTS_FILE, 'utf8'));
+    }
+  } catch (err) {
+    console.error('Error reading projects.json:', err);
+  }
+  return [];
+}
+
+function writeProjects(projects) {
+  try {
+    fs.writeFileSync(PROJECTS_FILE, JSON.stringify(projects, null, 2), 'utf8');
+    return true;
+  } catch (err) {
+    console.error('Error writing projects.json:', err);
+    return false;
+  }
+}
+
+function readRequestBody(req) {
+  return new Promise((resolve, reject) => {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => { resolve(body); });
+    req.on('error', (err) => { reject(err); });
+  });
+}
+
 const server = http.createServer((req, res) => {
-  // Decode URI to handle spaces and special characters in paths
-  let filePath = decodeURIComponent(req.url.split('?')[0]);
-  
+  const urlObj = req.url.split('?');
+  const pathname = decodeURIComponent(urlObj[0]);
+  const queryParams = new URLSearchParams(urlObj[1] || '');
+
+  // 1. Handle API routes
+  if (pathname.startsWith('/api/')) {
+    if (pathname === '/api/projects') {
+      if (req.method === 'GET') {
+        const projects = readProjects();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(projects));
+        return;
+      } else if (req.method === 'POST') {
+        readRequestBody(req).then(body => {
+          try {
+            const projects = JSON.parse(body);
+            if (Array.isArray(projects)) {
+              writeProjects(projects);
+              res.writeHead(200, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({ success: true }));
+            } else {
+              res.writeHead(400, { 'Content-Type': 'application/json' });
+              res.end(JSON.stringify({ success: false, error: 'Invalid data format' }));
+            }
+          } catch (e) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ success: false, error: 'Invalid JSON' }));
+          }
+        }).catch(err => {
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: false, error: err.message }));
+        });
+        return;
+      }
+    }
+
+    if (pathname === '/api/upload-pdf' && req.method === 'POST') {
+      readRequestBody(req).then(body => {
+        try {
+          const { projectId, fileName, pdf, annexureId = 'anx3' } = JSON.parse(body);
+          if (!projectId) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ success: false, error: 'Missing projectId' }));
+            return;
+          }
+
+          if (fileName === null || pdf === null) {
+            // Delete PDF file if exists
+            const destPath = path.join(UPLOADS_DIR, `${projectId}_${annexureId}.pdf`);
+            if (fs.existsSync(destPath)) {
+              try {
+                fs.unlinkSync(destPath);
+              } catch (err) {
+                console.warn(`Windows file lock: could not unlink ${destPath} immediately.`, err);
+              }
+            }
+            if (annexureId === 'anx3') {
+              const legacyPath = path.join(UPLOADS_DIR, `${projectId}.pdf`);
+              if (fs.existsSync(legacyPath)) {
+                try {
+                  fs.unlinkSync(legacyPath);
+                } catch (err) {
+                  console.warn(`Windows file lock: could not unlink legacy ${legacyPath} immediately.`, err);
+                }
+              }
+            }
+            // Update projects.json to clear PDF metadata
+            const projects = readProjects();
+            const pIdx = projects.findIndex(p => p.id == projectId);
+            if (pIdx !== -1) {
+              const fieldName = annexureId === 'anx3' ? 'annexure3PdfName' : `${annexureId}PdfName`;
+              delete projects[pIdx][fieldName];
+              if (annexureId === 'anx3') {
+                delete projects[pIdx]['anx3PdfName'];
+              }
+              writeProjects(projects);
+            }
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ success: true }));
+            return;
+          }
+
+          if (!fileName || !pdf) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ success: false, error: 'Missing required fields' }));
+            return;
+          }
+
+          // Ensure uploads directory exists
+          if (!fs.existsSync(UPLOADS_DIR)) {
+            fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+          }
+
+          const fileBuffer = Buffer.from(pdf, 'base64');
+          const destPath = path.join(UPLOADS_DIR, `${projectId}_${annexureId}.pdf`);
+          fs.writeFileSync(destPath, fileBuffer);
+
+          // Update projects.json
+          const projects = readProjects();
+          const pIdx = projects.findIndex(p => p.id == projectId);
+          if (pIdx !== -1) {
+            const fieldName = annexureId === 'anx3' ? 'annexure3PdfName' : `${annexureId}PdfName`;
+            projects[pIdx][fieldName] = fileName;
+            writeProjects(projects);
+          }
+
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: true }));
+        } catch (e) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ success: false, error: e.message }));
+        }
+      }).catch(err => {
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      });
+      return;
+    }
+
+    if (pathname === '/api/download-pdf' && req.method === 'GET') {
+      const projectId = queryParams.get('projectId');
+      const annexureId = queryParams.get('annexureId') || 'anx3';
+      const inline = queryParams.get('inline') === 'true';
+
+      if (!projectId) {
+        res.writeHead(400, { 'Content-Type': 'text/plain' });
+        res.end('Missing projectId');
+        return;
+      }
+
+      let filePath = path.join(UPLOADS_DIR, `${projectId}_${annexureId}.pdf`);
+
+      // Fallback for old anx3 uploads that were saved as projectId.pdf
+      if (annexureId === 'anx3' && !fs.existsSync(filePath)) {
+        const oldFilePath = path.join(UPLOADS_DIR, `${projectId}.pdf`);
+        if (fs.existsSync(oldFilePath)) {
+          filePath = oldFilePath;
+        }
+      }
+
+      if (!fs.existsSync(filePath)) {
+        res.writeHead(404, { 'Content-Type': 'text/plain' });
+        res.end('PDF not found');
+        return;
+      }
+
+      // Try to find the original filename from projects
+      const projects = readProjects();
+      const proj = projects.find(p => p.id == projectId);
+      const fieldName = annexureId === 'anx3' ? 'annexure3PdfName' : `${annexureId}PdfName`;
+      const originalName = proj ? (proj[fieldName] || proj['anx3PdfName'] || `${annexureId}.pdf`) : `${projectId}.pdf`;
+
+      const headers = {
+        'Content-Type': 'application/pdf'
+      };
+
+      if (inline) {
+        headers['Content-Disposition'] = `inline; filename="${encodeURIComponent(originalName)}"`;
+      } else {
+        headers['Content-Disposition'] = `attachment; filename="${encodeURIComponent(originalName)}"`;
+      }
+
+      res.writeHead(200, headers);
+      const stream = fs.createReadStream(filePath);
+      stream.pipe(res);
+      return;
+    }
+
+    res.writeHead(404, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Endpoint not found' }));
+    return;
+  }
+
+  // 2. Handle static files
+  let filePath = pathname;
   if (filePath === '/') {
     filePath = '/index.html';
   }

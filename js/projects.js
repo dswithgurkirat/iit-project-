@@ -139,6 +139,18 @@ function newProjectModal() {
   if (el) el.classList.add('open'); 
 }
 
+async function saveProjectsBackend() {
+  try {
+    await fetch('/api/projects', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(S.projects)
+    });
+  } catch (err) {
+    console.error('Failed to save projects to backend:', err);
+  }
+}
+
 function deleteProject(id, event) {
   if (event) {
     event.preventDefault();
@@ -152,6 +164,7 @@ function deleteProject(id, event) {
     () => {
       const wasActive = S.activeProject && S.activeProject.id === id;
       S.projects = S.projects.filter(p => p.id !== id);
+      saveProjectsBackend();
 
       if (wasActive) {
         S.activeProject = null;
@@ -183,6 +196,7 @@ function createProject() {
     progress:0, status:'Not Completed', createdAt: new Date().toLocaleString('en-US', {month: 'short', day: 'numeric', year: 'numeric'}), signatures:0
   };
   S.projects.unshift(proj);
+  saveProjectsBackend();
   closeModal('modal-project');
   document.getElementById('proj-title').value = '';
   document.getElementById('proj-rivers').value = '';

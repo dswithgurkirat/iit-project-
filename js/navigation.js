@@ -22,7 +22,13 @@ window.addEventListener('popstate', (event) => {
   }
 });
 
-function initApp() {
+async function initApp() {
+  try {
+    const res = await fetch('/api/projects');
+    S.projects = await res.json();
+  } catch (err) {
+    console.error('Failed to load projects from backend:', err);
+  }
   renderDashboard(); renderProjects(); renderChapters(); renderPlates();
   initDemandTable(); initSummaryTable(); initAuctionTable();
   renderSignatures(); renderFinalChecklist();
@@ -81,6 +87,10 @@ function showView(id, btn, push = true) {
   if (id==='generate') renderFinalChecklist();
   if (id==='plates') renderPlates(); // Re-render in case new graphs were added
   if (id==='workflow') updateWorkflowDistrictUI();
+  if (id==='anx1' && typeof renderPdfUploadUIAnx1 === 'function') renderPdfUploadUIAnx1();
+  if (id==='anx2' && typeof renderPdfUploadUIAnx2 === 'function') renderPdfUploadUIAnx2();
+  if (id==='anx3' && typeof renderPdfUploadUI === 'function') renderPdfUploadUI();
+  if (id==='anx4' && typeof renderPdfUploadUIAnx4 === 'function') renderPdfUploadUIAnx4();
   if (S.activeProject && typeof updateActiveProjectCardUI === 'function') updateActiveProjectCardUI();
   
   renderDistrictLegends();
