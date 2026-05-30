@@ -187,7 +187,10 @@ function generateFinalPDF() {
     { title: 'ANNEXURE I(b) — DE-SILTATION', id: '#anx1-desilt' },
     { title: 'ANNEXURE I(c) — PATTA LANDS', id: '#anx1-patta' },
     { title: 'ANNEXURE I(d) — M-SAND PLANTS', id: '#anx1-msand' },
-    { title: 'ANNEXURE II — MINING LEASES', id: '#anx2-leases' },
+    { title: 'ANNEXURE II(a) — MINING LEASES', id: '#anx2-leases' },
+    { title: 'ANNEXURE II(b) — PATTA LANDS', id: '#anx2-patta' },
+    { title: 'ANNEXURE II(c) — DE-SILTATION', id: '#anx2-desilt' },
+    { title: 'ANNEXURE II(d) — M-SAND PLANTS', id: '#anx2-msand' },
     { title: 'ANNEXURE III(a) — CLUSTERS', id: '#anx3-clusters' },
     { title: 'ANNEXURE III(b) — CONTIGUOUS CLUSTERS', id: '#anx3-contiguous' },
     { title: 'ANNEXURE IV(a) — LEASE ROUTES', id: '#anx4-routes' },
@@ -207,61 +210,75 @@ function generateFinalPDF() {
   ];
 
   allTablesData.forEach(tblConfig => {
-    const tableEl = document.querySelector(tblConfig.id);
-    if (tableEl && tableEl.rows.length > 1) { // ensure it has rows beyond header
-      doc.addPage(); addPageHeader(tblConfig.title.split(' — ')[0]); y=25;
-      doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.setTextColor(...navyArr);
-      doc.text(tblConfig.title, W/2, y, {align:'center'}); y+=10;
-
-      const head = []; const body = []; const foot = [];
-      let hasActionCol = false;
-
-      // Extract Headers
-      tableEl.querySelectorAll('thead tr').forEach(tr => {
-        const rowData = [];
-        tr.querySelectorAll('th, td').forEach(cell => rowData.push(cell.innerText.trim()));
-        if (rowData[rowData.length - 1] === 'Action') {
-          hasActionCol = true;
-          rowData.pop();
-        }
-        head.push(rowData);
-      });
-
-      // Extract Body
-      tableEl.querySelectorAll('tbody tr').forEach(tr => {
-        const rowData = [];
-        tr.querySelectorAll('th, td').forEach(cell => {
-          const select = cell.querySelector('select');
-          rowData.push(select ? select.value : cell.innerText.trim().replace('✕',''));
-        });
-        if (hasActionCol) rowData.pop();
-        body.push(rowData);
-      });
-
-      // Extract Footer (if any)
-      tableEl.querySelectorAll('tfoot tr').forEach(tr => {
-        const rowData = [];
-        tr.querySelectorAll('th, td').forEach(cell => {
-          const colspan = parseInt(cell.getAttribute('colspan') || '1', 10);
-          rowData.push({ content: cell.innerText.trim(), colSpan: colspan });
-        });
-        if (hasActionCol && rowData.length > 0 && (rowData[rowData.length - 1].content === '' || rowData[rowData.length - 1].content === '✕')) {
-          rowData.pop();
-        }
-        foot.push(rowData);
-      });
-
-      // Render the extracted table structure natively into PDF
-      doc.autoTable({
-        startY: y, margin: {left:pad, right:pad}, styles: {fontSize: 7, cellPadding: 2},
-        headStyles: {fillColor: navyArr},
-        footStyles: {fillColor: [240,240,245], textColor: navyArr, fontStyle: 'bold'},
-        head: head,
-        body: body,
-        foot: foot.length > 0 ? foot : false,
-        theme: 'grid'
-      });
+    let tables = [];
+    if (tblConfig.id === '#anx2-leases') {
+      tables = Array.from(document.querySelectorAll('table[id^="anx2-leases"]'));
+    } else {
+      const el = document.querySelector(tblConfig.id);
+      if (el) tables.push(el);
     }
+
+    tables.forEach((tableEl, tblIdx) => {
+      if (tableEl && tableEl.rows.length > 1) { // ensure it has rows beyond header
+        doc.addPage(); addPageHeader(tblConfig.title.split(' — ')[0]); y=25;
+        doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.setTextColor(...navyArr);
+        
+        let title = tblConfig.title;
+        if (tblConfig.id === '#anx2-leases' && tables.length > 1) {
+          title += ` (Table ${tblIdx + 1})`;
+        }
+        doc.text(title, W/2, y, {align:'center'}); y+=10;
+
+        const head = []; const body = []; const foot = [];
+        let hasActionCol = false;
+
+        // Extract Headers
+        tableEl.querySelectorAll('thead tr').forEach(tr => {
+          const rowData = [];
+          tr.querySelectorAll('th, td').forEach(cell => rowData.push(cell.innerText.trim()));
+          if (rowData[rowData.length - 1] === 'Action') {
+            hasActionCol = true;
+            rowData.pop();
+          }
+          head.push(rowData);
+        });
+
+        // Extract Body
+        tableEl.querySelectorAll('tbody tr').forEach(tr => {
+          const rowData = [];
+          tr.querySelectorAll('th, td').forEach(cell => {
+            const select = cell.querySelector('select');
+            rowData.push(select ? select.value : cell.innerText.trim().replace('✕',''));
+          });
+          if (hasActionCol) rowData.pop();
+          body.push(rowData);
+        });
+
+        // Extract Footer (if any)
+        tableEl.querySelectorAll('tfoot tr').forEach(tr => {
+          const rowData = [];
+          tr.querySelectorAll('th, td').forEach(cell => {
+            const colspan = parseInt(cell.getAttribute('colspan') || '1', 10);
+            rowData.push({ content: cell.innerText.trim(), colSpan: colspan });
+          });
+          if (hasActionCol && rowData.length > 0 && (rowData[rowData.length - 1].content === '' || rowData[rowData.length - 1].content === '✕')) {
+            rowData.pop();
+          }
+          foot.push(rowData);
+        });
+
+        // Render the extracted table structure natively into PDF
+        doc.autoTable({
+          startY: y, margin: {left:pad, right:pad}, styles: {fontSize: 7, cellPadding: 2},
+          headStyles: {fillColor: navyArr},
+          footStyles: {fillColor: [240,240,245], textColor: navyArr, fontStyle: 'bold'},
+          head: head,
+          body: body,
+          foot: foot.length > 0 ? foot : false,
+          theme: 'grid'
+        });
+      }
+    });
   });
 
   // SIGNATURE PAGE

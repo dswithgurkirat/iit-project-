@@ -3,61 +3,106 @@
   <div class="header-row">
     <div>
       <div class="page-title">Annexure III — Cluster Details</div>
-      <div class="page-sub">Cluster & Contiguous Cluster details as per EMGSM 2020</div>
+      <div class="page-sub">Cluster &amp; Contiguous Cluster Details · EMGSM 2020</div>
     </div>
-    <div style="display:flex;gap:8px">
-      <button class="btn btn-teal btn-sm" onclick="downloadAnxTemplate(3)">⬇ Excel Template</button>
-      <label class="btn btn-navy btn-sm" style="cursor:pointer">📤 Upload Excel <input type="file" accept=".xlsx,.xls" hidden onchange="handleAnxUpload(event,3)"></label>
-      <button class="btn btn-saffron btn-sm" onclick="exportAnxPDF(3)">📄 Export PDF</button>
-    </div>
-  </div>
-  <div class="card" style="margin-bottom:16px">
-    <div class="card-hd"><div class="card-title">Cluster Details</div></div>
-    <div class="card-bd">
-      <div class="tbl-wrap">
-        <table class="anx-tbl" id="anx3-clusters" style="min-width:1000px">
-          <thead><tr><th>River Name</th><th>Cluster No.</th><th>Lease No.</th><th>Location</th><th>Village</th><th>Area (Ha)</th><th>Total Excav. (MT)</th><th>Mineral Excav. (MT) @60%</th><th>Action</th></tr></thead>
-          <tbody>
-            <tr>
-              <td contenteditable rowspan="1">Sutlej</td>
-              <td contenteditable>1</td>
-              <td contenteditable>NPRO_JL_PL_ST_61<br>NPRO_JL_PL_ST_62<br>NPRO_JL_PL_ST_63</td>
-              <td><select><option>Riverbed</option><option>Patta Land</option></select></td>
-              <td contenteditable>Mizapur,<br>Fatehpur,<br>Bhagwan</td>
-              <td contenteditable oninput="calcClusterRow(this)">45.20</td>
-              <td contenteditable oninput="calcClusterRow(this)">1074334.80</td>
-              <td class="anx3-mineral">644600.88</td>
-              <td><button class="btn btn-xs btn-danger" onclick="delRow(this)">✕</button></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <button class="btn btn-xs btn-outline" style="margin-top:8px" onclick="addAnx3Row()">+ Add Cluster</button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-teal btn-sm" onclick="dlTemplate('cluster')">⬇ Cluster Template</button>
+      <button class="btn btn-teal btn-sm" onclick="dlTemplate('contiguous')">⬇ Contiguous Template</button>
     </div>
   </div>
+
+  <div class="notif notif-info" style="margin-bottom:16px">
+    Download the Excel templates → Fill values locally → Upload below. You can also edit cell content inline.
+  </div>
+
   <div class="card">
-    <div class="card-hd"><div class="card-title">Contiguous Clusters</div></div>
     <div class="card-bd">
-      <div class="tbl-wrap">
-        <table class="anx-tbl" id="anx3-contiguous" style="min-width:1100px">
-          <thead><tr><th>River</th><th>Contiguous Cluster No.</th><th>Cluster No.</th><th># Leases</th><th>Location</th><th>Distance Between</th><th>Village</th><th>Area (Ha)</th><th>Mineral Excav. (MT) @60%</th><th>Action</th></tr></thead>
-          <tbody>
-            <tr>
-              <td contenteditable>Sutlej</td>
-              <td contenteditable>CC-1</td>
-              <td contenteditable>1,2,3</td>
-              <td contenteditable>9</td>
-              <td><select><option>Riverbed</option><option>Patta Land</option></select></td>
-              <td contenteditable>0.55km</td>
-              <td contenteditable>Minwal,<br>Mau Sahib,<br>Burewal</td>
-              <td contenteditable>134.40</td>
-              <td contenteditable>5678901.23</td>
-              <td><button class="btn btn-xs btn-danger" onclick="delRow(this)">✕</button></td>
-            </tr>
-          </tbody>
-        </table>
+      
+      <!-- Section A: Cluster Details -->
+      <div class="anx-section">
+        <div class="anx-section-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+          <div class="anx-section-title" style="font-weight:bold; font-size:14px;">a) Cluster Details:</div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-teal btn-xs" onclick="exportClusterXlsx()">⬇ Export to Excel</button>
+            <label class="btn btn-navy btn-xs" style="cursor:pointer">
+              📤 Upload Cluster Excel
+              <input type="file" accept=".xlsx,.xls" hidden onchange="uploadExcel(event,'cluster')">
+            </label>
+          </div>
+        </div>
+
+        <div class="tbl-wrap">
+          <table class="anx-tbl" id="anx3-clusters">
+            <thead>
+              <tr>
+                <th>River Name</th>
+                <th>Cluster No.</th>
+                <th>Lease No.</th>
+                <th>Location (Riverbed / Patta Land)</th>
+                <th>Village</th>
+                <th>Area (in Ha.)</th>
+                <th>Total Excavation (MT)</th>
+                <th>Total Mineral Excavation (MT) (Considering 60% as per EMGSM, 2020)</th>
+                <th style="width: 50px;" class="no-print">Action</th>
+              </tr>
+            </thead>
+            <tbody id="clusterBody">
+              <!-- rows injected by JS -->
+            </tbody>
+            <tfoot id="clusterFoot">
+              <!-- totals injected by JS -->
+            </tfoot>
+          </table>
+        </div>
+
+        <div class="section-footer" style="margin-top:8px">
+          <button class="btn btn-xs btn-outline" onclick="addClusterRow()">+ Add Cluster Row</button>
+        </div>
       </div>
-      <button class="btn btn-xs btn-outline" style="margin-top:8px" onclick="addAnx3ContRow()">+ Add Contiguous Cluster</button>
+
+      <!-- Section B: Contiguous Clusters -->
+      <div class="anx-section" style="margin-top: 32px;">
+        <div class="anx-section-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+          <div class="anx-section-title" style="font-weight:bold; font-size:14px;">b) Contiguous Clusters:</div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-teal btn-xs" onclick="exportContXlsx()">⬇ Export to Excel</button>
+            <label class="btn btn-navy btn-xs" style="cursor:pointer">
+              📤 Upload Contiguous Excel
+              <input type="file" accept=".xlsx,.xls" hidden onchange="uploadExcel(event,'contiguous')">
+            </label>
+          </div>
+        </div>
+
+        <div class="tbl-wrap">
+          <table class="anx-tbl" id="anx3-contiguous">
+            <thead>
+              <tr>
+                <th>River Name</th>
+                <th>Contiguous Cluster No.</th>
+                <th>Cluster No.</th>
+                <th>Number of leases in the cluster</th>
+                <th>Location (Riverbed / Patta Land)</th>
+                <th>Distance between clusters</th>
+                <th>Village</th>
+                <th>Area Of Cluster (Ha)</th>
+                <th>Total Mineral Excavation (MT) (Considering 60% as per EMGSM, 2020)</th>
+                <th style="width: 50px;" class="no-print">Action</th>
+              </tr>
+            </thead>
+            <tbody id="contBody">
+              <!-- rows injected by JS -->
+            </tbody>
+            <tfoot id="contFoot">
+              <!-- totals injected by JS -->
+            </tfoot>
+          </table>
+        </div>
+
+        <div class="section-footer" style="margin-top:8px">
+          <button class="btn btn-xs btn-outline" onclick="addContRow()">+ Add Contiguous Row</button>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>

@@ -133,7 +133,11 @@ function addRowAnx1(tableId, cellDataArray) {
   
   cellDataArray.forEach((data) => {
     const td = document.createElement('td');
-    const dataStr = String(data !== undefined && data !== null ? data : '');
+    let dataStr = String(data !== undefined && data !== null ? data : '').trim();
+
+    if (dataStr === '' && !dataStr.includes('<button') && !dataStr.includes('<select')) {
+      dataStr = 'NUL';
+    }
 
     if (!dataStr.includes('<button') && !dataStr.includes('<select')) {
       td.contentEditable = "true";

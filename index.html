@@ -714,118 +714,450 @@
   <div class="header-row">
     <div>
       <div class="page-title">Annexure II — Mining Leases</div>
-      <div class="page-sub">List of Potential Mining Leases (Existing & Proposed) Rivers</div>
+      <div class="page-sub">Details of Mining Leases, Patta Lands, De-siltation & M-Sand Plants · EMGSM 2020</div>
     </div>
     <div style="display:flex;gap:8px">
-      <button class="btn btn-teal btn-sm" onclick="downloadAnxTemplate(2)">⬇ Excel Template</button>
-      <label class="btn btn-navy btn-sm" style="cursor:pointer">📤 Upload Excel <input type="file" accept=".xlsx,.xls" hidden onchange="handleAnxUpload(event,2)"></label>
-      <button class="btn btn-saffron btn-sm" onclick="exportAnxPDF(2)">📄 Export PDF</button>
+      <!-- Global Upload PDF Button -->
+      <label class="btn btn-saffron btn-sm" style="cursor:pointer">
+        📤 Upload PDF
+        <input type="file" accept="application/pdf" hidden onchange="handlePDFUploadAnx2(event)">
+      </label>
     </div>
   </div>
+  
+  <div class="notif notif-info" style="margin-bottom:16px">
+    Download the Excel template for each section below → Fill values locally → Upload at the bottom of the section → Click 'Download Final Annexure 2 PDF' when ready.
+  </div>
+
+  <!-- PDF Preview Section (Hidden by default) -->
+  <div id="pdf-preview-section-anx2" class="card" style="display: none; border-color: #0ea5e9; margin-bottom: 24px;">
+    <div class="card-bd">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 style="margin: 0; font-size: 18px; color: #0369a1;">Uploaded PDF Preview</h3>
+        <button class="btn btn-sm btn-danger" onclick="closePDFPreviewAnx2()">✕ Close Preview</button>
+      </div>
+      <iframe id="pdf-iframe-anx2" style="width: 100%; height: 600px; border: 1px solid #e5e7eb; border-radius: 6px; background: #f9fafb;"></iframe>
+    </div>
+  </div>
+
   <div class="card">
     <div class="card-bd">
-      <div class="tbl-wrap">
-        <table class="anx-tbl" id="anx2-leases" style="min-width:1200px">
-          <thead><tr>
-            <th>Sl. No.</th><th>River Details</th><th>Sand Bar Code</th><th>Lease Details</th>
-            <th>Area (Ha)</th><th>Latitude</th><th>Longitude</th>
-            <th>Dist. From PRB (KM)</th><th>Within 500m?</th>
-            <th>Mining Density (g/cc)</th><th>Deposit Depth (m)</th>
-            <th>Total Excav. MT/YR</th><th>Total Excav. Vol. (60%)</th>
-            <th>Mineral</th><th>Existing/Proposed</th><th>Remarks</th><th>Action</th>
-          </tr></thead>
-          <tbody>
-            <tr>
-              <td contenteditable>1</td>
-              <td contenteditable>Sutlej</td>
-              <td contenteditable>JL-ST-01</td>
-              <td contenteditable>Jalandhar Sutlej-1<br>Vill-Kadiana, Block-Phillaur</td>
-              <td contenteditable>12.50</td>
-              <td contenteditable class="coord-input">31°04'48.86"N<br>31°04'18.21"N</td>
-              <td contenteditable class="coord-input">75°53'39.66"E<br>75°53'47.89"E</td>
-              <td contenteditable>2.5</td>
-              <td><select><option>Yes</option><option>No</option></select></td>
-              <td contenteditable>1.52</td>
-              <td contenteditable>3</td>
-              <td contenteditable>285000</td>
-              <td contenteditable>171000</td>
-              <td contenteditable>Sand</td>
-              <td><select><option>Existing</option><option>Proposed</option></select></td>
-              <td contenteditable>—</td>
-              <td><button class="btn btn-xs btn-danger" onclick="delRow(this)">✕</button></td>
-            </tr>
-          </tbody>
-        </table>
+      
+      <!-- Section A: Mining Leases -->
+      <div id="section-a-wrapper">
+        <div class="anx-section section-a-block">
+          <div class="anx-section-header">
+            <div class="anx-section-title">a) Potential Mining Leases (Existing & Proposed) Rivers:</div>
+            <button class="btn btn-teal btn-xs" onclick="downloadSectionTemplateAnx2('A')">⬇ Excel Template (Leases)</button>
+          </div>
+          
+          <div class="tbl-wrap">
+            <table class="anx-tbl" id="anx2-leases" style="min-width:1400px">
+              <thead>
+                <tr>
+                  <th style="width: 50px;">Sl. No.</th>
+                  <th>River Details</th>
+                  <th>Sand Bar Code</th>
+                  <th>Lease Details</th>
+                  <th>Area (Ha)</th>
+                  <th>Latitude</th>
+                  <th>Longitude</th>
+                  <th>Distance from PA/WC (KM)</th>
+                  <th>Within 500m? (Cluster Area)</th>
+                  <th>Bulk Density (gm/cc)</th>
+                  <th>Depth of Deposit (m)</th>
+                  <th>Total Excavation (MT/YR)</th>
+                  <th>Total Excavation (Net 60%)</th>
+                  <th>Mineral</th>
+                  <th>Existing/Proposed</th>
+                  <th>Remarks</th>
+                  <th style="width: 50px;">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td contenteditable="true">1</td>
+                  <td contenteditable="true">Sutlej</td>
+                  <td contenteditable="true" class="coord-input">PO_JL_PL_ST_1B</td>
+                  <td contenteditable="true">Jalandhar Sutlej-1 Vill- Kadiana, Block- Phillaur</td>
+                  <td contenteditable="true" oninput="calcLeaseRow(this)">4.8</td>
+                  <td contenteditable="true" class="coord-input" style="white-space: pre-line;">31° 0' 48.886" N
+31° 0' 48.121" N
+31° 0' 47.214" N
+31° 0' 45.964" N
+31° 0' 45.741" N
+31° 0' 46.434" N
+31° 0' 47.331" N
+31° 0' 48.358" N
+31° 0' 48.535" N
+31° 0' 48.236" N
+31° 0' 48.619" N
+31° 0' 49.516" N
+31° 0' 50.244" N
+31° 0' 50.792" N
+31° 0' 51.774" N
+31° 0' 51.969" N
+31° 0' 51.527" N
+31° 0' 51.049" N
+31° 0' 49.961" N</td>
+                  <td contenteditable="true" class="coord-input" style="white-space: pre-line;">75° 53' 39.686" E
+75° 53' 37.489" E
+75° 53' 34.086" E
+75° 53' 31.294" E
+75° 53' 29.392" E
+75° 53' 27.465" E
+75° 53' 24.967" E
+75° 53' 23.655" E
+75° 53' 25.161" E
+75° 53' 27.351" E
+75° 53' 28.831" E
+75° 53' 26.493" E
+75° 53' 29.310" E
+75° 53' 31.822" E
+75° 53' 35.033" E
+75° 53' 38.541" E
+75° 53' 41.834" E
+75° 53' 42.609" E
+75° 53' 40.684" E</td>
+                  <td contenteditable="true">NA</td>
+                  <td contenteditable="true">Yes, Area: 25.27 Ha.</td>
+                  <td contenteditable="true" oninput="calcLeaseRow(this)">1.54</td>
+                  <td contenteditable="true" oninput="calcLeaseRow(this)">1.74</td>
+                  <td class="calc-total">128620.80</td>
+                  <td class="calc-net">77172.48</td>
+                  <td contenteditable="true">Sand</td>
+                  <td>
+                    <select><option selected>Existing</option><option>Proposed</option></select>
+                  </td>
+                  <td contenteditable="true">EC Granted Area 4.8 Ha (whole)</td>
+                  <td><button class="btn btn-xs btn-danger" onclick="delRowAnx2(this)">✕</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="section-footer">
+            <button class="btn btn-xs btn-outline" onclick="addNewLeaseRow(this)">+ Add Lease</button>
+            <label class="btn btn-navy btn-xs" style="cursor:pointer">
+              📤 Upload Excel (Leases)
+              <input type="file" accept=".xlsx,.xls,.csv" hidden onchange="handleSectionUploadAnx2(event, 'A')">
+            </label>
+            <button class="btn btn-xs btn-danger rm-sec-a-btn" onclick="this.closest('.section-a-block').remove()" style="display:none;">✕ Remove This Table</button>
+          </div>
+        </div>
       </div>
-      <button class="btn btn-xs btn-outline" style="margin-top:10px" onclick="addAnx2Row()">+ Add Lease</button>
+      
+      <div style="margin-bottom: 30px;">
+        <button class="btn btn-sm btn-saffron" onclick="addSectionABlock()">➕ Add Another Section A Page/Table</button>
+      </div>
+
+      <!-- Section B: Patta Lands -->
+      <div class="anx-section">
+        <div class="anx-section-header">
+          <div class="anx-section-title">b) Patta lands/Khatedari land (Existing & Proposed):</div>
+          <button class="btn btn-teal btn-xs" onclick="downloadSectionTemplateAnx2('B')">⬇ Excel Template (Patta Lands)</button>
+        </div>
+
+        <div class="tbl-wrap">
+          <table class="anx-tbl" id="anx2-patta" style="min-width:1200px">
+            <thead>
+              <tr>
+                <th style="width: 40px;">Sl.no</th>
+                <th>Owner</th>
+                <th>Sy.No (Khasra No)</th>
+                <th>Area (Ha)</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <th>District</th>
+                <th>Tehsil</th>
+                <th>Village</th>
+                <th>Total Reserve (MT)</th>
+                <th>Total Mineral (60% MT)</th>
+                <th>Existing/Proposed</th>
+                <th>Remarks</th>
+                <th style="width: 50px;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td contenteditable="true">1</td>
+                <td contenteditable="true" style="font-weight: bold;">Raj Kumar, S/O Divan Chand</td>
+                <td contenteditable="true" style="white-space: pre-line;">8//21, 8//22, 8//23
+8//24, 15//1, 15//2</td>
+                <td contenteditable="true" oninput="calcPattaRow(this)">2.77</td>
+                <td contenteditable="true" class="coord-input" style="white-space: pre-line;">30°59'37.61"N
+30°59'37.53"N
+30°59'35.72"N
+30°59'35.71"N
+30°59'35.61"N
+30°59'35.57"N
+30°59'33.63"N
+30°59'33.62"N</td>
+                <td contenteditable="true" class="coord-input" style="white-space: pre-line;">75°27'9.08"E
+75°27'21.44"E
+75°27'21.44"E
+75°27'19.03"E
+75°27'19.03"E
+75°27'14.06"E
+75°27'14.05"E
+75°27'9.10"E</td>
+                <td contenteditable="true">Jalandhar</td>
+                <td contenteditable="true">Shahkot</td>
+                <td contenteditable="true">Bangiwal</td>
+                <td class="p-reserve" contenteditable="true" oninput="updatePattaTotals()">126312</td>
+                <td class="p-min" contenteditable="true" oninput="updatePattaTotals()">60630</td>
+                <td>
+                  <select><option selected>Existing</option><option>Proposed</option></select>
+                </td>
+                <td contenteditable="true">EC Granted area 2.77 ha (whole)</td>
+                <td><button class="btn btn-xs btn-danger" onclick="delRowAnx2(this)">✕</button></td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="total-row" style="font-weight: bold; background-color: #e5e7eb; text-align: center;">
+                <td colspan="3">Total</td>
+                <td id="patta-sum-area">2.77</td>
+                <td colspan="5"></td>
+                <td id="patta-sum-reserve">126312</td>
+                <td id="patta-sum-mineral">60630.00</td>
+                <td colspan="2"></td>
+                <td></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        
+        <div class="section-footer">
+          <button class="btn btn-xs btn-outline" onclick="addRowAnx2('anx2-patta',['','','','0','','','Jalandhar','','','0','0','<select><option>Existing</option><option>Proposed</option></select>','','<button class=\'btn btn-xs btn-danger\' onclick=\'delRowAnx2(this)\'>✕</button>']); updatePattaTotals();">+ Add Patta Land</button>
+          <label class="btn btn-navy btn-xs" style="cursor:pointer">
+            📤 Upload Excel (Patta Lands)
+            <input type="file" accept=".xlsx,.xls,.csv" hidden onchange="handleSectionUploadAnx2(event, 'B')">
+          </label>
+        </div>
+      </div>
+
+      <!-- Section C: De-Siltation Location -->
+      <div class="anx-section">
+        <div class="anx-section-header">
+          <div class="anx-section-title">c) De-Siltation Location (Lakes/Ponds/Dams etc.) (Existing & Proposed):</div>
+          <button class="btn btn-teal btn-xs" onclick="downloadSectionTemplateAnx2('C')">⬇ Excel Template (De-Siltation)</button>
+        </div>
+
+        <div class="tbl-wrap">
+          <table class="anx-tbl" id="anx2-desilt" style="min-width:1000px">
+            <thead>
+              <tr>
+                <th>Name of Reservoir/Dams</th>
+                <th>Maintain/Controlled by State Govt./PSU etc.</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <th>District</th>
+                <th>Tehsil</th>
+                <th>Village</th>
+                <th>Size (Ha)</th>
+                <th>Quantity MT/Year</th>
+                <th>Existing/Proposed</th>
+                <th style="width: 50px;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td contenteditable="true" style="font-weight: bold;">Sutlej</td>
+                <td contenteditable="true">State Govt.</td>
+                <td contenteditable="true" class="coord-input">31°00'56"N</td>
+                <td contenteditable="true" class="coord-input">75°54'59"E</td>
+                <td contenteditable="true">Jalandhar</td>
+                <td contenteditable="true">Phillaur</td>
+                <td contenteditable="true">Powari</td>
+                <td contenteditable="true" oninput="updateDesiltTotals()">10.93</td>
+                <td contenteditable="true">-</td>
+                <td><select><option selected>Existing</option><option>Proposed</option></select></td>
+                <td><button class="btn btn-xs btn-danger" onclick="delRowAnx2(this)">✕</button></td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="total-row" style="font-weight: bold; background-color: #e5e7eb; text-align: center;">
+                <td colspan="7">Total</td>
+                <td id="desilt-sum-size">10.93</td>
+                <td colspan="2"></td>
+                <td></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        
+        <div class="section-footer">
+          <button class="btn btn-xs btn-outline" onclick="addRowAnx2('anx2-desilt',['','','','','Jalandhar','','','0.00','-','<select><option>Existing</option><option>Proposed</option></select>','<button class=\'btn btn-xs btn-danger\' onclick=\'delRow(this)\'>✕</button>']); updateDesiltTotals();">+ Add Location</button>
+          <label class="btn btn-navy btn-xs" style="cursor:pointer">
+            📤 Upload Excel (De-Siltation)
+            <input type="file" accept=".xlsx,.xls,.csv" hidden onchange="handleSectionUploadAnx2(event, 'C')">
+          </label>
+        </div>
+      </div>
+
+      <!-- Section D: M-Sand Plants -->
+      <div class="anx-section">
+        <div class="anx-section-header">
+          <div class="anx-section-title">d) M-Sand Plants (Existing & Proposed):</div>
+          <button class="btn btn-teal btn-xs" onclick="downloadSectionTemplateAnx2('D')">⬇ Excel Template (M-Sand)</button>
+        </div>
+
+        <div class="tbl-wrap">
+          <table class="anx-tbl" id="anx2-msand" style="min-width:1000px">
+            <thead>
+              <tr>
+                <th>Plant Name</th>
+                <th>Owner</th>
+                <th>District</th>
+                <th>Tehsil</th>
+                <th>Village</th>
+                <th>Geo-location</th>
+                <th>Quantity Tonnes/Annum</th>
+                <th>Existing/Proposed</th>
+                <th style="width: 50px;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td contenteditable="true" style="font-weight: bold;">Not Available</td>
+                <td contenteditable="true">Not Available</td>
+                <td contenteditable="true">Jalandhar</td>
+                <td contenteditable="true">Phillaur</td>
+                <td contenteditable="true">Not Available</td>
+                <td contenteditable="true" class="coord-input">Not Available</td>
+                <td contenteditable="true">Not Available</td>
+                <td><select><option selected>Existing</option><option>Proposed</option></select></td>
+                <td><button class="btn btn-xs btn-danger" onclick="delRowAnx2(this)">✕</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="section-footer">
+          <button class="btn btn-xs btn-outline" onclick="addRowAnx2('anx2-msand',['','','Jalandhar','','','','','<select><option>Existing</option><option>Proposed</option></select>','<button class=\'btn btn-xs btn-danger\' onclick=\'delRowAnx2(this)\'>✕</button>'])">+ Add M-Sand Plant</button>
+          <label class="btn btn-navy btn-xs" style="cursor:pointer">
+            📤 Upload Excel (M-Sand)
+            <input type="file" accept=".xlsx,.xls,.csv" hidden onchange="handleSectionUploadAnx2(event, 'D')">
+          </label>
+        </div>
+      </div>
+
+      <!-- Final Action Area -->
+      <div class="final-actions">
+        <button class="btn btn-saffron btn-lg" onclick="exportAnx2PDF(this)">📄 Download Final Annexure 2 PDF</button>
+      </div>
+      
     </div>
   </div>
 </div>
-
       <!-- ═══ ANNEXURE III ═══ -->
 <div id="view-anx3" class="view">
   <div class="header-row">
     <div>
       <div class="page-title">Annexure III — Cluster Details</div>
-      <div class="page-sub">Cluster & Contiguous Cluster details as per EMGSM 2020</div>
+      <div class="page-sub">Cluster &amp; Contiguous Cluster Details · EMGSM 2020</div>
     </div>
-    <div style="display:flex;gap:8px">
-      <button class="btn btn-teal btn-sm" onclick="downloadAnxTemplate(3)">⬇ Excel Template</button>
-      <label class="btn btn-navy btn-sm" style="cursor:pointer">📤 Upload Excel <input type="file" accept=".xlsx,.xls" hidden onchange="handleAnxUpload(event,3)"></label>
-      <button class="btn btn-saffron btn-sm" onclick="exportAnxPDF(3)">📄 Export PDF</button>
-    </div>
-  </div>
-  <div class="card" style="margin-bottom:16px">
-    <div class="card-hd"><div class="card-title">Cluster Details</div></div>
-    <div class="card-bd">
-      <div class="tbl-wrap">
-        <table class="anx-tbl" id="anx3-clusters" style="min-width:1000px">
-          <thead><tr><th>River Name</th><th>Cluster No.</th><th>Lease No.</th><th>Location</th><th>Village</th><th>Area (Ha)</th><th>Total Excav. (MT)</th><th>Mineral Excav. (MT) @60%</th><th>Action</th></tr></thead>
-          <tbody>
-            <tr>
-              <td contenteditable rowspan="1">Sutlej</td>
-              <td contenteditable>1</td>
-              <td contenteditable>NPRO_JL_PL_ST_61<br>NPRO_JL_PL_ST_62<br>NPRO_JL_PL_ST_63</td>
-              <td><select><option>Riverbed</option><option>Patta Land</option></select></td>
-              <td contenteditable>Mizapur,<br>Fatehpur,<br>Bhagwan</td>
-              <td contenteditable oninput="calcClusterRow(this)">45.20</td>
-              <td contenteditable oninput="calcClusterRow(this)">1074334.80</td>
-              <td class="anx3-mineral">644600.88</td>
-              <td><button class="btn btn-xs btn-danger" onclick="delRow(this)">✕</button></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <button class="btn btn-xs btn-outline" style="margin-top:8px" onclick="addAnx3Row()">+ Add Cluster</button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-teal btn-sm" onclick="dlTemplate('cluster')">⬇ Cluster Template</button>
+      <button class="btn btn-teal btn-sm" onclick="dlTemplate('contiguous')">⬇ Contiguous Template</button>
     </div>
   </div>
+
+  <div class="notif notif-info" style="margin-bottom:16px">
+    Download the Excel templates → Fill values locally → Upload below. You can also edit cell content inline.
+  </div>
+
   <div class="card">
-    <div class="card-hd"><div class="card-title">Contiguous Clusters</div></div>
     <div class="card-bd">
-      <div class="tbl-wrap">
-        <table class="anx-tbl" id="anx3-contiguous" style="min-width:1100px">
-          <thead><tr><th>River</th><th>Contiguous Cluster No.</th><th>Cluster No.</th><th># Leases</th><th>Location</th><th>Distance Between</th><th>Village</th><th>Area (Ha)</th><th>Mineral Excav. (MT) @60%</th><th>Action</th></tr></thead>
-          <tbody>
-            <tr>
-              <td contenteditable>Sutlej</td>
-              <td contenteditable>CC-1</td>
-              <td contenteditable>1,2,3</td>
-              <td contenteditable>9</td>
-              <td><select><option>Riverbed</option><option>Patta Land</option></select></td>
-              <td contenteditable>0.55km</td>
-              <td contenteditable>Minwal,<br>Mau Sahib,<br>Burewal</td>
-              <td contenteditable>134.40</td>
-              <td contenteditable>5678901.23</td>
-              <td><button class="btn btn-xs btn-danger" onclick="delRow(this)">✕</button></td>
-            </tr>
-          </tbody>
-        </table>
+      
+      <!-- Section A: Cluster Details -->
+      <div class="anx-section">
+        <div class="anx-section-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+          <div class="anx-section-title" style="font-weight:bold; font-size:14px;">a) Cluster Details:</div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-teal btn-xs" onclick="exportClusterXlsx()">⬇ Export to Excel</button>
+            <label class="btn btn-navy btn-xs" style="cursor:pointer">
+              📤 Upload Cluster Excel
+              <input type="file" accept=".xlsx,.xls" hidden onchange="uploadExcel(event,'cluster')">
+            </label>
+          </div>
+        </div>
+
+        <div class="tbl-wrap">
+          <table class="anx-tbl" id="anx3-clusters">
+            <thead>
+              <tr>
+                <th>River Name</th>
+                <th>Cluster No.</th>
+                <th>Lease No.</th>
+                <th>Location (Riverbed / Patta Land)</th>
+                <th>Village</th>
+                <th>Area (in Ha.)</th>
+                <th>Total Excavation (MT)</th>
+                <th>Total Mineral Excavation (MT) (Considering 60% as per EMGSM, 2020)</th>
+                <th style="width: 50px;" class="no-print">Action</th>
+              </tr>
+            </thead>
+            <tbody id="clusterBody">
+              <!-- rows injected by JS -->
+            </tbody>
+            <tfoot id="clusterFoot">
+              <!-- totals injected by JS -->
+            </tfoot>
+          </table>
+        </div>
+
+        <div class="section-footer" style="margin-top:8px">
+          <button class="btn btn-xs btn-outline" onclick="addClusterRow()">+ Add Cluster Row</button>
+        </div>
       </div>
-      <button class="btn btn-xs btn-outline" style="margin-top:8px" onclick="addAnx3ContRow()">+ Add Contiguous Cluster</button>
+
+      <!-- Section B: Contiguous Clusters -->
+      <div class="anx-section" style="margin-top: 32px;">
+        <div class="anx-section-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+          <div class="anx-section-title" style="font-weight:bold; font-size:14px;">b) Contiguous Clusters:</div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-teal btn-xs" onclick="exportContXlsx()">⬇ Export to Excel</button>
+            <label class="btn btn-navy btn-xs" style="cursor:pointer">
+              📤 Upload Contiguous Excel
+              <input type="file" accept=".xlsx,.xls" hidden onchange="uploadExcel(event,'contiguous')">
+            </label>
+          </div>
+        </div>
+
+        <div class="tbl-wrap">
+          <table class="anx-tbl" id="anx3-contiguous">
+            <thead>
+              <tr>
+                <th>River Name</th>
+                <th>Contiguous Cluster No.</th>
+                <th>Cluster No.</th>
+                <th>Number of leases in the cluster</th>
+                <th>Location (Riverbed / Patta Land)</th>
+                <th>Distance between clusters</th>
+                <th>Village</th>
+                <th>Area Of Cluster (Ha)</th>
+                <th>Total Mineral Excavation (MT) (Considering 60% as per EMGSM, 2020)</th>
+                <th style="width: 50px;" class="no-print">Action</th>
+              </tr>
+            </thead>
+            <tbody id="contBody">
+              <!-- rows injected by JS -->
+            </tbody>
+            <tfoot id="contFoot">
+              <!-- totals injected by JS -->
+            </tfoot>
+          </table>
+        </div>
+
+        <div class="section-footer" style="margin-top:8px">
+          <button class="btn btn-xs btn-outline" onclick="addContRow()">+ Add Contiguous Row</button>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
-
       <!-- ═══ ANNEXURE IV ═══ -->
 <div id="view-anx4" class="view">
   <div class="header-row">

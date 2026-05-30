@@ -7,7 +7,13 @@ function addRow(tableId, cells) {
   const tbody=document.querySelector('#'+tableId+' tbody');
   if (!tbody) return;
   const tr=document.createElement('tr');
-  tr.innerHTML=cells.map(c=>`<td contenteditable>${c}</td>`).join('');
+  tr.innerHTML=cells.map(c=>{
+    let val = String(c !== undefined && c !== null ? c : '').trim();
+    if (val === '' && !val.includes('<button') && !val.includes('<select')) {
+      val = 'NUL';
+    }
+    return `<td contenteditable>${val}</td>`;
+  }).join('');
   tbody.appendChild(tr);
 }
 
@@ -56,7 +62,7 @@ function handleAnxUpload(e,n) {
 function getAnnexureTableIds(n) {
   return {
     1: ['anx1-rivers','anx1-desilt','anx1-patta','anx1-msand'],
-    2: ['anx2-leases'],
+    2: ['anx2-leases','anx2-patta','anx2-desilt','anx2-msand'],
     3: ['anx3-clusters','anx3-contiguous'],
     4: ['anx4-routes','anx4-cluster-routes'],
     5: ['anx5-benchmarks'],
@@ -72,6 +78,10 @@ function findAnnexureTableId(n, sheetName, tableIds) {
     'anx1-desilt': ['desilt','de-silt','reservoir','lake','pond','dam'],
     'anx1-patta': ['patta','khatedari','land'],
     'anx1-msand': ['m-sand','msand','plant'],
+    'anx2-leases': ['lease','leases','river','rivers'],
+    'anx2-patta': ['patta','khatedari','land'],
+    'anx2-desilt': ['desilt','de-silt','reservoir','lake','pond','dam'],
+    'anx2-msand': ['m-sand','msand','plant'],
     'anx3-clusters': ['cluster'],
     'anx3-contiguous': ['contiguous'],
     'anx4-routes': ['route','routes','lease'],
@@ -109,7 +119,8 @@ function populateTableFromSheet(tableId, rows) {
   cleanRows.forEach(row => {
     const tr = document.createElement('tr');
     headers.forEach((_, index) => {
-      const value = row[index] !== undefined ? String(row[index]) : '';
+      let value = row[index] !== undefined ? String(row[index]).trim() : '';
+      if (value === '') value = 'NUL';
       const escaped = value.replace(/</g, '&lt;').replace(/>/g, '&gt;');
       tr.insertAdjacentHTML('beforeend', `<td contenteditable>${escaped}</td>`);
     });

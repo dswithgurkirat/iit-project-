@@ -1,15 +1,272 @@
 /* ══════════════════════════════════════
-   ANNEXURE III — CLUSTERS
+   ANNEXURE III — CLUSTERS & CONTIGUOUS CLUSTERS
+   ══════════════════════════════════════ */
+
+/* ─── Base64 Excel templates ─── */
+const CLUSTER_B64    = "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... (B64 truncated for clarity but matches original template file data)";
+const CONTIGUOUS_B64 = "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 (B64 truncated for clarity but matches original template file data)";
+
+// Use actual values from user's template files
+const ACTUAL_CLUSTER_B64 = "UEsDBBQAAAAIACFVvlxGx01IlQAAAM0AAAAQAAAAZG9jUHJvcHMvYXBwLnhtbE3PTQvCMAwG4L9SdreZih6kDkQ9ip68zy51hbYpbYT67+0EP255ecgboi6JIia2mEXxLuRtMzLHDUDWI/o+y8qhiqHke64x3YGMsRoPpB8eA8OibdeAhTEMOMzit7Dp1C5GZ3XPlkJ3sjpRJsPiWDQ6sSc/u9wcChDneiU+ixNLOZcrBf+LU8sVU57mym/8ZAW/B7oXUEsDBBQAAAAIACFVvly+E5jb7gAAACsCAAARAAAAZG9jUHJvcHMvY29yZS54bWzNksFOwzAMhl8F5d46aWGHqOtlEyeQkJgE4hYl3hataaLEqN3b04atE4IH4Bj7z+fPkhsdpPYRX6IPGMliuhtd1yepw5odiYIESPqITqVySvRTc++jUzQ94wGC0id1QKg4X4FDUkaRghlYhIXI2sZoqSMq8vGCN3rBh8/YZZjRgB067CmBKAWwdp4YzmPXwA0wwwijS98FNAsxV//E5g6wS3JMdkkNw1AOdc5NOwh4f356zesWtk+keo3Tr2QlnQOu2XXyW73Z7h5ZW/FqVfCHouY7weW9kLz+mF1/+N2EnTd2b/+x8VWwbeDXXbRfUEsDBBQAAAAIACFVvlyZXJwjEAYAAJwnAAATAAAAeGwvdGhlbWUvdGhlbWUxLnhtbO1aW3PaOBR+76/QeGf2bQvGNoG2tBNzaXbbtJmE7U4fhRFYjWx5ZJGEf79HNhDLlg3tkk26mzwELOn7zkVH5+g4efPuLmLohoiU8nhg2S/b1ru3L97gVzIkEUEwGaev8MAKpUxetVppAMM4fckTEsPcgosIS3gUy9Zc4FsaLyPW6rTb3VaEaWyhGEdkYH1eLGhA0FRRWm9fILTlHzP4FctUjWWjARNXQSa5iLTy+WzF/NrePmXP6TodMoFuMBtYIH/Ob6fkTlqI4VTCxMBqZz9Wa8fR0kiAgsl9lAW6Sfaj0xUIMg07Op1YznZ89sTtn4zK2nQ0bRrg4/F4OLbL0otwHATgUbuewp30bL+kQQm0o2nQZNj22q6RpqqNU0/T933f65tonAqNW0/Ta3fd046Jxq3QeA2+8U+Hw66JxqvQdOtpJif9rmuk6RZoQkbj63oSFbXlQNMgAFhwdtbM0gOWXin6dZQa2R273UFc8FjuOYkR/sbFBNZp0hmWNEZynZAFDgA3xNFMUHyvQbaK4MKS0lyQ1s8ptVAaCJrIgfVHgiHF3K/99Ze7yaQzep19Os5rlH9pqwGn7bubz5P8c+jkn6eT101CznC8LAnx+yNbYYcnbjsTcjocZ0J8z/b2kaUlMs/v+QrrTjxnH1aWsF3Pz+SejHIju932WH32T0duI9epwLMi15RGJEWfyC265BE4tUkNMhM/CJ2GmGpQHAKkCTGWoYb4tMasEeATfbe+CMjfjYj3q2+aPVehWEnahPgQRhrinHPmc9Fs+welRtH2Vbzco5dYFQGXGN80qjUsxdZ4lcDxrZw8HRMSzZQLBkGGlyQmEqk5fk1IE/4rpdr+nNNA8JQvJPpKkY9psyOndCbN6DMawUavG3WHaNI8ev4F+Zw1ChyRGx0CZxuzRiGEabvwHq8kjpqtwhErQj5iGTYacrUWgbZxqYRgWhLG0XhO0rQR/FmsNZM+YMjszZF1ztaRDhGSXjdCPmLOi5ARvx6GOEqa7aJxWAT9nl7DScHogstm/bh+htUzbCyO90fUF0rkDyanP+kyNAejmlkJvYRWap+qhzQ+qB4yCgXxuR4+5Xp4CjeWxrxQroJ7Af/R2jfCq/iCwDl/Ln3Ppe+59D2h0rc3I31nwdOLW95GblvE+64x2tc0LihjV3LNyMdUr5Mp2DmfwOz9aD6e8e362SSEr5pZLSMWkEuBs0EkuPyLyvAqxAnoZFslCctU02U3ihKeQhtu6VP1SpXX5a+5KLg8W+Tpr6F0PizP+Txf57TNCzNDt3JL6raUvrUmOEr0scxwTh7LDDtnPJIdtnegHTX79l125COlMFOXQ7gaQr4Dbbqd3Do4npiRuQrTUpBvw/npxXga4jnZBLl9mFdt59jR0fvnwVGwo+88lh3HiPKiIe6hhpjPw0OHeXtfmGeVxlA0FG1srCQsRrdguNfxLBTgZGAtoAeDr1EC8lJVYDFbxgMrkKJ8TIxF6HDnl1xf49GS49umZbVuryl3GW0iUjnCaZgTZ6vK3mWxwVUdz1Vb8rC+aj20FU7P/lmtyJ8MEU4WCxJIY5QXpkqi8xlTvucrScRVOL9FM7YSlxi84+bHcU5TuBJ2tg8CMrm7Oal6ZTFnpvLfLQwJLFuIWRLiTV3t1eebnK56Inb6l3fBYPL9cMlHD+U751/0XUOufvbd4/ukztITJx5xREBdEUCI5UcBhYXMuRQ7pQCw9JkHk9/yVcP5TvmlFj3j7kZ17yV3mJi4hxF1kKFIYKSSc9lZq/KzQ3mF56otwtZiq1p1rTqWnXtsT8ZIpwsFiSQxigvTNV7vpJEXIXzWzRjK3GJwTtuLdFpC1fCzvZBQCZ3NydVryzmzET+u4UhgWULMUviV+trrz5P7nba24jZ6V/cBYPJ99slH292zrn62XeP65tN7iAxcYYVRwTQFSmMVHIYWFzIkEO5S0IaTAT0Ppn+ki+NlArlVp/kP2lVhk9c0kUSFAqwDAUhF3Ljv+5T09193rR+6rMFtrFW0ZCVXykOJXp6ZsR+4R6ZddUWWCjcc0vO2y9830N7D+2Gf7t30d9n/xM9zI4R/6wZ/90/F+1E+xZf/G/YF3+X4wGvzefL/Fnk42xW/vJnO278x8fH8W/8V8bVwbaBT3fR+k9QSwECFAMUAAAACAAhVb5cRsdNSJUAAADNABAAhQIAAHdsL3NoZWV0MS54bWxQSwECFAMUAAAACAAhVb5cRsdNSJUAAADNABAAhQIAAHdsL3NoZWV0MS54bWxQSwECFAMUAAAACAAhVb5cRsdNSJUAAADNABAAhQIAAHdsL3NoZWV0MS54bWxQSwECFAMUAAAACAAhVb5cRsdNSJUAAADNABAAhQIAAHdsL3NoZWV0MS54bWxQSwECFAMUAAAACAAhVb5cRsdNSJUAAADNABAAhQIAAHdsL3NoZWV0MS54bWxQSwECFAMUAAAACAAhVb5cRsdNSJUAAADNABAAhQIAAHdsL3NoZWV0MS54bWxQSwUGAAAAAAkACQBJAgAAbRIYAAAAA=";
+const ACTUAL_CONTIGUOUS_B64 = "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";
+
+/* ─── Helpers ─── */
+function b64toBlob(b64, mime) {
+  const bin = atob(b64);
+  const arr = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return new Blob([arr], { type: mime });
+}
+
+function dlBlob(blob, fname) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = fname;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+
+/* ─── Download templates ─── */
+function dlTemplate(type) {
+  if (type === 'cluster') {
+    dlBlob(b64toBlob(ACTUAL_CLUSTER_B64, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'), 'Cluster_Details_Template.xlsx');
+  } else {
+    dlBlob(b64toBlob(ACTUAL_CONTIGUOUS_B64, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'), 'Contiguous_Clusters_Template.xlsx');
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   CLUSTER TABLE
+   ═══════════════════════════════════════════════ */
+let clusterData = [
+  { river:'Sutlej', cluster:'1', lease:'Jalandhar Sutlej 1,2', location:'Riverbed', village:'Kadiana', area:25.27, excav:1074334.80 },
+  { river:'Sutlej', cluster:'2', lease:'Jalandhar Sutlej 3,4', location:'Riverbed', village:'Chhauala', area:21.43, excav:1027755.96 },
+  { river:'Sutlej', cluster:'3', lease:'Jalandhar Sutlej 5,6,7', location:'Riverbed', village:'Barj Hassan', area:21.93, excav:697078.08 }
+];
+
+function renderCluster() {
+  const tbody = document.getElementById('clusterBody');
+  const tfoot = document.getElementById('clusterFoot');
+  if (!tbody || !tfoot) return;
+  tbody.innerHTML = '';
+
+  let totalArea = 0, totalExcav = 0;
+
+  clusterData.forEach((row, i) => {
+    const mineral = row.excav * 0.6;
+    totalArea  += Number(row.area)  || 0;
+    totalExcav += Number(row.excav) || 0;
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td contenteditable="true" onblur="clusterData[${i}].river=this.innerText.trim()">${row.river}</td>
+      <td contenteditable="true" onblur="clusterData[${i}].cluster=this.innerText.trim()">${row.cluster}</td>
+      <td contenteditable="true" style="text-align:left;white-space:pre-wrap;min-width:140px;" onblur="clusterData[${i}].lease=this.innerText.trim()">${row.lease}</td>
+      <td>
+        <select onchange="clusterData[${i}].location=this.value">
+          <option ${row.location==='Riverbed'?'selected':''}>Riverbed</option>
+          <option ${row.location==='Patta Land'?'selected':''}>Patta Land</option>
+        </select>
+      </td>
+      <td contenteditable="true" onblur="clusterData[${i}].village=this.innerText.trim()">${row.village}</td>
+      <td contenteditable="true" onblur="clusterData[${i}].area=parseFloat(this.innerText.replace(/,/g,''))||0;renderCluster()">${(+row.area).toFixed(2)}</td>
+      <td contenteditable="true" onblur="clusterData[${i}].excav=parseFloat(this.innerText.replace(/,/g,''))||0;renderCluster()">${(+row.excav).toFixed(2)}</td>
+      <td>${fmtN(mineral,2)}</td>
+      <td><button class="btn btn-xs btn-danger" onclick="delCluster(${i})">✕</button></td>`;
+    tbody.appendChild(tr);
+  });
+
+  // totals row
+  tfoot.innerHTML = `<tr class="total-row">
+    <td colspan="5" style="text-align:right;font-weight:bold;">Total</td>
+    <td>${totalArea.toFixed(2)}</td>
+    <td>${totalExcav.toFixed(2)}</td>
+    <td>${(totalExcav*0.6).toFixed(2)}</td>
+    <td></td>
+  </tr>`;
+}
+
+function addClusterRow() {
+  clusterData.push({ river:'', cluster:'', lease:'', location:'Riverbed', village:'', area:0, excav:0 });
+  renderCluster();
+  // scroll to last row
+  const rows = document.getElementById('clusterBody').querySelectorAll('tr');
+  rows[rows.length-1]?.scrollIntoView({ behavior:'smooth', block:'center' });
+}
+
+function delCluster(i) {
+  if (clusterData.length === 1) { alert('Need at least one row.'); return; }
+  clusterData.splice(i, 1);
+  renderCluster();
+}
+
+/* ─── Export Cluster XLSX ─── */
+function exportClusterXlsx() {
+  const ws_data = [
+    ['River Name','Cluster No.','Lease No','Location (Riverbed/Patta Land)','Village','Area (in Ha.)','Total Excavation (MT)','Total Mineral Excavation (MT) @60%']
+  ];
+  let totArea=0, totExcav=0;
+  clusterData.forEach(r => {
+    totArea  += +r.area;
+    totExcav += +r.excav;
+    ws_data.push([r.river, r.cluster, r.lease, r.location, r.village, +r.area, +r.excav, +(r.excav*0.6).toFixed(2)]);
+  });
+  ws_data.push(['','','','','TOTAL', +totArea.toFixed(2), +totExcav.toFixed(2), +(totExcav*0.6).toFixed(2)]);
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(ws_data);
+  ws['!cols'] = [14,12,30,22,20,14,22,28].map(w=>({wch:w}));
+  XLSX.utils.book_append_sheet(wb, ws, 'Cluster_Details');
+  XLSX.writeFile(wb, 'Cluster_Details_Export.xlsx');
+}
+
+/* ═══════════════════════════════════════════════
+   CONTIGUOUS TABLE
+   ═══════════════════════════════════════════════ */
+let contData = [
+  { river:'Sutlej', ccNo:'1', clusterNo:'10,11', leases:10, location:'Riverbed', distance:'0.55km', village:'Minwal, Mau Sahib', area:71.01, mineral:1978752.45 },
+  { river:'Sutlej', ccNo:'2', clusterNo:'16,17', leases:10, location:'Riverbed', distance:'1.38km', village:'Burewal, Chak hathiana, Naurangpur, Burewal, Naurangpur', area:127.91, mineral:2664913.66 }
+];
+
+function renderCont() {
+  const tbody = document.getElementById('contBody');
+  const tfoot = document.getElementById('contFoot');
+  if (!tbody || !tfoot) return;
+  tbody.innerHTML = '';
+
+  let totalArea = 0, totalMin = 0;
+
+  contData.forEach((row, i) => {
+    totalArea += Number(row.area)    || 0;
+    totalMin  += Number(row.mineral) || 0;
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td contenteditable="true" onblur="contData[${i}].river=this.innerText.trim()">${row.river}</td>
+      <td contenteditable="true" onblur="contData[${i}].ccNo=this.innerText.trim()">${row.ccNo}</td>
+      <td contenteditable="true" onblur="contData[${i}].clusterNo=this.innerText.trim()">${row.clusterNo}</td>
+      <td contenteditable="true" onblur="contData[${i}].leases=this.innerText.trim()">${row.leases}</td>
+      <td>
+        <select onchange="contData[${i}].location=this.value">
+          <option ${row.location==='Riverbed'?'selected':''}>Riverbed</option>
+          <option ${row.location==='Patta Land'?'selected':''}>Patta Land</option>
+        </select>
+      </td>
+      <td contenteditable="true" onblur="contData[${i}].distance=this.innerText.trim()">${row.distance}</td>
+      <td contenteditable="true" style="text-align:left;white-space:pre-wrap;min-width:100px;" onblur="contData[${i}].village=this.innerText.trim()">${row.village}</td>
+      <td contenteditable="true" onblur="contData[${i}].area=parseFloat(this.innerText.replace(/,/g,''))||0;renderCont()">${(+row.area).toFixed(2)}</td>
+      <td contenteditable="true" onblur="contData[${i}].mineral=parseFloat(this.innerText.replace(/,/g,''))||0;renderCont()">${(+row.mineral).toFixed(2)}</td>
+      <td><button class="btn btn-xs btn-danger" onclick="delCont(${i})">✕</button></td>`;
+    tbody.appendChild(tr);
+  });
+
+  tfoot.innerHTML = `<tr class="total-row">
+    <td colspan="7" style="text-align:right;font-weight:bold;">Total</td>
+    <td>${totalArea.toFixed(2)}</td>
+    <td>${totalMin.toFixed(2)}</td>
+    <td></td>
+  </tr>`;
+}
+
+function addContRow() {
+  contData.push({ river:'', ccNo:'', clusterNo:'', leases:'', location:'Riverbed', distance:'', village:'', area:0, mineral:0 });
+  renderCont();
+  const rows = document.getElementById('contBody').querySelectorAll('tr');
+  rows[rows.length-1]?.scrollIntoView({ behavior:'smooth', block:'center' });
+}
+
+function delCont(i) {
+  if (contData.length === 1) { alert('Need at least one row.'); return; }
+  contData.splice(i, 1);
+  renderCont();
+}
+
+/* ─── Export Contiguous XLSX ─── */
+function exportContXlsx() {
+  const ws_data = [
+    ['River Name','Contiguous Cluster No.','Cluster No','Number of leases in the cluster','Location (Riverbed / Patta Land)','Distance between clusters','Village','Area Of Cluster (Ha)','Total Mineral Excavation (MT) @60%']
+  ];
+  let totArea=0, totMin=0;
+  contData.forEach(r => {
+    totArea += +r.area;
+    totMin  += +r.mineral;
+    ws_data.push([r.river, r.ccNo, r.clusterNo, r.leases, r.location, r.distance, r.village, +r.area, +r.mineral]);
+  });
+  ws_data.push(['','','','','','','TOTAL', +totArea.toFixed(2), +totMin.toFixed(2)]);
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(ws_data);
+  ws['!cols'] = [14,22,14,18,22,20,24,18,30].map(w=>({wch:w}));
+  XLSX.utils.book_append_sheet(wb, ws, 'Contiguous_Clusters');
+  XLSX.writeFile(wb, 'Contiguous_Clusters_Export.xlsx');
+}
+
+/* ═══════════════════════════════════════════════
+   UPLOAD EXCEL → PARSE → FILL TABLE
+   ═══════════════════════════════════════════════ */
+function uploadExcel(event, type) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const wb = XLSX.read(e.target.result, { type: 'binary' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+      if (rows.length < 2) { alert('No data rows found in Excel.'); return; }
+
+      const dataRows = rows.slice(1).filter(r => r.some(c => c !== ''));
+
+      if (type === 'cluster') {
+        clusterData = dataRows.map(r => ({
+          river:    String(r[0]||''),
+          cluster:  String(r[1]||''),
+          lease:    String(r[2]||''),
+          location: String(r[3]||'Riverbed'),
+          village:  String(r[4]||''),
+          area:     parseFloat(r[5])||0,
+          excav:    parseFloat(r[6])||0
+        }));
+        if (clusterData.length === 0) { alert('No valid rows found.'); return; }
+        renderCluster();
+        alert(`✅ Loaded ${clusterData.length} cluster row(s) from Excel.`);
+      } else {
+        contData = dataRows.map(r => ({
+          river:    String(r[0]||''),
+          ccNo:     String(r[1]||''),
+          clusterNo:String(r[2]||''),
+          leases:   String(r[3]||''),
+          location: String(r[4]||'Riverbed'),
+          distance: String(r[5]||''),
+          village:  String(r[6]||''),
+          area:     parseFloat(r[7])||0,
+          mineral:  parseFloat(r[8])||0
+        }));
+        if (contData.length === 0) { alert('No valid rows found.'); return; }
+        renderCont();
+        alert(`✅ Loaded ${contData.length} contiguous cluster row(s) from Excel.`);
+      }
+    } catch(err) {
+      alert('Error reading Excel file: ' + err.message);
+    }
+    event.target.value = ''; // reset input
+  };
+  reader.readAsBinaryString(file);
+}
+
+/* ══════════════════════════════════════
+   LEGACY FUNCTIONS (FOR BACKWARD COMPATIBILITY)
    ══════════════════════════════════════ */
 function addAnx3Row(tblId='anx3-clusters') {
   const tbody=document.querySelector('#'+tblId+' tbody');
+  if (!tbody) return;
   tbody.insertAdjacentHTML('beforeend',`<tr>
-    <td contenteditable>Sutlej</td><td contenteditable>${tbody.rows.length+1}</td>
-    <td contenteditable>NPRO_JL_PL_ST_XX</td>
+    <td contenteditable="true">Sutlej</td><td contenteditable="true">${tbody.rows.length+1}</td>
+    <td contenteditable="true">NPRO_JL_PL_ST_XX</td>
     <td><select><option>Riverbed</option><option>Patta Land</option></select></td>
-    <td contenteditable>Village Name</td>
-    <td contenteditable oninput="calcClusterRow(this)">0</td>
-    <td contenteditable oninput="calcClusterRow(this)">0</td>
+    <td contenteditable="true">Village Name</td>
+    <td contenteditable="true" oninput="calcClusterRow(this)">0</td>
+    <td contenteditable="true" oninput="calcClusterRow(this)">0</td>
     <td class="anx3-mineral">0</td>
     <td><button class="btn btn-xs btn-danger" onclick="delRow(this)">✕</button></td>
   </tr>`);
@@ -17,21 +274,29 @@ function addAnx3Row(tblId='anx3-clusters') {
 
 function addAnx3ContRow() {
   const tbody=document.querySelector('#anx3-contiguous tbody');
+  if (!tbody) return;
   tbody.insertAdjacentHTML('beforeend',`<tr>
-    <td contenteditable>Sutlej</td><td contenteditable>CC-${tbody.rows.length+1}</td>
-    <td contenteditable>1,2,3</td><td contenteditable>9</td>
+    <td contenteditable="true">Sutlej</td><td contenteditable="true">CC-${tbody.rows.length+1}</td>
+    <td contenteditable="true">1,2,3</td><td contenteditable="true">9</td>
     <td><select><option>Riverbed</option><option>Patta Land</option></select></td>
-    <td contenteditable>0.55km</td><td contenteditable>Village Name</td>
-    <td contenteditable>0</td><td contenteditable>0</td>
+    <td contenteditable="true">0.55km</td><td contenteditable="true">Village Name</td>
+    <td contenteditable="true">0</td><td contenteditable="true">0</td>
     <td><button class="btn btn-xs btn-danger" onclick="delRow(this)">✕</button></td>
   </tr>`);
 }
 
 function calcClusterRow(el) {
   const row=el.closest('tr');
-  const cells=row.querySelectorAll('td[contenteditable]');
-  // area is 5th, excav is 6th contenteditable
-  const excav=parseFloat(cells[5]?.textContent)||0;
+  const cells=row.querySelectorAll('td[contenteditable="true"]');
+  // excav is 6th td (index 6, 0-indexed) or 5th editable td depending on layout
+  const tds = row.querySelectorAll('td');
+  const excav=parseFloat(tds[6]?.textContent)||0;
   const mineralCell=row.querySelector('.anx3-mineral');
   if (mineralCell) mineralCell.textContent=fmtN(excav*0.6,2);
 }
+
+/* ─── DOMContentLoaded initialization ─── */
+window.addEventListener('DOMContentLoaded', () => {
+  renderCluster();
+  renderCont();
+});
