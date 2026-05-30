@@ -58,6 +58,31 @@ function readRequestBody(req) {
   });
 }
 
+function deleteFileWithRetries(filePath, retries = 5, delay = 100) {
+  return new Promise((resolve) => {
+    function attempt(n) {
+      if (!fs.existsSync(filePath)) {
+        resolve(true);
+        return;
+      }
+      try {
+        fs.unlinkSync(filePath);
+        console.log(`Successfully deleted file: ${filePath}`);
+        resolve(true);
+      } catch (err) {
+        if (n > 0) {
+          console.warn(`File ${filePath} locked, retrying deletion in ${delay}ms... (attempts left: ${n})`);
+          setTimeout(() => attempt(n - 1), delay);
+        } else {
+          console.error(`Failed to delete file ${filePath} after multiple attempts:`, err);
+          resolve(false);
+        }
+      }
+    }
+    attempt(retries);
+  });
+}
+
 const server = http.createServer((req, res) => {
   const urlObj = req.url.split('?');
   const pathname = decodeURIComponent(urlObj[0]);
@@ -96,7 +121,7 @@ const server = http.createServer((req, res) => {
     }
 
     if (pathname === '/api/upload-pdf' && req.method === 'POST') {
-      readRequestBody(req).then(body => {
+      readRequestBody(req).then(async body => {
         try {
           const { projectId, fileName, pdf, annexureId = 'anx3' } = JSON.parse(body);
           if (!projectId) {
@@ -108,22 +133,11 @@ const server = http.createServer((req, res) => {
           if (fileName === null || pdf === null) {
             // Delete PDF file if exists
             const destPath = path.join(UPLOADS_DIR, `${projectId}_${annexureId}.pdf`);
-            if (fs.existsSync(destPath)) {
-              try {
-                fs.unlinkSync(destPath);
-              } catch (err) {
-                console.warn(`Windows file lock: could not unlink ${destPath} immediately.`, err);
-              }
-            }
+            await deleteFileWithRetries(destPath);
+            
             if (annexureId === 'anx3') {
               const legacyPath = path.join(UPLOADS_DIR, `${projectId}.pdf`);
-              if (fs.existsSync(legacyPath)) {
-                try {
-                  fs.unlinkSync(legacyPath);
-                } catch (err) {
-                  console.warn(`Windows file lock: could not unlink legacy ${legacyPath} immediately.`, err);
-                }
-              }
+              await deleteFileWithRetries(legacyPath);
             }
             // Update projects.json to clear PDF metadata
             const projects = readProjects();

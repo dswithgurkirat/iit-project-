@@ -377,6 +377,17 @@ async function deletePdfAnx3() {
     return;
   }
   
+  // Hide preview and clear iframe first to release Windows file lock
+  const previewSection = document.getElementById('pdf-preview-section-anx3');
+  const iframe = document.getElementById('pdf-iframe-anx3');
+  if (previewSection) previewSection.style.display = 'none';
+  if (iframe) {
+    if (iframe.src.startsWith('blob:')) {
+      URL.revokeObjectURL(iframe.src);
+    }
+    iframe.src = '';
+  }
+
   toast("Deleting PDF...", "info");
   try {
     const res = await fetch(`/api/upload-pdf`, {
