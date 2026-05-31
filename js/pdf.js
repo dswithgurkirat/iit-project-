@@ -195,7 +195,10 @@ function generateFinalPDF() {
     { title: 'ANNEXURE III(b) — CONTIGUOUS CLUSTERS', id: '#anx3-contiguous' },
     { title: 'ANNEXURE IV(a) — LEASE ROUTES', id: '#anx4-routes' },
     { title: 'ANNEXURE IV(b) — CLUSTER ROUTES', id: '#anx4-cluster-routes' },
-    { title: 'ANNEXURE V — BENCH MARK & CORS', id: '#anx5-benchmarks' },
+    { title: 'ANNEXURE V(a) — MINING LEASES', id: '#anx5-mining' },
+{ title: 'ANNEXURE V(b) — PATTA LANDS', id: '#anx5-patta' },
+{ title: 'ANNEXURE V(c) — DE-SILTATION', id: '#anx5-desilt' },
+{ title: 'ANNEXURE V(d) — M-SAND PLANTS', id: '#anx5-msand' },
     { title: 'ANNEXURE VI — FINAL CLUSTERS', id: '#anx6-final-clusters' },
     { title: 'ANNEXURE VII — FINAL PATTA LANDS', id: '#anx7-patta-final' },
     { title: 'ADDITIONAL — SAND GHATS COORDS', id: '#anx-coords-tbl' },
@@ -213,6 +216,18 @@ function generateFinalPDF() {
     let tables = [];
     if (tblConfig.id === '#anx2-leases') {
       tables = Array.from(document.querySelectorAll('table[id^="anx2-leases"]'));
+    } else if (tblConfig.id === '#anx5-mining') {
+      tables = Array.from(document.querySelectorAll('table[id^="anx5-mining"]'));
+    } else if (tblConfig.id === '#anx5-patta') {
+      tables = Array.from(document.querySelectorAll('table[id^="anx5-patta"]'));
+    } else if (tblConfig.id === '#anx5-desilt') {
+      tables = Array.from(document.querySelectorAll('table[id^="anx5-desilt"]'));
+    } else if (tblConfig.id === '#anx5-msand') {
+      tables = Array.from(document.querySelectorAll('table[id^="anx5-msand"]'));
+    } else if (tblConfig.id === '#anx4-routes') {
+      tables = Array.from(document.querySelectorAll('#individual-routes-container table'));
+    } else if (tblConfig.id === '#anx4-cluster-routes') {
+      tables = Array.from(document.querySelectorAll('#cluster-routes-container table'));
     } else {
       const el = document.querySelector(tblConfig.id);
       if (el) tables.push(el);
@@ -224,7 +239,20 @@ function generateFinalPDF() {
         doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.setTextColor(...navyArr);
         
         let title = tblConfig.title;
-        if (tblConfig.id === '#anx2-leases' && tables.length > 1) {
+        const cardTitleEl = tableEl.closest('.card')?.querySelector('.card-title .editable-title, .card-title');
+        const sectionTitleEl = tableEl.closest('.anx-section, .section-a-block')?.querySelector('.editable-title');
+        const finalTitleEl = cardTitleEl || sectionTitleEl;
+        if (finalTitleEl) {
+          const domText = finalTitleEl.textContent.replace(/\(Click to edit title\)/gi, '').trim();
+          if (domText) {
+            const prefix = tblConfig.title.split(' — ')[0];
+            if (domText.toUpperCase().includes('ANNEXURE')) {
+              title = domText.toUpperCase();
+            } else {
+              title = `${prefix} — ${domText.toUpperCase()}`;
+            }
+          }
+        } else if (tblConfig.id === '#anx2-leases' && tables.length > 1) {
           title += ` (Table ${tblIdx + 1})`;
         }
         doc.text(title, W/2, y, {align:'center'}); y+=10;

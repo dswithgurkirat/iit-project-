@@ -33,8 +33,12 @@ function handleAnxUpload(e,n) {
       const sheets = workbook.SheetNames;
       if (!sheets.length) throw new Error('No sheets found in Excel file');
 
-      const tableIds = getAnnexureTableIds(n);
+      const allTableIds = getAnnexureTableIds(n);
       let updated = 0;
+
+      // If the input has data-table-id, only populate that specific table
+      const forcedTableId = e.target.getAttribute('data-table-id');
+      const tableIds = forcedTableId ? [forcedTableId] : allTableIds;
 
       sheets.forEach(sheetName => {
         const sheet = workbook.Sheets[sheetName];
@@ -64,9 +68,9 @@ function getAnnexureTableIds(n) {
   return {
     1: ['anx1-rivers','anx1-desilt','anx1-patta','anx1-msand'],
     2: ['anx2-leases','anx2-patta','anx2-desilt','anx2-msand'],
+    5: ['anx5-mining','anx5-patta','anx5-desilt','anx5-msand'],
     3: ['anx3-clusters','anx3-contiguous'],
     4: ['anx4-routes','anx4-cluster-routes'],
-    5: ['anx5-benchmarks'],
     6: ['anx6-final-clusters'],
     7: ['anx7-patta-final']
   }[n] || [];
@@ -83,11 +87,14 @@ function findAnnexureTableId(n, sheetName, tableIds) {
     'anx2-patta': ['patta','khatedari','land'],
     'anx2-desilt': ['desilt','de-silt','reservoir','lake','pond','dam'],
     'anx2-msand': ['m-sand','msand','plant'],
+    'anx5-mining': ['mining','lease','sand','excavation','river'],
+    'anx5-patta':  ['patta','khatedari','land','reserve'],
+    'anx5-desilt': ['desilt','de-silt','reservoir','lake','pond','dam','silt'],
+    'anx5-msand':  ['m-sand','msand','plant','sand plant'],
     'anx3-clusters': ['cluster'],
     'anx3-contiguous': ['contiguous'],
     'anx4-routes': ['route','routes','lease'],
     'anx4-cluster-routes': ['cluster route','cluster routes'],
-    'anx5-benchmarks': ['bench','benchmark','cors'],
     'anx6-final-clusters': ['final cluster','cluster summary'],
     'anx7-patta-final': ['patta']
   };

@@ -367,8 +367,13 @@ function addSectionABlock() {
   newBlock.querySelector('.rm-sec-a-btn').style.display = 'inline-flex';
   
   // Update title to indicate it's a new page/block
-  const title = newBlock.querySelector('.anx-section-title');
-  title.innerText = `a) Potential Mining Leases (Existing & Proposed) Rivers - Table ${sectionACount}:`;
+  const titleEl = newBlock.querySelector('.editable-title');
+  if (titleEl) {
+    titleEl.innerText = `a) Potential Mining Leases (Existing & Proposed) Rivers - Table ${sectionACount}:`;
+  } else {
+    const title = newBlock.querySelector('.anx-section-title');
+    if (title) title.innerText = `a) Potential Mining Leases (Existing & Proposed) Rivers - Table ${sectionACount}:`;
+  }
   
   // Update table ID dynamically
   const newTable = newBlock.querySelector('table');
@@ -451,12 +456,9 @@ function exportAnx2PDF() {
       doc.text("Annexure-II", pageWidth - 40, 55, { align: "right" }); // Top right annexure label
     }
 
-    doc.setFont("times", "bold");
-    doc.setFontSize(11);
-    doc.setTextColor(0, 0, 0);
-    
-    const titleExt = sectionABlocks.length > 1 ? ` (Table ${index + 1})` : '';
-    doc.text(`> List of Potential Mining Leases (Existing & Proposed) Rivers${titleExt}:`, 40, startY);
+    const titleEl = block.querySelector('.editable-title');
+    const titleText = titleEl ? titleEl.textContent.trim() : `List of Potential Mining Leases (Existing & Proposed) Rivers${sectionABlocks.length > 1 ? ` (Table ${index + 1})` : ''}:`;
+    doc.text(titleText.startsWith('>') ? titleText : `> ${titleText}`, 40, startY);
     startY += 15;
 
     const tableId = block.querySelector('table').id;
@@ -480,13 +482,14 @@ function exportAnx2PDF() {
   });
 
   // --- PAGE 2: Patta, Desiltation, M-Sand ---
-  doc.addPage();
-  startY = 80;
+  if (startY > pageHeight - 120) {
+    doc.addPage();
+    startY = 80;
+  }
 
-  // 1. Patta Lands
-  doc.setFont("times", "bold");
-  doc.setFontSize(11);
-  doc.text("> Patta Lands/Khatedari Land: (Existing & Proposed):", 40, startY);
+  const pattaTitleEl = document.querySelector('#view-anx2 #anx2-patta')?.closest('.anx-section')?.querySelector('.editable-title');
+  const pattaTitle = pattaTitleEl ? pattaTitleEl.textContent.trim() : "Patta Lands/Khatedari Land: (Existing & Proposed):";
+  doc.text(pattaTitle.startsWith('>') ? pattaTitle : `> ${pattaTitle}`, 40, startY);
   startY += 15;
 
   const pattaData = extractData('anx2-patta');
@@ -516,9 +519,15 @@ function exportAnx2PDF() {
   startY += 20;
 
   // 2. De-Siltation
+  if (startY > pageHeight - 120) {
+    doc.addPage();
+    startY = 80;
+  }
   doc.setFont("times", "bold");
   doc.setFontSize(11);
-  doc.text("> De-Siltation Location: (Lakes/Ponds/Dams etc.) (Existing & Proposed)", 40, startY);
+  const desiltTitleEl = document.querySelector('#view-anx2 #anx2-desilt')?.closest('.anx-section')?.querySelector('.editable-title');
+  const desiltTitle = desiltTitleEl ? desiltTitleEl.textContent.trim() : "De-Siltation Location: (Lakes/Ponds/Dams etc.) (Existing & Proposed)";
+  doc.text(desiltTitle.startsWith('>') ? desiltTitle : `> ${desiltTitle}`, 40, startY);
   startY += 15;
 
   const desiltData = extractData('anx2-desilt');
@@ -543,8 +552,14 @@ function exportAnx2PDF() {
   startY += 30;
 
   // 3. M-Sand Plants
+  if (startY > pageHeight - 120) {
+    doc.addPage();
+    startY = 80;
+  }
   doc.setFontSize(11);
-  doc.text("> M-Sand Plants : ( Existing & Proposed)", 40, startY);
+  const msandTitleEl = document.querySelector('#view-anx2 #anx2-msand')?.closest('.anx-section')?.querySelector('.editable-title');
+  const msandTitle = msandTitleEl ? msandTitleEl.textContent.trim() : "M-Sand Plants : ( Existing & Proposed)";
+  doc.text(msandTitle.startsWith('>') ? msandTitle : `> ${msandTitle}`, 40, startY);
   startY += 15;
 
   const msandData = extractData('anx2-msand');

@@ -587,9 +587,9 @@ function exportAnx3PDF() {
   doc.setTextColor(0, 0, 0);
   doc.text("Annexure-III", pageWidth - 40, 55, { align: "right" });
 
-  doc.setFont("times", "bold");
-  doc.setFontSize(11);
-  doc.text("> a) Cluster Details:", 40, startY);
+  const clusterTitleEl = document.querySelector('#view-anx3 #anx3-clusters')?.closest('.anx-section')?.querySelector('.editable-title');
+  const clusterTitleText = clusterTitleEl ? clusterTitleEl.textContent.trim() : "a) Cluster Details:";
+  doc.text(clusterTitleText.startsWith('>') ? clusterTitleText : `> ${clusterTitleText}`, 40, startY);
   startY += 15;
 
   const clusterDataPdf = extractData('anx3-clusters');
@@ -610,9 +610,9 @@ function exportAnx3PDF() {
     startY = 80;
   }
 
-  doc.setFont("times", "bold");
-  doc.setFontSize(11);
-  doc.text("> b) Contiguous Clusters:", 40, startY);
+  const contTitleEl = document.querySelector('#view-anx3 #anx3-contiguous')?.closest('.anx-section')?.querySelector('.editable-title');
+  const contTitleText = contTitleEl ? contTitleEl.textContent.trim() : "b) Contiguous Clusters:";
+  doc.text(contTitleText.startsWith('>') ? contTitleText : `> ${contTitleText}`, 40, startY);
   startY += 15;
 
   const contDataPdf = extractData('anx3-contiguous');

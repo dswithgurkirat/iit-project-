@@ -73,7 +73,7 @@ function showView(id, btn, push = true) {
     'front-matter':'Front Matter','chapters':'Chapters (10)','plates':'Plate Section',
     'graphs':'Cross Section Graph Generator','anx1':'Annexure I — Sand Sources',
     'anx2':'Annexure II — Mining Leases','anx3':'Annexure III — Cluster Details',
-    'anx4':'Annexure IV — Transportation Routes','anx5':'Annexure V — Bench Mark & CORS',
+    'anx4':'Annexure IV — Transportation Routes','anx5':'Annexure V — Sand Mining Report',
     'anx6':'Annexure VI — Final Cluster Details','anx7':'Annexure VII — Final Patta Lands',
     'annexures-extra':'Additional Annexures','demand-table':'Projected Demand Table',
     'auction-table':'Auctioned Sites','summary-table':'Source Summary Table','benchmark-table':'Bench Mark & CORS',
@@ -89,8 +89,9 @@ function showView(id, btn, push = true) {
   if (id==='workflow') updateWorkflowDistrictUI();
   if (id==='anx1' && typeof renderPdfUploadUIAnx1 === 'function') renderPdfUploadUIAnx1();
   if (id==='anx2' && typeof renderPdfUploadUIAnx2 === 'function') renderPdfUploadUIAnx2();
-  if (id==='anx3' && typeof renderPdfUploadUI === 'function') renderPdfUploadUI();
-  if (id==='anx4' && typeof renderPdfUploadUIAnx4 === 'function') renderPdfUploadUIAnx4();
+if (id==='anx3' && typeof renderPdfUploadUI === 'function') renderPdfUploadUI();
+if (id==='anx4' && typeof renderPdfUploadUIAnx4 === 'function') renderPdfUploadUIAnx4();
+if (id==='anx5' && typeof renderPdfUploadUIAnx5 === 'function') renderPdfUploadUIAnx5();
   if (S.activeProject && typeof updateActiveProjectCardUI === 'function') updateActiveProjectCardUI();
   
   renderDistrictLegends();

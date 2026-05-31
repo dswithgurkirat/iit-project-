@@ -241,10 +241,22 @@ function executePDFExport() {
     return tableHtml;
   };
 
-  html += addTable('anx1-rivers', 'a) Rivers:', ['River Name/M-Sand Plant', 'Total Stretch of River (in KM)', 'Type of River (Perennial or Non Perennial)']);
-  html += addTable('anx1-desilt', 'b) De-Siltation Location (Lakes/Ponds/Dams etc.):', ['Name of Reservoir/Dams', 'Maintain/Controlled by State Govt./PSU etc.', 'Latitude', 'Longitude', 'District', 'Tehsil', 'Village', 'Size (Ha)']);
-  html += addTable('anx1-patta', 'c) Patta lands/Khatedari land:', ['Owner', 'SL. No', 'Area (Ha)', 'District', 'Tehsil', 'Village', 'Agricultural Land (Yes/No)']);
-  html += addTable('anx1-msand', 'd) M-Sand Plants:', ['Plant Name', 'Owner', 'District', 'Tehsil', 'Village', 'Geo-location', 'Quantity Tonnes/Annum']);
+  const getTitle = (tableId, defaultTitle) => {
+    const tableEl = document.getElementById(tableId);
+    if (tableEl) {
+      const section = tableEl.closest('.anx-section');
+      if (section) {
+        const titleEl = section.querySelector('.editable-title');
+        if (titleEl) return titleEl.textContent.trim();
+      }
+    }
+    return defaultTitle;
+  };
+
+  html += addTable('anx1-rivers', getTitle('anx1-rivers', 'a) Rivers:'), ['River Name/M-Sand Plant', 'Total Stretch of River (in KM)', 'Type of River (Perennial or Non Perennial)']);
+  html += addTable('anx1-desilt', getTitle('anx1-desilt', 'b) De-Siltation Location (Lakes/Ponds/Dams etc.):'), ['Name of Reservoir/Dams', 'Maintain/Controlled by State Govt./PSU etc.', 'Latitude', 'Longitude', 'District', 'Tehsil', 'Village', 'Size (Ha)']);
+  html += addTable('anx1-patta', getTitle('anx1-patta', 'c) Patta lands/Khatedari land:'), ['Owner', 'SL. No', 'Area (Ha)', 'District', 'Tehsil', 'Village', 'Agricultural Land (Yes/No)']);
+  html += addTable('anx1-msand', getTitle('anx1-msand', 'd) M-Sand Plants:'), ['Plant Name', 'Owner', 'District', 'Tehsil', 'Village', 'Geo-location', 'Quantity Tonnes/Annum']);
   
   printElement.innerHTML = html;
   document.body.appendChild(printElement);

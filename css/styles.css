@@ -1061,6 +1061,17 @@ html.dark .topbar { background: var(--navy); }
   font-family: 'Plus Jakarta Sans', sans-serif; font-size: 16px; font-weight: 700; color: var(--text);
   margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid var(--border);
 }
+.editable-title {
+  border-bottom: 1px dashed var(--border-2);
+  outline: none;
+  cursor: text;
+  display: inline-block;
+  transition: border-bottom-color 0.2s, background-color 0.2s;
+}
+.editable-title:focus {
+  border-bottom: 1px solid var(--primary);
+  background-color: var(--primary-lt);
+}
 .anx-section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
 
 .anx-tbl { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 12px; }
