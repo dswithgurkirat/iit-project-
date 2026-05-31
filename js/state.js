@@ -1,3 +1,234 @@
+// ── INDEXEDDB PERSISTENCE FALLBACK FOR VERCEL/STATIC HOSTS ──
+const DB_NAME = 'DSR_Local_DB';
+const DB_VERSION = 1;
+const STORE_NAME = 'pdf_uploads';
+
+function getDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    request.onupgradeneeded = function(e) {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME, { keyPath: 'key' });
+      }
+    };
+    request.onsuccess = function(e) {
+      resolve(e.target.result);
+    };
+    request.onerror = function(e) {
+      reject(e.target.error);
+    };
+  });
+}
+
+async function savePDFToDB(projectId, annexureId, fileName, pdfBase64) {
+  const db = await getDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    const store = tx.objectStore(STORE_NAME);
+    const key = `${projectId}_${annexureId}`;
+    const request = store.put({ key: key, fileName: fileName, pdf: pdfBase64 });
+    request.onsuccess = () => resolve(true);
+    request.onerror = (e) => reject(e.target.error);
+  });
+}
+
+async function getPDFFromDB(projectId, annexureId) {
+  const db = await getDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readonly');
+    const store = tx.objectStore(STORE_NAME);
+    const key = `${projectId}_${annexureId}`;
+    const request = store.get(key);
+    request.onsuccess = (e) => resolve(e.target.result);
+    request.onerror = (e) => reject(e.target.error);
+  });
+}
+
+async function deletePDFFromDB(projectId, annexureId) {
+  const db = await getDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    const store = tx.objectStore(STORE_NAME);
+    const key = `${projectId}_${annexureId}`;
+    const request = store.delete(key);
+    request.onsuccess = () => resolve(true);
+    request.onerror = (e) => reject(e.target.error);
+  });
+}
+
+function b64toBlob(b64Data, contentType='', sliceSize=512) {
+  const byteCharacters = atob(b64Data);
+  const byteArrays = [];
+  for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+    const slice = byteCharacters.slice(offset, offset + sliceSize);
+    const byteNumbers = new Array(slice.length);
+    for (let i = 0; i < slice.length; i++) {
+      byteNumbers[i] = slice.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    byteArrays.push(byteArray);
+  }
+  return new Blob(byteArrays, {type: contentType});
+}
+
+async function getPDFLocalURL(projectId, annexureId) {
+  try {
+    const dbData = await getPDFFromDB(projectId, annexureId);
+    if (dbData && dbData.pdf) {
+      const blob = b64toBlob(dbData.pdf, 'application/pdf');
+      return URL.createObjectURL(blob);
+    }
+  } catch (e) {
+    console.error('Error loading PDF from DB:', e);
+  }
+  return null;
+}
+
+// Intercept window.fetch
+const originalFetch = window.fetch;
+window.fetch = async function(resource, options) {
+  const url = typeof resource === 'string' ? resource : (resource instanceof Request ? resource.url : '');
+  
+  if (url.includes('/api/upload-pdf')) {
+    try {
+      const body = JSON.parse(options.body);
+      const { projectId, fileName, pdf, annexureId = 'anx3' } = body;
+      
+      if (projectId) {
+        if (fileName === null || pdf === null) {
+          await deletePDFFromDB(projectId, annexureId);
+        } else {
+          await savePDFToDB(projectId, annexureId, fileName, pdf);
+        }
+      }
+    } catch (e) {
+      console.error('Failed to intercept upload to IndexedDB:', e);
+    }
+    
+    try {
+      const res = await originalFetch.call(window, resource, options);
+      if (res.ok) return res;
+    } catch (err) {
+      console.warn('Backend fetch failed, returning local mock success:', err);
+    }
+    
+    return new Response(JSON.stringify({ success: true }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+  
+  if (url.includes('/api/projects')) {
+    if (options && options.method === 'POST') {
+      try {
+        localStorage.setItem('dsr_projects', options.body);
+      } catch (e) {
+        console.error('Failed to save projects to localStorage:', e);
+      }
+      
+      try {
+        const res = await originalFetch.call(window, resource, options);
+        if (res.ok) return res;
+      } catch (err) {
+        console.warn('Backend projects save failed, returning local mock success:', err);
+      }
+      return new Response(JSON.stringify({ success: true }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      });
+    } else {
+      // GET method
+      try {
+        const res = await originalFetch.call(window, resource, options);
+        if (res.ok) {
+          const clone = res.clone();
+          const data = await clone.text();
+          localStorage.setItem('dsr_projects', data);
+          return res;
+        }
+      } catch (err) {
+        console.warn('Backend projects load failed, falling back to localStorage:', err);
+      }
+      
+      const localData = localStorage.getItem('dsr_projects');
+      if (localData) {
+        return new Response(localData, {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+    }
+  }
+  
+  return originalFetch.call(window, resource, options);
+};
+
+// Intercept iframe src setter to support local URL lookup
+const originalIFrameSrcSetter = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, 'src').set;
+Object.defineProperty(HTMLIFrameElement.prototype, 'src', {
+  set: async function(url) {
+    if (typeof url === 'string' && url.includes('/api/download-pdf')) {
+      const urlObj = new URL(url, window.location.origin);
+      const projectId = urlObj.searchParams.get('projectId');
+      const annexureId = urlObj.searchParams.get('annexureId') || 'anx3';
+      
+      const localUrl = await getPDFLocalURL(projectId, annexureId);
+      if (localUrl) {
+        originalIFrameSrcSetter.call(this, localUrl);
+        return;
+      }
+    }
+    originalIFrameSrcSetter.call(this, url);
+  },
+  get: function() {
+    return Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, 'src').get.call(this);
+  }
+});
+
+// Intercept window.open
+const originalWindowOpen = window.open;
+window.open = async function(url, target, features) {
+  if (typeof url === 'string' && url.includes('/api/download-pdf')) {
+    const urlObj = new URL(url, window.location.origin);
+    const projectId = urlObj.searchParams.get('projectId');
+    const annexureId = urlObj.searchParams.get('annexureId') || 'anx3';
+    
+    const dbData = await getPDFFromDB(projectId, annexureId);
+    if (dbData && dbData.pdf) {
+      const blob = b64toBlob(dbData.pdf, 'application/pdf');
+      const localUrl = URL.createObjectURL(blob);
+      return originalWindowOpen.call(window, localUrl, target, features);
+    }
+  }
+  return originalWindowOpen.call(window, url, target, features);
+};
+
+// Intercept all download links clicked for PDFs
+document.addEventListener('click', async function(e) {
+  const a = e.target.closest('a');
+  if (a && a.href && a.href.includes('/api/download-pdf')) {
+    const urlObj = new URL(a.href, window.location.origin);
+    const projectId = urlObj.searchParams.get('projectId');
+    const annexureId = urlObj.searchParams.get('annexureId') || 'anx3';
+    
+    const dbData = await getPDFFromDB(projectId, annexureId);
+    if (dbData && dbData.pdf) {
+      e.preventDefault();
+      const blob = b64toBlob(dbData.pdf, 'application/pdf');
+      const localUrl = URL.createObjectURL(blob);
+      
+      const tempLink = document.createElement('a');
+      tempLink.href = localUrl;
+      tempLink.download = a.download || `${annexureId}.pdf`;
+      document.body.appendChild(tempLink);
+      tempLink.click();
+      document.body.removeChild(tempLink);
+      URL.revokeObjectURL(localUrl);
+    }
+  }
+}, true);
+
 /* ══════════════════════════════════════
    STATE
 ══════════════════════════════════════ */
